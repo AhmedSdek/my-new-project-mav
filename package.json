@@ -21,6 +21,7 @@
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@mui/styled-engine-sc": "^6.4.9",
+    "@tailwindcss/vite": "^4.1.7",
     "animate.css": "^4.1.1",
     "bootstrap": "^5.3.5",
     "firebase": "^10.14.1",
@@ -33,6 +34,7 @@
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-loading": "^2.0.3",
+    "react-markdown": "^10.1.0",
     "react-phone-input-2": "^2.15.1",
     "react-router-dom": "^6.30.0",
     "react-slick": "^0.29.0",
@@ -43,6 +45,7 @@
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.17",
     "swiper": "^11.2.6",
+    "tailwindcss": "^4.1.7",
     "video-react": "^0.16.0"
   },
   "devDependencies": {

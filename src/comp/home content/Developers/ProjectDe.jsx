@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
-
+import ReactMarkdown from "react-markdown";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/effect-coverflow";
@@ -849,6 +849,7 @@ function ProjectDe() {
                         </Typography>
                         <Row>
                           {relatedProjects.map((item) => {
+                            console.log(item);
                             return (
                               <Col
                                 className=" col-sm-6 col-12 col-lg-4 col-md-6"

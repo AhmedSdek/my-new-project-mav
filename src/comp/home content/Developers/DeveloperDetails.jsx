@@ -14,6 +14,7 @@ export default function DeveloperDetails() {
     let disfiter = [];
     let list = [];
     if (value) {
+      
         if (value.data()) {
             const disdata = value.data().devDis.split('$')
             for (let i = 0; i < disdata.length; i++) {
