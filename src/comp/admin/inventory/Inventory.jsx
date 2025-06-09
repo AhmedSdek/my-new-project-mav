@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
+  IconButton,
   InputLabel,
   LinearProgress,
   MenuItem,
@@ -19,12 +20,13 @@ import {
   Select,
   Stack,
   TextField,
+  Tooltip,
   Typography,
   styled,
 } from "@mui/material";
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
-import { AddPhotoAlternate, Info } from "@mui/icons-material";
+import { AddPhotoAlternate, HelpOutline, Info } from "@mui/icons-material";
 import {
   arrayUnion,
   collection,
@@ -385,6 +387,32 @@ function Inventory() {
           value={newData.dev?.id || ""} // نخزن ونعرض الـ id
           fun={handleDevChange}
         />
+        <Tooltip
+          title={
+            <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+              {`📝 إزاي تستخدم Markdown:
+# عنوان رئيسي (H1)
+## عنوان فرعي (H2)
+### عنوان (H3)
+#### عنوان (H4)
+##### عنوان (H5)
+###### عنوان (H6)
+*نص مائل*           ← نص مائل
+**نص عريض**         ← نص بولد
+~~نص مشطوب~~        ← خط على النص
+- عنصر              ← قائمة نقطية
+1. عنصر مرقم        ← قائمة مرقمة
+> اقتباس            ← اقتباس
+`}
+            </Typography>
+          }
+          placement="right"
+          arrow
+        >
+          <IconButton>
+            <HelpOutline />
+          </IconButton>
+        </Tooltip>
         <Input
           name="description"
           value={newData.description}
