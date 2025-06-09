@@ -115,7 +115,7 @@ function Signin() {
                                         // Signed in 
                                         const user = userCredential.user;
                                         // ...
-                                        nav('/')
+                                        nav("/dashboard");
                                     })
                                     .catch((error) => {
                                         const errorCode = error.code;
