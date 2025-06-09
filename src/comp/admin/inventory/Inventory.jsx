@@ -6,6 +6,8 @@ import {
   Button,
   Card,
   Checkbox,
+  Dialog,
+  DialogContent,
   Divider,
   FormControl,
   FormControlLabel,
@@ -45,6 +47,7 @@ import RadioCom from "../RadioCom";
 import CheckboxCom from "../CheckboxCom";
 function Inventory() {
   const nav = useNavigate();
+  const [open, setOpen] = useState(false);
   // const [url, setUrl] = useState([]);
   const [prog, setProg] = useState(0);
   const [prog3, setProg3] = useState(0);
@@ -387,8 +390,28 @@ function Inventory() {
           value={newData.dev?.id || ""} // نخزن ونعرض الـ id
           fun={handleDevChange}
         />
-        <Tooltip
+        {/* <Tooltip
           title={
+            <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+            
+            </Typography>
+          }
+          placement="right"
+          arrow
+          disableHoverListener={true} // تعطّل الظهور بالـ hover
+          disableFocusListener={true} // تعطّل الظهور عند التركيز
+          disableTouchListener={false} // تفعيل اللمس
+          enterTouchDelay={0}
+        >
+          <IconButton>
+            <HelpOutline />
+          </IconButton>
+        </Tooltip> */}
+        <IconButton onClick={() => setOpen(true)}>
+          <HelpOutline />
+        </IconButton>
+        <Dialog open={open} onClose={() => setOpen(false)}>
+          <DialogContent>
             <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
               {`📝 إزاي تستخدم Markdown:
 # عنوان رئيسي (H1)
@@ -403,16 +426,10 @@ function Inventory() {
 - عنصر              ← قائمة نقطية
 1. عنصر مرقم        ← قائمة مرقمة
 > اقتباس            ← اقتباس
-`}
+`}{" "}
             </Typography>
-          }
-          placement="right"
-          arrow
-        >
-          <IconButton>
-            <HelpOutline />
-          </IconButton>
-        </Tooltip>
+          </DialogContent>
+        </Dialog>
         <Input
           name="description"
           value={newData.description}
@@ -524,7 +541,6 @@ function Inventory() {
           name="refNum"
           value={newData.refNum} // نخزن ونعرض الـ id
         />
-
 
         <Input
           onChange={onchange}

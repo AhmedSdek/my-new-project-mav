@@ -5,6 +5,8 @@ import {
   Box,
   Button,
   Card,
+  Dialog,
+  DialogContent,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -42,6 +44,7 @@ function ReSale() {
     whiteSpace: "nowrap",
     width: 1,
   });
+  const [open, setOpen] = React.useState(false);
   const [btn, setBtn] = useState(false);
   const [imgText, setImgText] = React.useState("");
   const [sold, setSold] = React.useState("");
@@ -988,8 +991,11 @@ function ReSale() {
               </RadioGroup>
             </FormControl>
 
-            <Tooltip
-              title={
+            <IconButton onClick={() => setOpen(true)}>
+              <HelpOutline />
+            </IconButton>
+            <Dialog open={open} onClose={() => setOpen(false)}>
+              <DialogContent>
                 <Typography
                   style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}
                 >
@@ -1006,16 +1012,10 @@ function ReSale() {
 - عنصر              ← قائمة نقطية
 1. عنصر مرقم        ← قائمة مرقمة
 > اقتباس            ← اقتباس
-`}
+`}{" "}
                 </Typography>
-              }
-              placement="right"
-              arrow
-            >
-              <IconButton>
-                <HelpOutline />
-              </IconButton>
-            </Tooltip>
+              </DialogContent>
+            </Dialog>
 
             <TextField
               id="outlined-multiline-static"
