@@ -525,6 +525,7 @@ function Inventory() {
           value={newData.refNum} // نخزن ونعرض الـ id
         />
 
+
         <Input
           onChange={onchange}
           id="Garden-area"
