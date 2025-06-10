@@ -44,6 +44,7 @@ import Cityscape from "./comp/admin/cityscape/Cityscape";
 import CityscapeProjects from "./comp/home content/cityscape/CityscapeProjects";
 import EditCity from "./comp/admin/Edit/City/EditCity";
 import Inventory from "./comp/admin/inventory/Inventory";
+import InventoryDetails from "./comp/inventory/InventoryDetails";
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -151,6 +152,10 @@ function App() {
               <Route
                 path="/developers/:devId/:projId"
                 element={<ProjectDe />}
+              />
+                  <Route
+                path="/developers/:devId/:projId/:compId"
+                element={<InventoryDetails />}
               />
             </Routes>
             <Footer />

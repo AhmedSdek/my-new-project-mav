@@ -65,10 +65,12 @@ const Controls = () => {
 };
 function ProjectDe() {
   const { devId, projId } = useParams();
+  console.log({ devId, projId });
   const [value, loading, error] = useDocument(doc(db, "admin", devId));
   const [open, setOpen] = useState(false);
   const [imgsrc, setImgsrc] = useState("");
   const [relatedProjects, setRelatedProjects] = useState([]); // تخزين المشاريع ذات الصلة
+  // console.log(relatedProjects);
   const [imgopen, setImgopen] = useState(false);
   // دالة لجلب المشاريع ذات الصلة
   const getRelatedProjects = async () => {
@@ -101,6 +103,7 @@ function ProjectDe() {
           .data()
           .dev.filter((person) => person.proj === projId)
           .map((fil) => {
+            // console.log(fil);
             return (
               <div key={fil}>
                 <Container>
@@ -860,6 +863,9 @@ function ProjectDe() {
                                 }}
                                 key={item.id}
                               >
+                                {/* <ReactMarkdown>
+                                  {item.descriptionList}
+                                </ReactMarkdown> */}
                                 <Card
                                   sx={{
                                     position: "relative",
@@ -870,7 +876,7 @@ function ProjectDe() {
                                   }}
                                 >
                                   <Link
-                                    to={`/maverickdeals/`}
+                                    to={`/developers/${devId}/${projId}/${item.id}`}
                                     style={{ textDecoration: "none" }}
                                   >
                                     <Stack>

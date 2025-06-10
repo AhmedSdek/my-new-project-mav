@@ -99,6 +99,7 @@ function MaverickDeals() {
         return (
             <Box sx={{ padding: '70px 0 0', minHeight: 'calc(100vh - 100px)', position: 'relative' }}>
                 <Container>
+                  
                     {/* <div style={{ margin: '20px 0' }}>
                         <h4 style={{
                             letterSpacing: '0px',

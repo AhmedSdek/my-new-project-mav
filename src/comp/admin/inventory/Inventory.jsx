@@ -84,10 +84,10 @@ function Inventory() {
     delivery: "",
     floor: "",
     type: "",
-    arya: "",
+    area: "",
     layoutImage: "",
   });
-  console.log(newData);
+  // console.log(newData);
   // البيانات كلها في Array واحدة
 
   // الفانكشن المسؤولة عن التعديل
@@ -294,29 +294,53 @@ function Inventory() {
     },
     [storage]
   ); // حط هنا كل الحاجات اللي بتتغير وبتستخدمها جوا الفانكشن
-  const sendData = async () => {
+  // const sendData = async () => {
+  //   setBtn(true);
+  //   try {
+  //     const id = new Date().getTime();
+  //     await setDoc(doc(db, "inventory", `${id}`), {
+  //       id: `${id}`,
+  //       ...newData, // هنا بنضيف كل الداتا اللي جوه newData
+  //     });
+  //   } catch (er) {}
+  //   setBtn(false);
+  // };
+  const sendData = async (dataToSend) => {
     setBtn(true);
     try {
       const id = new Date().getTime();
       await setDoc(doc(db, "inventory", `${id}`), {
         id: `${id}`,
-        ...newData, // هنا بنضيف كل الداتا اللي جوه newData
+        ...dataToSend,
       });
-    } catch (er) {}
+    } catch (er) {
+      console.error("Send error:", er);
+    }
     setBtn(false);
   };
+
   const onchange = useCallback((e) => {
     setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
-  const onsubmit = useCallback(async (e) => {
-    e.preventDefault();
-    sendData();
-    // setMessege(true);
-    // setTimeout(() => {
-    //   // setMessege(false);
-    //   nav("/");
-    // }, 2000);
-  }, []);
+  const onsubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      console.log(newData);
+      await sendData(newData);
+    },
+    [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
+  );
+
+  // const onsubmit = useCallback(async (e) => {
+  //   e.preventDefault();
+  //   console.log(newData);
+  //   // sendData();
+  // }, []);
+  // setMessege(true);
+  // setTimeout(() => {
+  //   // setMessege(false);
+  //   nav("/");
+  // }, 2000);
   const moneyType = useMemo(() => ["dollar", "pound"], []);
   const soldOutOptions = useMemo(() => ["SOLD OUT", "Not"], []);
   const deliveryOptions = useMemo(
@@ -390,23 +414,6 @@ function Inventory() {
           value={newData.dev?.id || ""} // نخزن ونعرض الـ id
           fun={handleDevChange}
         />
-        {/* <Tooltip
-          title={
-            <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
-            
-            </Typography>
-          }
-          placement="right"
-          arrow
-          disableHoverListener={true} // تعطّل الظهور بالـ hover
-          disableFocusListener={true} // تعطّل الظهور عند التركيز
-          disableTouchListener={false} // تفعيل اللمس
-          enterTouchDelay={0}
-        >
-          <IconButton>
-            <HelpOutline />
-          </IconButton>
-        </Tooltip> */}
         <IconButton onClick={() => setOpen(true)}>
           <HelpOutline />
         </IconButton>
@@ -587,12 +594,12 @@ function Inventory() {
         />
         <Input
           onChange={onchange}
-          id="arya"
+          id="area"
           label="Area(m)"
           variant="outlined"
           type="number"
-          name="arya"
-          value={newData.arya} // نخزن ونعرض الـ id
+          name="area"
+          value={newData.area} // نخزن ونعرض الـ id
         />
         <FormGro
           label="Bedrooms"

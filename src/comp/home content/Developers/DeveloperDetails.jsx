@@ -10,6 +10,7 @@ import MavLoading from '../../Loading/MavLoading';
 
 export default function DeveloperDetails() {
     const { devId } = useParams()
+    console.log(devId);
     const [value, loading, error] = useDocument(doc(db, 'admin', devId));
     let disfiter = [];
     let list = [];
