@@ -152,7 +152,7 @@ function ReSale() {
   };
   const handleFileChange = async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
-      console.log(event.target.files.length);
+      // console.log(event.target.files.length);
       // console.log(i)
       const storageRef = ref(storage, "resale/" + event.target.files[i].name);
       const uploadTask = uploadBytesResumable(

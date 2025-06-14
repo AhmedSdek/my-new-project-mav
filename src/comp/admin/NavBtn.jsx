@@ -48,15 +48,15 @@ export default function NavBtn() {
       to: "inventory",
     },
     {
-      text: "EditDeveloper",
+      text: "Edit Developer",
       to: "editDeveloper",
     },
     {
-      text: "EditDeals",
+      text: "Edit Deals",
       to: "editDeals",
     },
     {
-      text: "Editluanches",
+      text: "Edit luanches",
       to: "editluanches",
     },
     {
@@ -64,7 +64,7 @@ export default function NavBtn() {
       to: "cityscape",
     },
     {
-      text: "EditCity",
+      text: "Edit City",
       to: "editcity",
     },
   ];

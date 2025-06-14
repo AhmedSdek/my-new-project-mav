@@ -20,7 +20,7 @@ function EditCity() {
                 {value &&
                     <Row>
                         {value.docs.map((project, index) => {
-                            console.log(project.data())
+                            // console.log(project.data())
                             return (
                                 <Col className=" col-sm-6 col-12 col-lg-4 col-md-6" style={{ marginBottom: '15px', position: 'relative', maxHeight: '300px' }} key={index}>
                                     <Card sx={{ padding: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f6f7f7', position: 'relative', overflow: 'initial', gap: 2, height: '100%', }}>

@@ -20,7 +20,7 @@ function EditDeals() {
                 {value &&
                     <Row>
                         {value.docs.map((item, index) => {
-                            console.log(item.data().id)
+                            // console.log(item.data().id)
                             return (
                                 <Col className=" col-sm-6 col-12 col-lg-4 col-md-6" style={{ marginBottom: '15px', position: 'relative', maxHeight: '100%' }} key={index}>
                                     <Card sx={{ position: 'relative', height: '100%' }}>

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { db, storage } from "../../../firebase/config";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,15 +28,8 @@ import {
 } from "@mui/material";
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
-import { AddPhotoAlternate, HelpOutline, Info } from "@mui/icons-material";
-import {
-  arrayUnion,
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { HelpOutline } from "@mui/icons-material";
+import { collection, doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { data } from "../../Data";
 import { useCollection } from "react-firebase-hooks/firestore";
@@ -87,10 +80,6 @@ function Inventory() {
     area: "",
     layoutImage: "",
   });
-  // console.log(newData);
-  // البيانات كلها في Array واحدة
-
-  // الفانكشن المسؤولة عن التعديل
   const handleCheckboxChange = useCallback((e) => {
     const { value, checked } = e.target;
     if (checked) {
@@ -438,7 +427,6 @@ function Inventory() {
           handleCheckboxChange={handleCheckboxChange}
           aminatis={newData.aminatis}
         />
-
         <FormGro
           label="Project"
           name="proj"
