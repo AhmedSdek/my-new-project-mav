@@ -129,7 +129,7 @@ function DealDetails() {
     );
   }
   if (value) {
-    // console.log(value.data().Dis);
+    console.log(value.data());
     // console.log(value.data().dis3);
 
     const disdata = value.data().Dis.split("$");

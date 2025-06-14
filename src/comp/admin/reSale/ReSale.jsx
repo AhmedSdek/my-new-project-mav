@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { db, storage } from '../../../firebase/config';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { db, storage } from "../../../firebase/config";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -26,9 +26,11 @@ import {
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
 import { AddPhotoAlternate, HelpOutline, Info } from "@mui/icons-material";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { data } from "../../Data";
+import { useCollection } from "react-firebase-hooks/firestore";
+import FormGro from "../FormGro";
 
 function ReSale() {
   const [messege, setMessege] = React.useState(false);
@@ -80,7 +82,8 @@ function ReSale() {
   const [icon, setIcon] = useState("");
   const [landArea, setLandArea] = useState("");
   const [roofArea, setRoofArea] = useState("");
-
+  const [projects, setProjects] = useState([]);
+  const [value, loading, error] = useCollection(collection(db, "admin"));
   const handleimgTextChange = (event) => {
     setImgText(event.target.value);
   };
@@ -363,9 +366,29 @@ function ReSale() {
         RoofArea: roofArea,
         landArea: landArea,
       });
-    } catch (er) {}
+      setMessege(true);
+      setTimeout(() => {
+        setMessege(false);
+        nav("/");
+      }, 2000);
+    } catch (er) {
+      console.log(er);
+    }
     setBtn(false);
   };
+  useEffect(() => {
+    const arr = [];
+    if (value) {
+      value.docs.forEach((e) => {
+        e.data().dev.forEach((it) => {
+          if (!arr.includes(it.proj) && it.proj !== "") {
+            arr.push(it.proj);
+          }
+        });
+      });
+    }
+    setProjects(arr);
+  }, [value]);
   return (
     <>
       <Box
@@ -403,11 +426,6 @@ function ReSale() {
             onSubmit={async (e) => {
               e.preventDefault();
               sendData();
-              setMessege(true);
-              setTimeout(() => {
-                setMessege(false);
-                nav("/");
-              }, 2000);
             }}
             style={{
               display: "flex",
@@ -433,8 +451,15 @@ function ReSale() {
                 handleimgTextChange(e);
               }}
             />
-
-            <TextField
+            <FormGro
+              label="Compond Name"
+              // name="proj"
+              data={projects}
+              inputLabel="Compond Name"
+              value={compoundName || ""} // نخزن ونعرض الـ id
+              fun={handleCompoundNameChange}
+            />
+            {/* <TextField
               sx={{
                 margin: "10px",
                 padding: "5px",
@@ -448,7 +473,7 @@ function ReSale() {
               onChange={(e) => {
                 handleCompoundNameChange(e);
               }}
-            />
+            /> */}
 
             <Stack
               sx={{
@@ -1091,4 +1116,4 @@ function ReSale() {
   );
 }
 
-export default ReSale 
+export default ReSale;

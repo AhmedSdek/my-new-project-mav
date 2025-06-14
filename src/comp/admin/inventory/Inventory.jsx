@@ -294,17 +294,6 @@ function Inventory() {
     },
     [storage]
   ); // حط هنا كل الحاجات اللي بتتغير وبتستخدمها جوا الفانكشن
-  // const sendData = async () => {
-  //   setBtn(true);
-  //   try {
-  //     const id = new Date().getTime();
-  //     await setDoc(doc(db, "inventory", `${id}`), {
-  //       id: `${id}`,
-  //       ...newData, // هنا بنضيف كل الداتا اللي جوه newData
-  //     });
-  //   } catch (er) {}
-  //   setBtn(false);
-  // };
   const sendData = async (dataToSend) => {
     setBtn(true);
     try {
@@ -331,16 +320,6 @@ function Inventory() {
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
 
-  // const onsubmit = useCallback(async (e) => {
-  //   e.preventDefault();
-  //   console.log(newData);
-  //   // sendData();
-  // }, []);
-  // setMessege(true);
-  // setTimeout(() => {
-  //   // setMessege(false);
-  //   nav("/");
-  // }, 2000);
   const moneyType = useMemo(() => ["dollar", "pound"], []);
   const soldOutOptions = useMemo(() => ["SOLD OUT", "Not"], []);
   const deliveryOptions = useMemo(

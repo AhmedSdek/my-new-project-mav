@@ -32,7 +32,7 @@ export default function NavBtn() {
       to: "",
     },
     {
-      text: "Resell Form",
+      text: "Deals",
       to: "resale",
     },
     {
