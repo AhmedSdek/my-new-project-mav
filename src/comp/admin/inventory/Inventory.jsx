@@ -296,6 +296,10 @@ function Inventory() {
         id: `${id}`,
         ...dataToSend,
       });
+      setTimeout(() => {
+        setMessege(false);
+        nav("/");
+      }, 2000);
     } catch (er) {
       console.error("Send error:", er);
     }

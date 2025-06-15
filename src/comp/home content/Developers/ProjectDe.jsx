@@ -94,7 +94,7 @@ function ProjectDe() {
       // استعلام لجلب المشاريع من inventory
       const inventoryQuery = query(
         collection(db, "inventory"),
-        where("proj", "==", projId)
+        where("compoundName", "==", projId)
       );
       const inventorySnapshot = await getDocs(inventoryQuery);
 
