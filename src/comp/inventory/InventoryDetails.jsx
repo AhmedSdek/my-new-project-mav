@@ -58,13 +58,24 @@ function InventoryDetails() {
   const getProjectById = async () => {
     setLoading(true);
     setError("");
+
     try {
-      const docRef = doc(db, "inventory", compId);
-      const docSnap = await getDoc(docRef);
+      // المحاولة الأولى: من inventory
+      let docRef = doc(db, "inventory", compId);
+      let docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
-        setProject({ id: docSnap.id, ...docSnap.data() });
+        setProject({ id: docSnap.id, ...docSnap.data(), source: "inventory" });
       } else {
-        setError("⚠️ لا يوجد مشروع بهذا الرقم التعريفي.");
+        // المحاولة الثانية: من Resell
+        docRef = doc(db, "Resell", compId);
+        docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setProject({ id: docSnap.id, ...docSnap.data(), source: "Resell" });
+        } else {
+          setError("⚠️ لا يوجد مشروع بهذا الرقم التعريفي.");
+        }
       }
     } catch (err) {
       console.error("حدث خطأ أثناء جلب المشروع:", err);
@@ -193,7 +204,7 @@ function InventoryDetails() {
             modules={[FreeMode, Pagination, Navigation, Autoplay]}
             className="mySwiper2"
           >
-            {project.projImgs.map((el, index) => {
+            {project.img.map((el, index) => {
               return (
                 <SwiperSlide key={index}>
                   <img
@@ -232,7 +243,7 @@ function InventoryDetails() {
                     boxShadow: "0 -1px 15px -3px rgba(0, 0, 0, 0.2)",
                     borderRadius: "50%",
                   }}
-                  src={project.dev.image}
+                  src={project.icon}
                   alt=""
                 />
               </Stack>
@@ -266,7 +277,7 @@ function InventoryDetails() {
                         textAlign: "center",
                       }}
                     >
-                      {`${project.type} ${project.proj}`}
+                      {`${project.Type} ${project.compoundName}`}
                     </Typography>
                     {/* <Typography
                       variant="caption"
@@ -293,7 +304,7 @@ function InventoryDetails() {
                     }}
                   >
                     <p style={{ fontWeight: "bold", padding: "8px" }}>
-                      {`${project.status}`}
+                      {`${project.Sale}`}
                     </p>
                   </Box>
                 </Stack>
@@ -366,7 +377,7 @@ function InventoryDetails() {
                         Compound
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.proj}
+                        {project.compoundName}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -375,8 +386,8 @@ function InventoryDetails() {
                         Developer
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        <Link to={`/developers/${project.dev.name}`}>
-                          {project.dev.name}
+                        <Link to={`/developers/${project.devname}`}>
+                          {project.devname}
                           <ArrowCircleRight sx={{ fontSize: "18px" }} />
                         </Link>
                       </StyledTableCell>
@@ -408,7 +419,7 @@ function InventoryDetails() {
                       <StyledTableCell component="th" scope="row">
                         Area
                       </StyledTableCell>
-                      <StyledTableCell align="left">{`${project.area} m²`}</StyledTableCell>
+                      <StyledTableCell align="left">{`${project.Area} m²`}</StyledTableCell>
                     </StyledTableRow>
 
                     {/* {project.gardenArea && (
@@ -437,7 +448,7 @@ function InventoryDetails() {
                         Bedrooms
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.bedroom}
+                        {project.Bed}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -446,7 +457,7 @@ function InventoryDetails() {
                         Bathrooms
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.bathroom}
+                        {project.Bath}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -464,7 +475,7 @@ function InventoryDetails() {
                         Sale type
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.status}
+                        {project.Sale}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -473,7 +484,7 @@ function InventoryDetails() {
                         Finishing
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.finishing}
+                        {project.Finsh}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -512,7 +523,7 @@ function InventoryDetails() {
               </TableContainer>
             </Stack>
 
-            {project.status === "Resale" && (
+            {project.Sale === "Resale" && (
               <Stack
                 sx={{
                   justifyContent: "center",
@@ -736,7 +747,7 @@ function InventoryDetails() {
             >
               Description
             </Typography>
-            <ReactMarkdown>{project.description}</ReactMarkdown>
+            <ReactMarkdown>{project.Dis}</ReactMarkdown>
           </Col>
           <Divider />
         </Row>
@@ -754,7 +765,7 @@ function InventoryDetails() {
         >
           <img
             style={{ width: "100%", maxHeight: "100%" }}
-            src={project.masterplan[0]}
+            src={project.Masterimg[0]}
             alt=""
           />
           <IconButton
@@ -780,7 +791,7 @@ function InventoryDetails() {
         >
           <img
             style={{ width: "100%", maxHeight: "100%" }}
-            src={project.layoutImage[0]}
+            src={project.Layoutimg[0]}
             alt=""
           />
           <IconButton

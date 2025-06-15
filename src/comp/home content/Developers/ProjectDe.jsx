@@ -70,20 +70,50 @@ function ProjectDe() {
   const [open, setOpen] = useState(false);
   const [imgsrc, setImgsrc] = useState("");
   const [relatedProjects, setRelatedProjects] = useState([]); // تخزين المشاريع ذات الصلة
-  // console.log(relatedProjects);
+  console.log(relatedProjects);
   const [imgopen, setImgopen] = useState(false);
   // دالة لجلب المشاريع ذات الصلة
+  // const getRelatedProjects = async () => {
+  //   try {
+  //     const q = query(
+  //       collection(db, "inventory"),
+  //       where("proj", "==", projId) // جلب المشاريع التي تحتوي على نفس قيمة projId
+  //     );
+  //     const querySnapshot = await getDocs(q);
+  //     const projects = [];
+  //     querySnapshot.forEach((doc) => {
+  //       projects.push({ id: doc.id, ...doc.data() });
+  //     });
+  //     setRelatedProjects(projects);
+  //   } catch (error) {
+  //     console.error("حدث خطأ أثناء جلب المشاريع ذات الصلة:", error);
+  //   }
+  // };
   const getRelatedProjects = async () => {
     try {
-      const q = query(
+      // استعلام لجلب المشاريع من inventory
+      const inventoryQuery = query(
         collection(db, "inventory"),
-        where("proj", "==", projId) // جلب المشاريع التي تحتوي على نفس قيمة projId
+        where("proj", "==", projId)
       );
-      const querySnapshot = await getDocs(q);
+      const inventorySnapshot = await getDocs(inventoryQuery);
+
+      // استعلام لجلب المشاريع من Resell
+      const resellQuery = query(
+        collection(db, "Resell"),
+        where("compoundName", "==", projId)
+      );
+      const resellSnapshot = await getDocs(resellQuery);
+
+      // دمج النتائج من الاثنين
       const projects = [];
 
-      querySnapshot.forEach((doc) => {
-        projects.push({ id: doc.id, ...doc.data() });
+      inventorySnapshot.forEach((doc) => {
+        projects.push({ id: doc.id, ...doc.data(), source: "inventory" });
+      });
+
+      resellSnapshot.forEach((doc) => {
+        projects.push({ id: doc.id, ...doc.data(), source: "Resell" });
       });
 
       setRelatedProjects(projects);
@@ -887,7 +917,7 @@ function ProjectDe() {
                                             width: "100%",
                                             objectFit: "cover",
                                           }}
-                                          src={item.projImgs[0]}
+                                          src={item.img[0]}
                                           alt=""
                                         />
                                       </Box>
@@ -906,7 +936,7 @@ function ProjectDe() {
                                             }}
                                             variant="h6"
                                           >
-                                            {`${item.type} - ${projId}`}
+                                            {`${item.Type} - ${projId}`}
                                           </Typography>
                                           {/* <Typography
                                           component="h2"
@@ -938,7 +968,7 @@ function ProjectDe() {
                                         >
                                           <div className="svgicon">
                                             <p style={{ fontWeight: "bold" }}>
-                                              {item.bedroom}
+                                              {item.Bed}
                                             </p>
                                             <svg
                                               width="23"
@@ -957,7 +987,7 @@ function ProjectDe() {
                                           </div>
                                           <div className="svgicon">
                                             <p style={{ fontWeight: "bold" }}>
-                                              {item.bathroom}
+                                              {item.Bath}
                                             </p>
 
                                             <svg
@@ -1010,7 +1040,7 @@ function ProjectDe() {
                                                 fontWeight: "bold",
                                               }}
                                             >
-                                              {item.arya}
+                                              {item.Area}
                                               &nbsp;m²
                                             </p>
                                           </div>
@@ -1036,10 +1066,10 @@ function ProjectDe() {
                                               color: "#1e4164",
                                             }}
                                           >
-                                            {`${item.status}`}
+                                            {`${item.Sale}`}
                                           </p>
                                         </Box>
-                                        {item.soldOut === "SOLD OUT" && (
+                                        {item.sold === "SOLD OUT" && (
                                           <Box
                                             sx={{
                                               position: "absolute",
@@ -1065,7 +1095,7 @@ function ProjectDe() {
                                                 textAlign: "center",
                                               }}
                                             >
-                                              {`${item.soldOut}`}
+                                              {`${item.sold}`}
                                             </p>
                                           </Box>
                                         )}

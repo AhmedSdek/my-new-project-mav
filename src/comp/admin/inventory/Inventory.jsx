@@ -41,23 +41,35 @@ import CheckboxCom from "../CheckboxCom";
 function Inventory() {
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
-  // const [url, setUrl] = useState([]);
   const [prog, setProg] = useState(0);
   const [prog3, setProg3] = useState(0);
   const [prog2, setProg2] = useState(0);
   const [btn, setBtn] = useState(false);
   const [messege, setMessege] = useState(false);
-  // console.log(messege)
   const [newData, setNewData] = useState({
-    dev: null,
-    description: "",
-    descbold: "",
+    // dev: null,
+    Dis: "",
+    devid: "",
+    compoundName: "",
+    img: [],
+    monyType: "",
+    Area: "",
+    imgtext: "",
+    Masterimg: "",
+    Layoutimg: "",
+    Bed: "",
+    Bath: "",
+    Location: "",
+    Sale: "",
+    Finsh: "",
+
+    icon: "",
+    devname: "",
+    // sold: "",
+
+    // descbold: "",
     aminatis: [],
     descriptionList: "",
-    proj: "",
-    projImgs: [],
-    masterplan: "",
-    moneyType: "",
     price: "",
     downPayment: "",
     remaining: "",
@@ -69,16 +81,11 @@ function Inventory() {
     gardenArea: "",
     about: "",
     // description: "",
-    status: "",
-    finishing: "",
-    bathroom: "",
-    bedroom: "",
-    soldOut: "",
+    // status: "",
+    sold: "",
     delivery: "",
     floor: "",
-    type: "",
-    area: "",
-    layoutImage: "",
+    Type: "",
   });
   const handleCheckboxChange = useCallback((e) => {
     const { value, checked } = e.target;
@@ -98,7 +105,6 @@ function Inventory() {
   const [projects, setProjects] = useState([]);
   useEffect(() => {
     const arr = [];
-
     if (value) {
       value.docs.forEach((e) => {
         e.data().dev.forEach((it) => {
@@ -108,7 +114,6 @@ function Inventory() {
         });
       });
     }
-
     setProjects(arr);
   }, [value]);
   const handleFileChange = useCallback(async (event) => {
@@ -166,7 +171,7 @@ function Inventory() {
             console.log("File available at", downloadURL);
             setNewData((prev) => ({
               ...prev,
-              projImgs: [...prev.projImgs, downloadURL],
+              img: [...prev.img, downloadURL],
             }));
             setBtn(false);
             // Add a new document in collection "cities"
@@ -230,7 +235,7 @@ function Inventory() {
             console.log("File available at", downloadURL);
             setNewData((prev) => ({
               ...prev,
-              masterplan: downloadURL,
+              Masterimg: downloadURL,
             }));
             setBtn(false);
             // Add a new document in collection "cities"
@@ -273,7 +278,7 @@ function Inventory() {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               setNewData((prev) => ({
                 ...prev,
-                layoutImage: downloadURL,
+                Layoutimg: downloadURL,
               }));
               setBtn(false);
             });
@@ -303,13 +308,13 @@ function Inventory() {
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      console.log(newData);
+      // console.log(newData);
       await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
 
-  const moneyType = useMemo(() => ["dollar", "pound"], []);
+  const monyType = useMemo(() => ["dollar", "pound"], []);
   const soldOutOptions = useMemo(() => ["SOLD OUT", "Not"], []);
   const deliveryOptions = useMemo(
     () => [
@@ -357,13 +362,28 @@ function Inventory() {
     []
   );
   const statusOptions = useMemo(() => ["Resale", "Rent"], []);
+  // const handleDevChange = useCallback(
+  //   (e) => {
+  //     const selectedDev = data.find((dev) => dev.id === e.target.value);
+  //     setNewData((prev) => ({ ...prev, [e.target.name]: selectedDev }));
+  //   },
+  //   [data]
+  // );
   const handleDevChange = useCallback(
     (e) => {
       const selectedDev = data.find((dev) => dev.id === e.target.value);
-      setNewData((prev) => ({ ...prev, [e.target.name]: selectedDev }));
+      if (selectedDev) {
+        setNewData((prev) => ({
+          ...prev,
+          devid: selectedDev.id,
+          icon: selectedDev.image || "",
+          devname: selectedDev.name || "",
+        }));
+      }
     },
     [data]
   );
+
   return (
     <Box className="w-full flex flex-col justify-center align-items-center pt-16">
       <Stack className="align-items-center mb-2.5">
@@ -379,7 +399,7 @@ function Inventory() {
           name="dev"
           data={data}
           inputLabel="Dev"
-          value={newData.dev?.id || ""} // نخزن ونعرض الـ id
+          value={newData.devid || ""} // نخزن ونعرض الـ id
           fun={handleDevChange}
         />
         <IconButton onClick={() => setOpen(true)}>
@@ -406,8 +426,8 @@ function Inventory() {
           </DialogContent>
         </Dialog>
         <Input
-          name="description"
-          value={newData.description}
+          name="Dis"
+          value={newData.Dis}
           onChange={onchange}
           // placeholder="اكتب شيئًا هنا"
           rows={4}
@@ -428,20 +448,28 @@ function Inventory() {
           aminatis={newData.aminatis}
         />
         <FormGro
-          label="Project"
-          name="proj"
+          label="Compound"
+          name="compoundName"
           data={projects}
-          inputLabel="Project"
-          value={newData.proj || ""} // نخزن ونعرض الـ id
+          inputLabel="Compound"
+          value={newData.compoundName || ""} // نخزن ونعرض الـ id
           fun={onchange}
         />
         <FileUpload handleFileChange={handleFileChange} prog={prog} />
+        <Input
+          onChange={onchange}
+          type="text"
+          id="imgtext"
+          label="img text"
+          name="imgtext"
+          value={newData.imgtext} // نخزن ونعرض الـ id
+        />
         <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} />
         <FormGro
           label="Money Type"
-          name="moneyType"
-          data={moneyType}
-          value={newData.moneyType || ""} // نخزن ونعرض الـ id
+          name="monyType"
+          data={monyType}
+          value={newData.monyType || ""} // نخزن ونعرض الـ id
           fun={onchange}
           inputLabel="Money Type"
         />
@@ -452,6 +480,14 @@ function Inventory() {
           type="number"
           name="price"
           value={newData.price} // نخزن ونعرض الـ id
+        />
+        <Input
+          onChange={onchange}
+          type="text"
+          id="Location"
+          label="Location"
+          name="Location"
+          value={newData.Location} // نخزن ونعرض الـ id
         />
         <Input
           onChange={onchange}
@@ -528,9 +564,9 @@ function Inventory() {
 
         <FormGro
           label="SOLD OUT"
-          name="soldOut"
+          name="sold"
           data={soldOutOptions}
-          value={newData.soldOut || ""} // نخزن ونعرض الـ id
+          value={newData.sold || ""} // نخزن ونعرض الـ id
           fun={onchange}
           inputLabel="Sold"
         />
@@ -553,9 +589,9 @@ function Inventory() {
         />
         <FormGro
           label="Type"
-          name="type"
+          name="Type"
           data={typeOptions}
-          value={newData.type || ""} // نخزن ونعرض الـ id
+          value={newData.Type || ""} // نخزن ونعرض الـ id
           fun={onchange}
           inputLabel="Type"
         />
@@ -565,36 +601,36 @@ function Inventory() {
           label="Area(m)"
           variant="outlined"
           type="number"
-          name="area"
-          value={newData.area} // نخزن ونعرض الـ id
+          name="Area"
+          value={newData.Area} // نخزن ونعرض الـ id
         />
         <FormGro
           label="Bedrooms"
-          name="bedroom"
+          name="Bed"
           data={bedroomOptions}
-          value={newData.bedroom || ""} // نخزن ونعرض الـ id
+          value={newData.Bed || ""} // نخزن ونعرض الـ id
           fun={onchange}
           inputLabel="Bedrooms"
         />
         <FormGro
           label="Bathrooms"
-          name="bathroom"
+          name="Bath"
           data={bathroomOptions}
-          value={newData.bathroom || ""} // نخزن ونعرض الـ id
+          value={newData.Bath || ""} // نخزن ونعرض الـ id
           fun={onchange}
           inputLabel="Bathrooms"
         />
         <RadioCom
           data={finshOptions}
-          name="finishing"
-          value={newData.finishing}
+          name="Finsh"
+          value={newData.Finsh}
           onChange={onchange}
         />
         <FileUpload handleFileChange={handleFiletowChange} prog={prog2} />
         <RadioCom
-          name="status"
+          name="Sale"
           data={statusOptions}
-          value={newData.status}
+          value={newData.Sale}
           onChange={onchange}
         />
         <Button

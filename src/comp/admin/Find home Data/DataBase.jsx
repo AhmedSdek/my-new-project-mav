@@ -342,554 +342,1052 @@ function DataBase() {
         setBtn(false)
     }
     return (
-        <>
-            <Box style={{ width: '100%', flexDirection: 'column', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '70px 0 0' }}>
-                <Stack sx={{ alignItems: 'center', marginBottom: '10px' }}>
-                    <Typography variant='h5'>
-                        Maverick Deals
-                    </Typography>
-                </Stack>
-                <Card sx={{ width: { xs: '90%', sm: '80%' }, display: 'flex', alignItems: 'center', flexDirection: 'column', padding: '20px', margin: '10px 0 ' }}>
-                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
-                        Complete The Form
-                    </Typography>
-                    <Typography variant='caption'>
-                        Your privacy is important to us. We won't publish or share your information with anyone
-                    </Typography>
-                    <Box component='form'
-                        onSubmit={async (e) => {
-                            e.preventDefault();
-                            sendData();
-                            setMessege(true);
-                            setTimeout(() => {
-                                setMessege(false)
-                                nav('/')
-                            }, 2000);
-                        }}
-                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', width: '100%', margin: '15px 0 0' }}>
-                        <Stack sx={{ flexDirection: 'row', width: { xs: '100%', md: '50%' }, padding: '5px' }}>
-                            <FormControl sx={{ width: '100%' }}>
-                                <InputLabel id="demo-simple-select-label">Dev</InputLabel>
-                                <Select
-                                    sx={{ minWidth: 'fit-content' }}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={dev}
-                                    label="Dev"
-                                    onChange={handleDevChange}
-                                >
-                                    {data.map((devName) => {
-                                        return (
-                                            <MenuItem key={devName.id} value={devName.name}>{devName.name}</MenuItem>
-                                        )
-                                    })}
-                                </Select>
-                            </FormControl>
-                        </Stack>
-                        <Stack sx={{ flexDirection: 'row', width: { xs: '100%', md: '50%' }, padding: '5px' }}>
-                            <FormControl sx={{ width: '100%' }}>
-                                <InputLabel id="demo-simple-select-label">DevIcon</InputLabel>
-                                <Select
-                                    sx={{ minWidth: 'fit-content' }}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={icon}
-                                    label="DevIcon"
-                                    onChange={(e) => { setIcon(e.target.value) }}
-                                >
-                                    {data.map((devName) => {
-                                        return (
-                                            <MenuItem key={devName.id} value={devName.image}>{devName.name}</MenuItem>
-                                        )
-                                    })}
-                                </Select>
-                            </FormControl>
-                        </Stack>
-                        <TextField
-                            id="outlined-multiline-static"
-                            label=" Description"
-                            value={devDis}
-                            multiline
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => { 
-                                handleDevDisChange(e)
-                            }}
-                        />
-                        <TextField
-                            id="outlined-multiline-static"
-                            label=" Description bold"
-                            value={devDis2}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleDevDis2Change(e)
-                            }}
-                        />
-                        <FormGroup sx={{ flexDirection: 'row' }}>
-                            <FormControlLabel control={<Checkbox value='Clubhouse' onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                            }} />} label="Clubhouse" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                            }} value='Commercial Strip' />} label="Commercial Strip" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                            }} value='Underground Parking' />} label="Underground Parking" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Outdoor Pools" />} label="Outdoor Pools" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Jogging Trail" />} label="Jogging Trail" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Bicycles Lanes" />} label="Bicycles Lanes" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Business Hub" />} label="Business Hub" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Schools" />} label="Schools" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Sports Clubs" />} label="Sports Clubs" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Livability" />} label="Livability" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Infrastructure" />} label="Infrastructure" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="mosque" />} label="mosque" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="children area" />} label="children area" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="kids' area" />} label="kids' area" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="gym" />} label="gym" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="spa" />} label="spa" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Educational hub" />} label="Educational hub" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Commercial area" />} label="Commercial area" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheck((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheck(arrCheck.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Medical centre" />} label="Medical centre" />
-                        </FormGroup>
-                        <TextField
-                            id="outlined-multiline-static"
-                            label="Dev Description list"
-                            multiline
-                            value={devDis6}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleDevDis6Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            value={proj}
-                            id="project" label="projectName"
-                            variant="outlined" type="text"
-                            onChange={handleProjChange}
-                        />
-                        <Divider />
-                        <Box sx={{ width: { xs: '100%', md: '50%' }, padding: '5px' }}>
-                            <Typography variant='body2'>
-                                Upload Your Project Images ...
-                            </Typography>
-                            <Button
-                                component="label"
-                                variant="outlined"
-                                sx={{ padding: '10px', margin: '15px' }}
-                                startIcon={<AddPhotoAlternate />}
-                                onChange={(e) => {
-                                    handleFileChange(e)
-                                }}
-                            >
-                                <VisuallyHiddenInput type="file" multiple />
-                            </Button>
-                            <LinearProgress variant="determinate" value={prog} />
-                        </Box>
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            value={district}
-                            id="District" label="District"
-                            variant="outlined" type="text"
-                            onChange={handleDistrictChange}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            value={price}
-                            id="price" label="Price"
-                            variant="outlined" type="text"
-                            onChange={(e) => {
-                                handlePriceChange(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="1%" label="%1" variant="outlined" type="number"
-                            value={pers1}
-                            onChange={(e) => {
-                                handlePers1Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year1" label="year1" variant="outlined" type="number"
-                            value={year1}
-                            onChange={(e) => {
-                                handleYear1Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer text"
-                            label=" offer text"
-                            multiline
-                            value={offerText1}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText1Change(e)
-                            }}
-                        />
-                        <FormGroup sx={{ flexDirection: 'row' }}>
-                            <FormControlLabel control={<Checkbox value='Apartment' onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                            }} />} label="Apartment" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                            }} value='Duplex' />} label="Duplex" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                            }} value='Studio' />} label="Studio" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Penthouse" />} label="Penthouse" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Family house" />} label="Family house" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Standalone" />} label="Standalone" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Twin house" />} label="Twin house" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="One storey Villa" />} label="One storey Villa" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Chalet" />} label="Chalet" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Townhouse" />} label="Townhouse" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Clinic" />} label="Clinic" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Cabin" />} label="Cabin" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Office" />} label="Office" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Retail" />} label="Retail" />
-                            <FormControlLabel control={<Checkbox onClick={(e) => {
-                                if (e.target.checked === true) {
-                                    setArrCheckType((old) => [...old, e.target.value])
-                                } else {
-                                    setArrCheckType(arrCheckType.filter((it) => it !== e.target.value))
-                                }
-                                // console.log(e.target.checked)
-                            }} value="Villa" />} label="Villa" />
-                        </FormGroup>
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="2%" label="%2" variant="outlined" type="number"
-                            value={pers2}
-                            onChange={(e) => {
-                                handlePers2Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year2" label="year2" variant="outlined" type="number"
-                            value={year2}
-                            onChange={(e) => {
-                                handleYear2Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer text2"
-                            label=" offer text2"
-                            multiline
-                            value={offerText2}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText2Change(e)
-                            }}
-                        />
+      <>
+        <Box
+          style={{
+            width: "100%",
+            flexDirection: "column",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "70px 0 0",
+          }}
+        >
+          <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
+            <Typography variant="h5">Maverick Deals</Typography>
+          </Stack>
+          <Card
+            sx={{
+              width: { xs: "90%", sm: "80%" },
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              padding: "20px",
+              margin: "10px 0 ",
+            }}
+          >
+            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+              Complete The Form
+            </Typography>
+            <Typography variant="caption">
+              Your privacy is important to us. We won't publish or share your
+              information with anyone
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                sendData();
+                setMessege(true);
+                setTimeout(() => {
+                  setMessege(false);
+                  nav("/");
+                }, 2000);
+              }}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                width: "100%",
+                margin: "15px 0 0",
+              }}
+            >
+              <Stack
+                sx={{
+                  flexDirection: "row",
+                  width: { xs: "100%", md: "50%" },
+                  padding: "5px",
+                }}
+              >
+                <FormControl sx={{ width: "100%" }}>
+                  <InputLabel id="demo-simple-select-label">Dev</InputLabel>
+                  <Select
+                    sx={{ minWidth: "fit-content" }}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={dev}
+                    label="Dev"
+                    onChange={handleDevChange}
+                  >
+                    {data.map((devName) => {
+                      return (
+                        <MenuItem key={devName.id} value={devName.name}>
+                          {devName.name}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Stack>
+              <Stack
+                sx={{
+                  flexDirection: "row",
+                  width: { xs: "100%", md: "50%" },
+                  padding: "5px",
+                }}
+              >
+                <FormControl sx={{ width: "100%" }}>
+                  <InputLabel id="demo-simple-select-label">DevIcon</InputLabel>
+                  <Select
+                    sx={{ minWidth: "fit-content" }}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={icon}
+                    label="DevIcon"
+                    onChange={(e) => {
+                      setIcon(e.target.value);
+                    }}
+                  >
+                    {data.map((devName) => {
+                      return (
+                        <MenuItem key={devName.id} value={devName.image}>
+                          {devName.name}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Stack>
+              <TextField
+                id="outlined-multiline-static"
+                label=" Description"
+                value={devDis}
+                multiline
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleDevDisChange(e);
+                }}
+              />
+              <TextField
+                id="outlined-multiline-static"
+                label=" Description bold"
+                value={devDis2}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleDevDis2Change(e);
+                }}
+              />
+              <FormGroup sx={{ flexDirection: "row" }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value="Clubhouse"
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                      }}
+                    />
+                  }
+                  label="Clubhouse"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                      }}
+                      value="Commercial Strip"
+                    />
+                  }
+                  label="Commercial Strip"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                      }}
+                      value="Underground Parking"
+                    />
+                  }
+                  label="Underground Parking"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Outdoor Pools"
+                    />
+                  }
+                  label="Outdoor Pools"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Jogging Trail"
+                    />
+                  }
+                  label="Jogging Trail"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Bicycles Lanes"
+                    />
+                  }
+                  label="Bicycles Lanes"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Business Hub"
+                    />
+                  }
+                  label="Business Hub"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Schools"
+                    />
+                  }
+                  label="Schools"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Sports Clubs"
+                    />
+                  }
+                  label="Sports Clubs"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Livability"
+                    />
+                  }
+                  label="Livability"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Infrastructure"
+                    />
+                  }
+                  label="Infrastructure"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="mosque"
+                    />
+                  }
+                  label="mosque"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="children area"
+                    />
+                  }
+                  label="children area"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="kids' area"
+                    />
+                  }
+                  label="kids' area"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="gym"
+                    />
+                  }
+                  label="gym"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="spa"
+                    />
+                  }
+                  label="spa"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Educational hub"
+                    />
+                  }
+                  label="Educational hub"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Commercial area"
+                    />
+                  }
+                  label="Commercial area"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheck((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheck(
+                            arrCheck.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Medical centre"
+                    />
+                  }
+                  label="Medical centre"
+                />
+              </FormGroup>
+              <TextField
+                id="outlined-multiline-static"
+                label="Dev Description list"
+                multiline
+                value={devDis6}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleDevDis6Change(e);
+                }}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                value={proj}
+                id="project"
+                label="Compound Name"
+                variant="outlined"
+                type="text"
+                onChange={handleProjChange}
+              />
+              <Divider />
+              <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
+                <Typography variant="body2">
+                  Upload Your Project Images ...
+                </Typography>
+                <Button
+                  component="label"
+                  variant="outlined"
+                  sx={{ padding: "10px", margin: "15px" }}
+                  startIcon={<AddPhotoAlternate />}
+                  onChange={(e) => {
+                    handleFileChange(e);
+                  }}
+                >
+                  <VisuallyHiddenInput type="file" multiple />
+                </Button>
+                <LinearProgress variant="determinate" value={prog} />
+              </Box>
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                value={district}
+                id="District"
+                label="District"
+                variant="outlined"
+                type="text"
+                onChange={handleDistrictChange}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                value={price}
+                id="price"
+                label="Price"
+                variant="outlined"
+                type="text"
+                onChange={(e) => {
+                  handlePriceChange(e);
+                }}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="1%"
+                label="%1"
+                variant="outlined"
+                type="number"
+                value={pers1}
+                onChange={(e) => {
+                  handlePers1Change(e);
+                }}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="year1"
+                label="year1"
+                variant="outlined"
+                type="number"
+                value={year1}
+                onChange={(e) => {
+                  handleYear1Change(e);
+                }}
+              />
+              <TextField
+                id="offer text"
+                label=" offer text"
+                multiline
+                value={offerText1}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleOfferText1Change(e);
+                }}
+              />
+              <FormGroup sx={{ flexDirection: "row" }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value="Apartment"
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                      }}
+                    />
+                  }
+                  label="Apartment"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                      }}
+                      value="Duplex"
+                    />
+                  }
+                  label="Duplex"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                      }}
+                      value="Studio"
+                    />
+                  }
+                  label="Studio"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Penthouse"
+                    />
+                  }
+                  label="Penthouse"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Family house"
+                    />
+                  }
+                  label="Family house"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Standalone"
+                    />
+                  }
+                  label="Standalone"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Twin house"
+                    />
+                  }
+                  label="Twin house"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="One storey Villa"
+                    />
+                  }
+                  label="One storey Villa"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Chalet"
+                    />
+                  }
+                  label="Chalet"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Townhouse"
+                    />
+                  }
+                  label="Townhouse"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Clinic"
+                    />
+                  }
+                  label="Clinic"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Cabin"
+                    />
+                  }
+                  label="Cabin"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Office"
+                    />
+                  }
+                  label="Office"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Retail"
+                    />
+                  }
+                  label="Retail"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={(e) => {
+                        if (e.target.checked === true) {
+                          setArrCheckType((old) => [...old, e.target.value]);
+                        } else {
+                          setArrCheckType(
+                            arrCheckType.filter((it) => it !== e.target.value)
+                          );
+                        }
+                        // console.log(e.target.checked)
+                      }}
+                      value="Villa"
+                    />
+                  }
+                  label="Villa"
+                />
+              </FormGroup>
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="2%"
+                label="%2"
+                variant="outlined"
+                type="number"
+                value={pers2}
+                onChange={(e) => {
+                  handlePers2Change(e);
+                }}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="year2"
+                label="year2"
+                variant="outlined"
+                type="number"
+                value={year2}
+                onChange={(e) => {
+                  handleYear2Change(e);
+                }}
+              />
+              <TextField
+                id="offer text2"
+                label=" offer text2"
+                multiline
+                value={offerText2}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleOfferText2Change(e);
+                }}
+              />
 
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="3%" label="%3" variant="outlined" type="number"
-                            value={pers3}
-                            onChange={(e) => {
-                                handlePers3Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year3" label="year3" variant="outlined" type="number"
-                            value={year3}
-                            onChange={(e) => {
-                                handleYear3Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer-text3"
-                            label=" offer text3"
-                            multiline
-                            value={offerText3}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText3Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="4%" label="%4" variant="outlined" type="number"
-                            value={pers4}
-                            onChange={(e) => {
-                                handlePers4Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year4" label="year4" variant="outlined" type="number"
-                            value={year4}
-                            onChange={(e) => {
-                                handleYear4Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer-text4"
-                            label=" offer text4"
-                            multiline
-                            value={offerText4}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText4Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="outlined-multiline-static"
-                            label="Project Description"
-                            multiline
-                            value={projDis}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleProjDisChange(e)
-                            }}
-                        />
-                        <TextField
-                            id="Project Description2"
-                            label="Project Description bold"
-                            value={projDis2}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleProjDis2Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="Project Description3"
-                            label="Project Description3"
-                            multiline
-                            value={projDis3}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleProjDis3Change(e)
-                            }}
-                        />
-                        {/* <TextField
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="3%"
+                label="%3"
+                variant="outlined"
+                type="number"
+                value={pers3}
+                onChange={(e) => {
+                  handlePers3Change(e);
+                }}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="year3"
+                label="year3"
+                variant="outlined"
+                type="number"
+                value={year3}
+                onChange={(e) => {
+                  handleYear3Change(e);
+                }}
+              />
+              <TextField
+                id="offer-text3"
+                label=" offer text3"
+                multiline
+                value={offerText3}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleOfferText3Change(e);
+                }}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="4%"
+                label="%4"
+                variant="outlined"
+                type="number"
+                value={pers4}
+                onChange={(e) => {
+                  handlePers4Change(e);
+                }}
+              />
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="year4"
+                label="year4"
+                variant="outlined"
+                type="number"
+                value={year4}
+                onChange={(e) => {
+                  handleYear4Change(e);
+                }}
+              />
+              <TextField
+                id="offer-text4"
+                label=" offer text4"
+                multiline
+                value={offerText4}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleOfferText4Change(e);
+                }}
+              />
+              <TextField
+                id="outlined-multiline-static"
+                label="Project Description"
+                multiline
+                value={projDis}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleProjDisChange(e);
+                }}
+              />
+              <TextField
+                id="Project Description2"
+                label="Project Description bold"
+                value={projDis2}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleProjDis2Change(e);
+                }}
+              />
+              <TextField
+                id="Project Description3"
+                label="Project Description3"
+                multiline
+                value={projDis3}
+                rows={4}
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                onChange={(e) => {
+                  handleProjDis3Change(e);
+                }}
+              />
+              {/* <TextField
                             id="Project Description4"
                             label="Project Description4"
                             multiline
@@ -900,7 +1398,7 @@ function DataBase() {
                                 handleProjDis4Change(e)
                             }}
                         /> */}
-                        {/* <TextField
+              {/* <TextField
                             id="Project Description5"
                             label="Project Description5 bold"
                             multiline
@@ -911,7 +1409,7 @@ function DataBase() {
                                 handleProjDis5Change(e)
                             }}
                         /> */}
-                        {/* <TextField
+              {/* <TextField
                             id="Project Description6"
                             label="Project Description6"
                             multiline
@@ -922,42 +1420,77 @@ function DataBase() {
                                 handleProjDis6Change(e)
                             }}
                         /> */}
-                        <Box sx={{ width: { xs: '100%', md: '50%' }, padding: '5px' }}>
-                            <Typography variant='body2'>
-                                Master plan Images ...
-                            </Typography>
-                            <Button
-                                component="label"
-                                variant="outlined"
-                                // tabIndex={-1}
-                                sx={{ padding: '10px', margin: '15px' }}
-                                startIcon={<AddPhotoAlternate />}
-                                onChange={(e) => {
-                                    handleMasterplanImgChange(e)
-                                }}
-                            >
-                                <VisuallyHiddenInput type="file" multiple />
-                            </Button>
-                            <LinearProgress variant="determinate" value={prog3} />
-                        </Box>
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="Location" label="Location" variant="outlined" type="text"
-                            value={location}
-                            onChange={(e) => {
-                                handlelocationChange(e)
-                            }}
-                        />
-                        <Button disabled={btn} variant="contained" type="submit" style={{ width: '50%' }}
-                            className="btn">
-                            {btn ? <ReactLoading type={'spin'} height={'20px'} width={'20px'} /> : "Send"}
-                        </Button>
-                    </Box>
-                </Card>
+              <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
+                <Typography variant="body2">Master plan Images ...</Typography>
+                <Button
+                  component="label"
+                  variant="outlined"
+                  // tabIndex={-1}
+                  sx={{ padding: "10px", margin: "15px" }}
+                  startIcon={<AddPhotoAlternate />}
+                  onChange={(e) => {
+                    handleMasterplanImgChange(e);
+                  }}
+                >
+                  <VisuallyHiddenInput type="file" multiple />
+                </Button>
+                <LinearProgress variant="determinate" value={prog3} />
+              </Box>
+              <TextField
+                sx={{
+                  margin: "10px",
+                  padding: "5px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+                id="Location"
+                label="Location"
+                variant="outlined"
+                type="text"
+                value={location}
+                onChange={(e) => {
+                  handlelocationChange(e);
+                }}
+              />
+              <Button
+                disabled={btn}
+                variant="contained"
+                type="submit"
+                style={{ width: "50%" }}
+                className="btn"
+              >
+                {btn ? (
+                  <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+                ) : (
+                  "Send"
+                )}
+              </Button>
             </Box>
-            <p style={{ zIndex: '10', backgroundColor: 'whitesmoke', display: 'flex', alignItems: 'center', color: 'black', padding: '10px', borderRadius: '6px', boxShadow: 'rgb(255 255 255 / 25%) 0px 5px 30px 0px', position: 'fixed', top: '100px', right: messege ? '20px' : '-230px', transition: '0.8s', scale: messege ? "1" : '0' }}>Data has been sent successfully <Info style={{ margin: '3px 0 0 10px', fontSize: '20px', color: 'teal' }} /></p>
-        </>
-    )
+          </Card>
+        </Box>
+        <p
+          style={{
+            zIndex: "10",
+            backgroundColor: "whitesmoke",
+            display: "flex",
+            alignItems: "center",
+            color: "black",
+            padding: "10px",
+            borderRadius: "6px",
+            boxShadow: "rgb(255 255 255 / 25%) 0px 5px 30px 0px",
+            position: "fixed",
+            top: "100px",
+            right: messege ? "20px" : "-230px",
+            transition: "0.8s",
+            scale: messege ? "1" : "0",
+          }}
+        >
+          Data has been sent successfully{" "}
+          <Info
+            style={{ margin: "3px 0 0 10px", fontSize: "20px", color: "teal" }}
+          />
+        </p>
+      </>
+    );
 }
 
 export default DataBase
