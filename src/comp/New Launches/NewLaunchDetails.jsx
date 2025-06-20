@@ -74,7 +74,7 @@ function NewLaunchDetails() {
             </Stack>
           </Stack>
           <hr />
-          <Stack sx={{ marginTop: '40px' }}>
+          <Stack sx={{ margin: '40px 0' }}>
             <Typography variant='h5' sx={{ fontWeight: 'bold', padding: '0 0 10px 0' }}>
               Launch Details
             </Typography>
