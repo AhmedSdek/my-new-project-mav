@@ -1,5 +1,5 @@
-import { doc } from 'firebase/firestore';
-import React, { useState } from 'react'
+import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react'
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { db } from '../../../firebase/config';
 import { Link, useParams } from 'react-router-dom';
@@ -9,33 +9,58 @@ import ContactUsIcon from '../../Contact Us/ContactUsIcon';
 import MavLoading from '../../Loading/MavLoading';
 
 export default function DeveloperDetails() {
-    const { devId } = useParams()
-    console.log(devId);
-    const [value, loading, error] = useDocument(doc(db, 'admin', devId));
-    let disfiter = [];
+  const { devId } = useParams()
+  console.log(devId)
+  const [docData, setDocData] = useState(null);
+  const [docLoading, setDocLoading] = useState(true);
+  const [docError, setDocError] = useState("");
+
+  useEffect(() => {
+    const fetchDocument = async () => {
+      if (!devId) return; // تأكد إن devId موجود
+
+      try {
+        const docRef = doc(db, "admin", devId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setDocData({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          setDocError("⚠️ لا يوجد مستند بهذا المعرف.");
+        }
+      } catch (err) {
+        console.error("❌ خطأ أثناء جلب المستند:", err);
+        setDocError("فشل تحميل البيانات.");
+      } finally {
+        setDocLoading(false);
+      }
+    };
+
+    fetchDocument();
+  }, [devId]); let disfiter = [];
     let list = [];
-    if (value) {
+  console.log(docData);
+  if (docData) {
       
-        if (value.data()) {
-            const disdata = value.data().devDis.split('$')
+    if (docData) {
+      const disdata = docData.devDis.split('$')
             for (let i = 0; i < disdata.length; i++) {
                 disfiter = [...disfiter, disdata[i]]
             }
-            const ul = value.data().devDis6.split('-')
+      const ul = docData.devDis6.split('-')
             for (let i = 1; i < ul.length; i++) {
                 list = [...list, ul[i]]
             }
-        }
-
+    }
         return (
             <Box sx={{ padding: '80px 0 0 0', minHeight: 'calc(100vh - 100px)' }}>
-                {value.data() ?
+            {docData ?
                 <Container  >
                         <Stack sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', gap: 3 }}>
                         <Stack sx={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-                                <img style={{ width: '70px', boxShadow: '0 -1px 15px -3px rgba(0, 0, 0, 0.2)', borderRadius: '50%', height: '70px' }} src={value.data().devIcon} alt='' />
+                    <img style={{ width: '70px', boxShadow: '0 -1px 15px -3px rgba(0, 0, 0, 0.2)', borderRadius: '50%', height: '70px' }} src={docData.devIcon} alt='' />
                             <Typography sx={{ fontWeight: 'bold', color: '#1e4164 ' }} variant='h5' component='h2'>
-                                {value.data().devName}
+                      {docData.devName}
                             </Typography>
                         </Stack>
                         <span className="text-2" data-test="entity-type">Developer</span>
@@ -43,7 +68,7 @@ export default function DeveloperDetails() {
                     <Divider />
                     <Box sx={{ padding: '50px 0 0 0' }}>
                         <Typography sx={{ fontWeight: 'bold', color: '#1e4164 ', padding: '10px 0' }} >
-                            {`About ${value.data().devName}`}
+                    {`About ${docData.devName}`}
                         </Typography>
                             {/* {disfiter.map((p, index) => {
                                 return (
@@ -54,11 +79,11 @@ export default function DeveloperDetails() {
                             })} */}
                               {
                       <Typography style={{ whiteSpace: "pre-wrap" }}>
-                        {value.data().devDis}
+                      {docData.devDis}
                       </Typography>
                     }
                             <Typography sx={{ fontWeight: 'bold', color: '#1e4164 ', padding: '10px 0' }}>
-                            {value.data().devDis2}
+                    {docData.devDis2}
                             </Typography>
                         <ul>
                             {list.map((li) => {
@@ -71,10 +96,10 @@ export default function DeveloperDetails() {
                         </ul>
                         <Stack>
                             <Typography sx={{ padding: '10px 0', fontWeight: 'bold', color: '#1e4164 ' }} >
-                                {`Explore projects In ${value.data().devName}`}
+                      {`Explore projects In ${docData.devName}`}
                             </Typography>
                             <Row>
-                                {value.data().dev.map((project, index) => {
+                      {docData.dev.map((project, index) => {
                                     return (
                                         <Col key={index} className="col-md-6 col-12 col-lg-4" style={{ marginBottom: '15px', position: 'relative' }} >
                                             <Card sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -83,7 +108,7 @@ export default function DeveloperDetails() {
                                                         <img style={{ height: '100%', width: '100%', objectFit: 'cover' }} src={project.projImgs[0]} alt='' />
                                                     </Box>
                                                     <CardContent style={{ padding: '15px 15px 0 15px' }}>
-                                                        <Stack sx={{}}>
+                                              <Stack >
                                                             <Typography sx={{ lineHeight: '1.3', fontWeight: 'bold', color: 'rgb(30, 65, 100)' }} variant="body1">
                                                                 {project.proj}
                                                             </Typography>
@@ -97,7 +122,7 @@ export default function DeveloperDetails() {
                                                     </CardContent>
                                                 </Link >
                                                 <Stack sx={{ padding: '0 10px 10px 0' }}>
-                                                    <ContactUsIcon sectionName='Developer' sectionData={value.data()} />
+                                            <ContactUsIcon sectionName='Developer' sectionData={docData} />
                                                 </Stack>
                                             </Card>
                                         </Col>
@@ -118,7 +143,7 @@ export default function DeveloperDetails() {
             </Box>
         )
     }
-    if (loading) {
+  if (docLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 100px)' }}>
                 <MavLoading />

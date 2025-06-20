@@ -9,7 +9,14 @@ import { Delete, Edit } from '@mui/icons-material';
 
 function EditDeveloper() {
     const [value, loading, error] = useCollection(collection(db, 'admin'));
-
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, "admin", id));
+      console.log("✅ تم الحذف بنجاح");
+    } catch (error) {
+      console.error("❌ خطأ أثناء الحذف:", error);
+    }
+  };
     return (
         <Box sx={{ minHeight: 'calc(100vh - 140px)', padding: '70px 0' }}>
             <h2>
@@ -27,7 +34,9 @@ function EditDeveloper() {
                                     <Stack sx={{ flexDirection: 'row' }}>
                                         <IconButton
                                             onClick={async (e) => {
-                                                await deleteDoc(doc(db, 'admin', product.data().devName));
+                                      console.log(product.data())
+                                      handleDelete(handleDelete(product.id))
+                                      // await deleteDoc(doc(db, 'admin', product.data().id));
                                             }}
                                             sx={{ width: '50px', height: '50px' }}>
                                             <Delete color='error' />

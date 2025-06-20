@@ -9,9 +9,10 @@ function FormGro(props) {
       <InputLabel>{inputLabel}</InputLabel>
       <Select label={label} name={name} value={value} onChange={fun}>
         {data?.map((item, index) => {
-          // console.log(item);
+          // console.log(item); 
           const isObject = typeof item === "object" && item !== null;
           const itemValue = isObject ? item.id : item;
+          // console.log(itemValue)
           const itemLabel = isObject ? item.name : item;
           return (
             <MenuItem value={itemValue} key={index}>

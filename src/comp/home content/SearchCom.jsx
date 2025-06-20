@@ -1,28 +1,51 @@
 import { Paper, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
 function SearchCom() {
     const [serch, setSerch] = useState(null);
     const [menu, setMenu] = useState(false);
-    const [value, loading, error] = useCollection(collection(db, 'admin'));
-    let firebasedata = [];
-    if (value) {
-        value.docs.map((item) => {
+  const [adminData, setAdminData] = useState([]);
+  const [adminLoading, setAdminLoading] = useState(true);
+  const [adminError, setAdminError] = useState("");
+
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "admin"));
+        const result = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setAdminData(result);
+      } catch (err) {
+        console.error("خطأ أثناء تحميل بيانات admin:", err);
+        setAdminError("فشل في تحميل البيانات.");
+      } finally {
+        setAdminLoading(false);
+      }
+    };
+
+    fetchAdminData();
+  }, []);
+  let firebasedata = [];
+  if (adminData) {
+    adminData.map((item) => {
+      console.log(item)
             //projects data
-            item.data().dev.map((proj) => {
+      item.dev.map((proj) => {
                 if (proj.proj.toUpperCase().includes(serch)) {
-                    firebasedata.push({ "divIcon": item.data().devIcon, "devName": item.data().devName, proj })
+                  firebasedata.push({ "divIcon": item.devIcon, "devName": item.devName, proj })
                 }
             })
             //developrt data
-            if (item.data().devName.toUpperCase().includes(serch)) {
-                firebasedata.push({ "Name": item.data().devName, "Icon": item.data().devIcon })
+      if (item.devName.toUpperCase().includes(serch)) {
+        firebasedata.push({ "Name": item.devName, "Icon": item.devIcon })
             }
             //distract data 
-            item.data().dev.map((proj) => {
+      item.dev.map((proj) => {
                 if (proj.district.toUpperCase().includes(serch)) {
                     if (!firebasedata.includes(proj.district) && firebasedata.district !== '') {
                         firebasedata.push(proj.district);
@@ -36,18 +59,18 @@ function SearchCom() {
             e.preventDefault();
         }}>
             <TextField color="warning" className='header-search' sx={{ backgroundColor: 'white', width: '100%', borderRadius: '10px' }} id="outlined-search" placeholder='Developers Or Area Or Compounds ' type="search" onChange={(e) => {
-                if (e.target.value === '') {
+          if (e.target.adminData === '') {
                     setSerch(null);
                     setMenu(false)
                 } else {
-                    setSerch(e.target.value.toUpperCase());
+            setSerch(e.target.adminData.toUpperCase());
                     setMenu(true)
                 }
             }
             } />
             <Stack className='searchBox' sx={{ display: !menu && "none" }}>
                 <Stack sx={{ width: '100%', gap: 1 }}>
-                    {value ?
+            {adminData ?
                         (firebasedata.length > 0 ?
                             firebasedata.map((filter, index) => {
                                 return (

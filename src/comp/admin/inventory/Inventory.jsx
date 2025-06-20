@@ -29,7 +29,7 @@ import {
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
 import { HelpOutline } from "@mui/icons-material";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { data } from "../../Data";
 import { useCollection } from "react-firebase-hooks/firestore";
@@ -47,6 +47,8 @@ function Inventory() {
   const [prog2, setProg2] = useState(0);
   const [btn, setBtn] = useState(false);
   const [messege, setMessege] = useState(false);
+  // const [developers, setDevelopers] = useState([]);
+  // console.log(developers[0])
   const [newData, setNewData] = useState({
     // dev: null,
     Dis: "",
@@ -99,6 +101,12 @@ function Inventory() {
     }
   }, []);
   const [value, loading, error] = useCollection(collection(db, "admin"));
+  const [devData, devLoading, devError] = useCollection(collection(db, "developers"));
+  const developers = devData?.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) || [];
+
   const [projects, setProjects] = useState([]);
   useEffect(() => {
     const arr = [];
@@ -363,6 +371,27 @@ function Inventory() {
     []
   );
   const statusOptions = useMemo(() => ["Resale", "Rent"], []);
+  const checkBoxOptions = useMemo(() => [
+    "Clubhouse",
+    "Commercial Strip",
+    "Underground Parking",
+    "Outdoor Pools",
+    "Jogging Trail",
+    "Bicycles Lanes",
+    "Business Hub",
+    "Schools",
+    "Sports Clubs",
+    "Livability",
+    "Infrastructure",
+    "mosque",
+    "children area",
+    "kids' area",
+    "gym",
+    "spa",
+    "Educational hub",
+    "Commercial area",
+    "Medical centre",
+  ], []);
   // const handleDevChange = useCallback(
   //   (e) => {
   //     const selectedDev = data.find((dev) => dev.id === e.target.value);
@@ -372,20 +401,22 @@ function Inventory() {
   // );
   const handleDevChange = useCallback(
     (e) => {
-      const selectedDev = data.find((dev) => dev.id === e.target.value);
+      const selectedDev = developers.find((dev) => dev.id === e.target.value);
       if (selectedDev) {
+        console.log(selectedDev)
         setNewData((prev) => ({
           ...prev,
           devid: selectedDev.id,
-          icon: selectedDev.image || "",
+          icon: selectedDev.img || "",
           devname: selectedDev.name || "",
         }));
       }
     },
-    [data]
+    [developers]
   );
-
+  // console.log(developers)
   return (
+
     <Box className="w-full flex flex-col justify-center align-items-center pt-16">
       <Stack className="align-items-center mb-2.5">
         <Typography variant="h5">inventory</Typography>
@@ -399,7 +430,7 @@ function Inventory() {
         <FormGro
           label="Dev"
           name="dev"
-          data={data}
+          data={developers}
           inputLabel="Dev"
           value={newData.devid || ""} // نخزن ونعرض الـ id
           fun={handleDevChange}
@@ -411,19 +442,19 @@ function Inventory() {
           <DialogContent>
             <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
               {`📝 إزاي تستخدم Markdown:
-# عنوان رئيسي (H1)
-## عنوان فرعي (H2)
-### عنوان (H3)
-#### عنوان (H4)
-##### عنوان (H5)
-###### عنوان (H6)
-*نص مائل*           ← نص مائل
-**نص عريض**         ← نص بولد
-~~نص مشطوب~~        ← خط على النص
-- عنصر              ← قائمة نقطية
-1. عنصر مرقم        ← قائمة مرقمة
-> اقتباس            ← اقتباس
-`}{" "}
+    # عنوان رئيسي (H1)
+    ## عنوان فرعي (H2)
+    ### عنوان (H3)
+    #### عنوان (H4)
+    ##### عنوان (H5)
+    ###### عنوان (H6)
+    *نص مائل*           ← نص مائل
+    **نص عريض**         ← نص بولد
+    ~~نص مشطوب~~        ← خط على النص
+    - عنصر              ← قائمة نقطية
+    1. عنصر مرقم        ← قائمة مرقمة
+    > اقتباس            ← اقتباس
+    `}{" "}
             </Typography>
           </DialogContent>
         </Dialog>
@@ -438,16 +469,17 @@ function Inventory() {
           id="outlined-multiline-static"
         />
         {/* <Input
-          name="descriptionList"
-          value={newData.descriptionList}
-          onChange={onchange}
-          rows={4}
-          label="Dev Description list"
-          multiline
-        /> */}
+              name="descriptionList"
+              value={newData.descriptionList}
+              onChange={onchange}
+              rows={4}
+              label="Dev Description list"
+              multiline
+            /> */}
         <CheckboxCom
+          data={checkBoxOptions}
           handleCheckboxChange={handleCheckboxChange}
-          aminatis={newData.aminatis}
+          name={newData.aminatis}
         />
         <FormGro
           label="Compound"

@@ -1154,25 +1154,27 @@ export const data = [
         "des1": "Founded in 2017 by one of the biggest names in real estate for the past 20 years, Mrs. Sahar El Agaty, Ivory Investment is focused and committed to building and delivering places that people can connect to. Creating places rather than developments is a lost art, and Ivory Investments would like to bring that “art” back to your business to have a lasting memory in all those that work, live and play within them.",
         "des2": ""
     },
-    {
-        "id": 142,
-        "image": makeplace,
-        'name': 'MakePlace',
-    },
-    {
-        "id": 143,
-        "image": tameer,
-        'name': 'Tameer',
-    },
-    {
-        "id": 144,
-        "image": waterway,
-        'name': 'Waterway',
-    },
-    {
-        "id": 145,
-        "image": newJersey,
-        'name': 'New Jersey',
-    },
 
 ];
+// [
+//     {
+//         "id": 142,
+//         "image": makeplace,
+//         'name': 'MakePlace',
+//     },
+//     {
+//         "id": 143,
+//         "image": tameer,
+//         'name': 'Tameer',
+//     },
+//     {
+//         "id": 144,
+//         "image": waterway,
+//         'name': 'Waterway',
+//     },
+//     {
+//         "id": 145,
+//         "image": newJersey,
+//         'name': 'New Jersey',
+//     },
+//   ]

@@ -45,8 +45,46 @@ import CityscapeProjects from "./comp/home content/cityscape/CityscapeProjects";
 import EditCity from "./comp/admin/Edit/City/EditCity";
 import Inventory from "./comp/admin/inventory/Inventory";
 import InventoryDetails from "./comp/inventory/InventoryDetails";
+import { data } from "./comp/Data";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
+import { db } from "./firebase/config";
+import DeveloperForm from "./comp/admin/developerForm/DeveloperForm";
+import ReactMarkdown from "react-markdown";
 
 function App() {
+  // const [developers, setDevelopers] = useState([]);
+
+  // const getDevelopers = async () => {
+  //   try {
+  //     const querySnapshot = await getDocs(collection(db, "developers"));
+  //     const devs = [];
+  //     querySnapshot.forEach((doc) => {
+  //       devs.push({ id: doc.id, ...doc.data() }); // id لو حابب تستخدمها لاحقًا
+  //     });
+  //     setDevelopers(devs);
+  //   } catch (error) {
+  //     console.error("❌ فشل تحميل المطورين:", error);
+  //   }
+  // };
+  // const uploadBasicDevelopers = async () => {
+  //   try {
+  //     const batchPromises = data.map((dev) => {
+  //       const minimalDev = {
+  //         id: dev.id.toString(),
+  //         name: dev.name,
+  //         img: dev.image,
+  //       };
+
+  //       return setDoc(doc(collection(db, "developers"), dev.id.toString()), minimalDev);
+  //     });
+
+  //     await Promise.all(batchPromises);
+  //     console.log("✅ تم رفع id و name و image فقط لكل مطور.");
+  //   } catch (error) {
+  //     console.error("❌ حصل خطأ أثناء رفع المطورين:", error);
+  //   }
+  // };
+
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(
     localStorage.getItem("mtTheme") === null
@@ -72,6 +110,7 @@ function App() {
   useEffect(() => {
     setLoading(true);
     setLoading(false);
+    // getDevelopers()
     // setTimeout(() => {
     // }, 2000)
   }, []);
@@ -95,6 +134,7 @@ function App() {
             <Routes>
               <Route path="dashboard" element={<Dashboard />}>
                 <Route index element={<SaleData />} />
+                  <Route path="form" element={<DeveloperForm />} />
                 <Route path="resale" element={<ReSale />} />
                 <Route path="database" element={<DataBase />} />
                 <Route path="inventory" element={<Inventory />} />
@@ -158,6 +198,16 @@ function App() {
                 element={<InventoryDetails />}
               />
             </Routes>
+              {/* {
+                developers.length > 0 &&
+                developers.map((item) => {
+                  return (
+                    <img key={item.id} src={item.image} alt="" />
+                  )
+                })
+              } */}
+              {/* <button onClick={uploadBasicDevelopers}>Upload Developers</button> */}
+              {/* <img src={developers[0].image} alt="" /> */}
             <Footer />
           </>
         )}
