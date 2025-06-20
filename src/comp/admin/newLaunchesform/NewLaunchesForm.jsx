@@ -413,6 +413,7 @@ function NewLaunchesForm() {
               flexDirection: "column",
               width: "100%",
               margin: "15px 0 0",
+              gap: '10px'
             }}
           >
             <FormGro
@@ -440,22 +441,6 @@ function NewLaunchesForm() {
               id="outlined-multiline-static"
             />
             <FileUpload handleFileChange={handleFileChange} prog={prog} title="Upload Your Images ..." />
-            {/* <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
-              <Typography variant="body2">Upload Your Images ...</Typography>
-              <Button
-                component="label"
-                variant="outlined"
-            // tabIndex={-1}
-                sx={{ padding: "10px", margin: "15px" }}
-                startIcon={<AddPhotoAlternate />}
-                onChange={(e) => {
-                  handleFileChange(e);
-                }}
-              >
-                <VisuallyHiddenInput type="file" multiple />
-              </Button>
-              <LinearProgress variant="determinate" value={prog} />
-            </Box> */}
             <Input
               name="Location"
               value={newData.Location}
@@ -465,24 +450,7 @@ function NewLaunchesForm() {
               id="outlined-multiline-static"
             />
             <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title="Master plan Images ..." />
-
-            {/* <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
-              <Typography variant="body2">Master plan Images ...</Typography>
-              <Button
-                component="label"
-                variant="outlined"
-            // tabIndex={-1}
-                sx={{ padding: "10px", margin: "15px" }}
-                startIcon={<AddPhotoAlternate />}
-                onChange={(e) => {
-                  handleMasterplanImgChange(e);
-                }}
-              >
-                <VisuallyHiddenInput type="file" />
-              </Button>
-              <LinearProgress variant="determinate" value={prog3} />
-            </Box> */}
-            <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
+            <Box sx={{ width: '100%', padding: "5px" }}>
               <Typography variant="body2">Video ...</Typography>
               <Button
                 component="label"

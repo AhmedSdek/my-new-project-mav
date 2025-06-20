@@ -66,7 +66,7 @@ function Inventory() {
     icon: "",
     devname: "",
     aminatis: [],
-    descriptionList: "",
+    // descriptionList: "",
     price: "",
     downPayment: "",
     remaining: "",
@@ -393,6 +393,7 @@ function Inventory() {
       <Card
         onSubmit={onsubmit}
         component="form"
+        sx={{ gap: '10px' }}
         className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
       >
         <FormGro
@@ -436,14 +437,14 @@ function Inventory() {
           multiline
           id="outlined-multiline-static"
         />
-        <Input
+        {/* <Input
           name="descriptionList"
           value={newData.descriptionList}
           onChange={onchange}
           rows={4}
           label="Dev Description list"
           multiline
-        />
+        /> */}
         <CheckboxCom
           handleCheckboxChange={handleCheckboxChange}
           aminatis={newData.aminatis}
