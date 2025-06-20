@@ -20,10 +20,10 @@ const VisuallyHiddenInput = (props) => (
   />
 );
 
-function UploadSection({ handleFileChange, prog }) {
+function UploadSection({ handleFileChange, prog, title }) {
   return (
     <Box className="mt-2.5 mb-2.5 w-full">
-      <Typography variant="body2">Layout Image ...</Typography>
+      <Typography variant="body2">{title}</Typography>
       <Button
         component="label"
         variant="outlined"

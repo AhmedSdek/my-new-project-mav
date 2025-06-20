@@ -33,11 +33,12 @@ import { collection, doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { data } from "../../Data";
 import { useCollection } from "react-firebase-hooks/firestore";
-import Input from "../Inpout";
+import Input from "../Input";
 import FormGro from "../FormGro";
 import FileUpload from "../FileUpload";
 import RadioCom from "../RadioCom";
 import CheckboxCom from "../CheckboxCom";
+
 function Inventory() {
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
@@ -62,12 +63,8 @@ function Inventory() {
     Location: "",
     Sale: "",
     Finsh: "",
-
     icon: "",
     devname: "",
-    // sold: "",
-
-    // descbold: "",
     aminatis: [],
     descriptionList: "",
     price: "",
@@ -459,7 +456,7 @@ function Inventory() {
           value={newData.compoundName || ""} // نخزن ونعرض الـ id
           fun={onchange}
         />
-        <FileUpload handleFileChange={handleFileChange} prog={prog} />
+        <FileUpload handleFileChange={handleFileChange} prog={prog} title='imges' />
         <Input
           onChange={onchange}
           type="text"
@@ -468,7 +465,7 @@ function Inventory() {
           name="imgtext"
           value={newData.imgtext} // نخزن ونعرض الـ id
         />
-        <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} />
+        <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title='Master img' />
         <FormGro
           label="Money Type"
           name="monyType"
@@ -630,7 +627,7 @@ function Inventory() {
           value={newData.Finsh}
           onChange={onchange}
         />
-        <FileUpload handleFileChange={handleFiletowChange} prog={prog2} />
+        <FileUpload handleFileChange={handleFiletowChange} prog={prog2} title='Layout img' />
         <RadioCom
           name="Sale"
           data={statusOptions}
