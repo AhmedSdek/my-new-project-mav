@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { db, storage } from '../../../firebase/config';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Card, Divider, Stack, Typography, styled } from '@mui/material';
+import { Box, Button, Card, Dialog, DialogContent, Divider, IconButton, Stack, Typography, styled } from '@mui/material';
 import ReactLoading from 'react-loading';
 import 'react-phone-input-2/lib/style.css'
-import { Info } from '@mui/icons-material';
+import { HelpOutline, Info } from '@mui/icons-material';
 import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useCollection } from 'react-firebase-hooks/firestore';
@@ -13,6 +13,7 @@ import Input from '../Input';
 import CheckboxCom from '../CheckboxCom';
 import FileUpload from '../FileUpload';
 // import data from
+
 function DataBase() {
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
@@ -37,6 +38,7 @@ function DataBase() {
 
     fetchDevelopers();
   }, []);
+  const [open, setOpen] = useState(false);
 
   // const developers =  useMemo(() => {
   //     return (
@@ -124,7 +126,7 @@ function DataBase() {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           // console.log('Upload is ' + progress + '% done');
@@ -329,9 +331,8 @@ function DataBase() {
         offer3: newData.offer3,
         offer4: newData.offer4,
       };
-      const docRef = doc(db, "admin", newData.devid);
+      const docRef = doc(db, "admin", newData.devName);
       const docSnap = await getDoc(docRef);
-
       if (!docSnap.exists()) {
         await setDoc(docRef, {
           devName: newData.devName,
@@ -347,6 +348,7 @@ function DataBase() {
         });
         alert("✅ تم إضافة المشروع للمطور الحالي");
       }
+      nav('/dashboard')
     } catch (err) {
       console.error("❌ خطأ:", err);
       alert("❌ حدث خطأ أثناء حفظ البيانات");
@@ -423,6 +425,29 @@ function DataBase() {
               value={newData.devid || ""} // نخزن ونعرض الـ id
               fun={handleDevChange}
             />
+            <IconButton onClick={() => setOpen(true)}>
+              <HelpOutline />
+            </IconButton>
+            <Dialog open={open} onClose={() => setOpen(false)}>
+              <DialogContent>
+                <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+                  {`📝 إزاي تستخدم Markdown:
+# عنوان رئيسي 
+## عنوان فرعي 
+### عنوان 
+#### عنوان 
+##### عنوان 
+###### عنوان 
+* نص مائل
+** نص عريض
+~~ نص مشطوب
+- قائمة نقطية
+1. قائمة مرقمة
+> اقتباس
+`}{" "}
+                </Typography>
+              </DialogContent>
+            </Dialog>
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
               id="Description"
@@ -439,347 +464,6 @@ function DataBase() {
               handleCheckboxChange={handleCheckboxChange}
               name={newData.aminatis}
             />
-            {/* <FormGroup sx={{ flexDirection: "row" }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    value="Clubhouse"
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                    }}
-                  />
-                }
-                label="Clubhouse"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                    }}
-                    value="Commercial Strip"
-                  />
-                }
-                label="Commercial Strip"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                    }}
-                    value="Underground Parking"
-                  />
-                }
-                label="Underground Parking"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Outdoor Pools"
-                  />
-                }
-                label="Outdoor Pools"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Jogging Trail"
-                  />
-                }
-                label="Jogging Trail"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Bicycles Lanes"
-                  />
-                }
-                label="Bicycles Lanes"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Business Hub"
-                  />
-                }
-                label="Business Hub"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Schools"
-                  />
-                }
-                label="Schools"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Sports Clubs"
-                  />
-                }
-                label="Sports Clubs"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Livability"
-                  />
-                }
-                label="Livability"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Infrastructure"
-                  />
-                }
-                label="Infrastructure"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="mosque"
-                  />
-                }
-                label="mosque"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="children area"
-                  />
-                }
-                label="children area"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="kids' area"
-                  />
-                }
-                label="kids' area"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="gym"
-                  />
-                }
-                label="gym"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="spa"
-                  />
-                }
-                label="spa"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Educational hub"
-                  />
-                }
-                label="Educational hub"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Commercial area"
-                  />
-                }
-                label="Commercial area"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={(e) => {
-                      if (e.target.checked === true) {
-                        setArrCheck((old) => [...old, e.target.value]);
-                      } else {
-                        setArrCheck(
-                          arrCheck.filter((it) => it !== e.target.value)
-                        );
-                      }
-                      // console.log(e.target.checked)
-                    }}
-                    value="Medical centre"
-                  />
-                }
-                label="Medical centre"
-              />
-            </FormGroup> */}
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
               id="Compound Name"
