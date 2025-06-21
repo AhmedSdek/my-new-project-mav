@@ -134,7 +134,7 @@ function App() {
             <Routes>
               <Route path="dashboard" element={<Dashboard />}>
                 <Route index element={<SaleData />} />
-                  <Route path="form" element={<DeveloperForm />} />
+                  <Route path="developerform" element={<DeveloperForm />} />
                 <Route path="resale" element={<ReSale />} />
                 <Route path="database" element={<DataBase />} />
                 <Route path="inventory" element={<Inventory />} />

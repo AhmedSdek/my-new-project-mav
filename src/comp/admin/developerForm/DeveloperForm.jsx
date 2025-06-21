@@ -125,7 +125,7 @@ function DeveloperForm() {
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
   return (
-    <Box className="w-full flex flex-col justify-center align-items-center pt-16">
+    <Box sx={{ height: 'calc(100vh - 100px)' }} className="w-full flex flex-col justify-center align-items-center pt-16">
       <Stack className="align-items-center mb-2.5">
         <Typography variant="h5">inventory</Typography>
       </Stack>
@@ -143,19 +143,19 @@ function DeveloperForm() {
           name="name"
           value={newData.name} // نخزن ونعرض الـ id
         />
-        <IconButton onClick={() => setOpen(true)}>
+        {/* <IconButton onClick={() => setOpen(true)}>
           <HelpOutline />
         </IconButton>
         <Dialog open={open} onClose={() => setOpen(false)}>
           <DialogContent>
             <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
               {`📝 إزاي تستخدم Markdown:
-# عنوان رئيسي 
-## عنوان فرعي 
-### عنوان 
-#### عنوان 
-##### عنوان 
-###### عنوان 
+# عنوان رئيسي
+## عنوان فرعي
+### عنوان
+#### عنوان
+##### عنوان
+###### عنوان
 * نص مائل
 ** نص عريض
 ~~ نص مشطوب
@@ -165,7 +165,7 @@ function DeveloperForm() {
 `}{" "}
             </Typography>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
         {/* <Input
           name="Dis"
           value={newData.Dis}

@@ -40,6 +40,10 @@ export default function NavBtn() {
       to: "database",
     },
     {
+      text: "Developer",
+      to: "developerform",
+    },
+    {
       text: "New Launches",
       to: "newlaunchesform",
     },
