@@ -31,7 +31,6 @@ import "react-phone-input-2/lib/style.css";
 import { HelpOutline } from "@mui/icons-material";
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { data } from "../../Data";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Input from "../Input";
 import FormGro from "../FormGro";

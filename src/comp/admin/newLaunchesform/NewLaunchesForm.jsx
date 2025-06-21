@@ -1,13 +1,13 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { db, storage } from '../../../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Card, Dialog, DialogContent, FormControl, FormControlLabel, FormLabel, IconButton, InputLabel, LinearProgress, MenuItem, Radio, RadioGroup, Select, Stack, TextField, Typography, styled } from '@mui/material';
 import ReactLoading from 'react-loading';
 import 'react-phone-input-2/lib/style.css'
 import { AddPhotoAlternate, HelpOutline, Info } from '@mui/icons-material';
-import { doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { data } from '../../Data';
+// import { data } from '../../Data';
 import Input from '../Input';
 import FormGro from '../FormGro';
 import FileUpload from '../FileUpload';
@@ -45,9 +45,32 @@ function NewLaunchesForm() {
     devname: "",
     price: "",
   });
+  const [developers, setDevelopers] = useState([]);
+  const [devLoading, setDevLoading] = useState(true);
+  const [devError, setDevError] = useState("");
+
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "developers"));
+        const devs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDevelopers(devs);
+      } catch (err) {
+        console.error("خطأ أثناء جلب المطورين:", err);
+        setDevError("حدث خطأ أثناء تحميل البيانات.");
+      } finally {
+        setDevLoading(false);
+      }
+    };
+
+    fetchDevelopers();
+  }, []);
   const handleDevChange = useCallback(
     (e) => {
-      const selectedDev = data.find((dev) => dev.id === e.target.value);
+      const selectedDev = developers.find((dev) => dev.id === e.target.value);
       if (selectedDev) {
         setNewData((prev) => ({
           ...prev,
@@ -57,7 +80,7 @@ function NewLaunchesForm() {
         }));
       }
     },
-    [data]
+    [developers]
   );
   const handleFileChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
@@ -419,7 +442,7 @@ function NewLaunchesForm() {
             <FormGro
               label="Dev"
               name="dev"
-              data={data}
+              data={developers}
               inputLabel="Dev"
               value={newData.devid || ""} // نخزن ونعرض الـ id
               fun={handleDevChange}

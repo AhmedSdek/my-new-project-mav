@@ -12,7 +12,6 @@ import FormGro from '../FormGro';
 import Input from '../Input';
 import CheckboxCom from '../CheckboxCom';
 import FileUpload from '../FileUpload';
-// import data from
 
 function DataBase() {
   const [developers, setDevelopers] = useState([]);
