@@ -71,11 +71,12 @@ function NewLaunchesForm() {
   const handleDevChange = useCallback(
     (e) => {
       const selectedDev = developers.find((dev) => dev.id === e.target.value);
+      console.log(selectedDev)
       if (selectedDev) {
         setNewData((prev) => ({
           ...prev,
           devid: selectedDev.id,
-          icon: selectedDev.image || "",
+          icon: selectedDev.img || "",
           devname: selectedDev.name || "",
         }));
       }
@@ -386,11 +387,12 @@ function NewLaunchesForm() {
     async (e) => {
       e.preventDefault();
       setMessege(true);
+      console.log(newData)
       // setTimeout(() => {
       //   setMessege(false);
       //   nav("/");
       // }, 2000);
-      await sendData(newData);
+      // await sendData(newData);
     },
     [newData]
   );
