@@ -57,8 +57,8 @@ function Inventory() {
     monyType: "",
     Area: "",
     imgtext: "",
-    Masterimg: "",
-    Layoutimg: "",
+    Masterimg: [],
+    Layoutimg: [],
     Bed: "",
     Bath: "",
     Location: "",
@@ -369,7 +369,7 @@ function Inventory() {
     () => ["Finished", "Semi Finished", "Cor & Shell", "Furnished"],
     []
   );
-  const statusOptions = useMemo(() => ["Resale", "Rent"], []);
+  const statusOptions = useMemo(() => ["Resale", "Rent", "Primary"], []);
   const checkBoxOptions = useMemo(() => [
     "Clubhouse",
     "Commercial Strip",
@@ -415,7 +415,6 @@ function Inventory() {
   );
   // console.log(developers)
   return (
-
     <Box className="w-full flex flex-col justify-center align-items-center pt-16">
       <Stack className="align-items-center mb-2.5">
         <Typography variant="h5">inventory</Typography>
@@ -463,7 +462,7 @@ function Inventory() {
           onChange={onchange}
           // placeholder="اكتب شيئًا هنا"
           rows={4}
-          label=" Description"
+          label="Description"
           multiline
           id="outlined-multiline-static"
         />

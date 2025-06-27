@@ -877,7 +877,7 @@ function ProjectDe() {
                   <Stack>
                     {relatedProjects.length > 0 && (
                       <>
-                        <Typography>
+                        <Typography sx={{ fontWeight: "bold", padding: "6px 0" }}>
                           Explore Properties In {fil.proj}
                         </Typography>
                         <Row>
@@ -1046,7 +1046,7 @@ function ProjectDe() {
                                           </div>
                                         </Stack>
 
-                                        <Box
+                                        {/* <Box
                                           sx={{
                                             position: "absolute",
                                             top: "16px",
@@ -1064,6 +1064,35 @@ function ProjectDe() {
                                             style={{
                                               fontWeight: "bold",
                                               color: "#1e4164",
+                                              fontSize: "12px"
+                                            }}
+                                          >
+                                            {`${item.Sale}`}
+                                          </p>
+                                        </Box> */}
+                                        <Box
+                                          sx={{
+                                            position: "absolute",
+                                            top: "5px",
+                                            left: "5px",
+                                            // backgroundColor: "white",
+                                            backgroundColor: "rgb(255 145 77)",
+                                            color: "red",
+                                            borderRadius: " 5px ",
+                                            // border: "2px solid red",
+                                            width: "100px",
+                                            height: "30px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                          }}
+                                        >
+                                          <p
+                                            style={{
+                                              fontWeight: "bold",
+                                              color: "#1e4164",
+                                              width: "100%",
+                                              textAlign: "center",
                                             }}
                                           >
                                             {`${item.Sale}`}
@@ -1073,7 +1102,7 @@ function ProjectDe() {
                                           <Box
                                             sx={{
                                               position: "absolute",
-                                              top: "20px",
+                                              top: "5px",
                                               right: "5px",
                                               backgroundColor: "white",
                                               color: "red",

@@ -741,13 +741,18 @@ function InventoryDetails() {
                 </Stack>
               </Stack>
             </Stack>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", margin: "10px 0" }}
-            >
-              Description
-            </Typography>
-            <ReactMarkdown>{project.Dis}</ReactMarkdown>
+            {
+              project.Dis &&
+              <>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", margin: "10px 0" }}
+                >
+                  Description
+                </Typography>
+                <ReactMarkdown>{project.Dis}</ReactMarkdown>
+              </>
+            }
           </Col>
           <Divider />
         </Row>
