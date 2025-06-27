@@ -34,6 +34,7 @@ import {
   useControls,
 } from "react-zoom-pan-pinch";
 import { Col, Row } from "react-bootstrap";
+import ContactUsIcon from "../../Contact Us/ContactUsIcon";
 const Controls = () => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
 
@@ -901,6 +902,7 @@ function ProjectDe() {
                                     position: "relative",
                                     height: "100%",
                                     display: "flex",
+                                    // padding: "0 0 10px",
                                     flexDirection: "column",
                                     justifyContent: "space-between",
                                   }}
@@ -938,26 +940,6 @@ function ProjectDe() {
                                           >
                                             {`${item.Type} - ${projId}`}
                                           </Typography>
-                                          {/* <Typography
-                                          component="h2"
-                                          sx={{
-                                            lineHeight: "1.3",
-                                            fontWeight: "bold",
-                                          }}
-                                          variant="h6"
-                                        >
-                                          {col.data().compoundName}
-                                        </Typography> */}
-                                          {/* <Typography
-                                          variant="caption"
-                                          sx={{
-                                            color: " rgb(100, 100, 100) ",
-                                            lineHeight: "1",
-                                            padding: "0 0 0 5px",
-                                          }}
-                                        >
-                                          {col.data().Location}
-                                        </Typography> */}
                                         </Stack>
                                         <Stack
                                           sx={{
@@ -1141,6 +1123,12 @@ function ProjectDe() {
                                       </CardContent>
                                     </Stack>
                                   </Link>
+                                  <Stack sx={{ margin: "0 10px 10px 0" }}>
+                                    <ContactUsIcon
+                                      sectionName="inventory"
+                                      sectionData={item}
+                                    />
+                                  </Stack>
                                 </Card>
                               </Col>
                             );
