@@ -1,5 +1,5 @@
 import { Container, Stack } from '@mui/material'
-import React from 'react'
+import React, { memo } from 'react'
 import img1 from './MAVERICK (24).webp'
 import img2 from './MAVERICK (25).webp'
 import img3 from './MAVERICK (26).webp'
@@ -19,4 +19,4 @@ function MavLoading() {
     )
 }
 
-export default MavLoading
+export default memo(MavLoading)

@@ -13,7 +13,7 @@ function Dashboard() {
         if (adminData.includes(user.uid)) {
             return (
                 <>
-                    <Stack>
+                <Stack >
                         <NavBtn />
                         <Container>
                             <Outlet />

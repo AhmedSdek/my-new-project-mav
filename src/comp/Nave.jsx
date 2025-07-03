@@ -3,12 +3,15 @@ import "./min.css";
 import logoPhoto from "./log.webp";
 import { Link } from "react-router-dom";
 import { db } from "../firebase/config";
-import { Tooltip } from "@mui/material";
+import { Button, ToggleButton, Tooltip } from "@mui/material";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection } from "firebase/firestore";
-import { FavoriteBorder } from "@mui/icons-material";
+import { FavoriteBorder, FormatBold } from "@mui/icons-material";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 function Navs() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language; // هيطلع "ar" أو "en"
   const [value, loading, error] = useCollection(collection(db, "admin"));
   var arr = [];
   value &&
@@ -46,6 +49,8 @@ function Navs() {
               <Nav.Link as={Link} to="/" eventKey="0">
                 Home
               </Nav.Link>
+              {/* <Button sx={{ color: 'white', width: 'fit-content', p: '2px', minWidth: 'auto' }} onClick={() => i18n.changeLanguage('ar')}>Ar</Button>
+              <Button sx={{ color: 'white', width: 'fit-content', p: '2px', minWidth: 'auto' }} onClick={() => i18n.changeLanguage('en')}>En</Button> */}
               <NavDropdown title="Districts" id="navbarScrollingDropdown">
                 {arr.map((link, index) => {
                   return (
@@ -88,6 +93,20 @@ function Navs() {
                   <FavoriteBorder />
                 </Tooltip>
               </Nav.Link>
+              <ToggleButton
+                sx={{
+                  color: 'white',
+                  '&.Mui-selected': {
+                    color: 'white',
+                    backgroundColor: '#1976d2', // لون الخلفية عند selected
+                  },
+                }}
+                onChange={() => {
+                  i18n.changeLanguage(lang === "ar" ? "en" : "ar");
+                }}
+                value={lang} aria-label="bold">
+                {lang === "ar" ? "عربي" : "English"}
+              </ToggleButton>
             </Nav>
           </Navbar.Collapse>
         </Container>

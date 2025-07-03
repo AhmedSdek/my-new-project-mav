@@ -1,18 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { db, storage } from '../../../firebase/config';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Card, Dialog, DialogContent, FormControl, FormControlLabel, FormLabel, IconButton, InputLabel, LinearProgress, MenuItem, Radio, RadioGroup, Select, Stack, TextField, Typography, styled } from '@mui/material';
+import { Box, Button, Card, Dialog, DialogContent, IconButton, LinearProgress, Stack, Typography, styled } from '@mui/material';
 import ReactLoading from 'react-loading';
 import 'react-phone-input-2/lib/style.css'
 import { AddPhotoAlternate, HelpOutline, Info } from '@mui/icons-material';
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-// import { data } from '../../Data';
 import Input from '../Input';
 import FormGro from '../FormGro';
 import FileUpload from '../FileUpload';
-
+import MavLoading from '../../Loading/MavLoading';
+import { useTranslation } from 'react-i18next';
 function NewLaunchesForm() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language; // هيطلع "ar" أو "en"
+  // const [lang, setLang] = useState("en"); // أو "ar"
   const [messege, setMessege] = useState(false);
   const nav = useNavigate()
   const VisuallyHiddenInput = styled('input')({
@@ -32,18 +35,29 @@ function NewLaunchesForm() {
   const [prog3, setProg3] = useState(0)
   const [prog4, setProg4] = useState(0)
   const [newData, setNewData] = useState({
-    Dis: "",
-    launchName: "",
-    Dis: "",
+    Dis: {
+      ar: "",
+      en: ""
+    },
+    launchName: {
+      ar: "",
+      en: ""
+    },
     img: '',
     video: "",
     img: [],
     masterplan: "",
-    Location: "",
+    Location: {
+      ar: "",
+      en: ""
+    },
     devid: "",
     icon: "",
-    devname: "",
-    price: "",
+    devName: {
+      ar: "",
+      en: ""
+    },
+    price: 0,
   });
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
@@ -52,7 +66,7 @@ function NewLaunchesForm() {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "developers"));
+        const snapshot = await getDocs(collection(db, "developer"));
         const devs = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -65,7 +79,6 @@ function NewLaunchesForm() {
         setDevLoading(false);
       }
     };
-
     fetchDevelopers();
   }, []);
   const handleDevChange = useCallback(
@@ -77,7 +90,8 @@ function NewLaunchesForm() {
           ...prev,
           devid: selectedDev.id,
           icon: selectedDev.img || "",
-          devname: selectedDev.name || "",
+          devName: selectedDev.devName || "",
+          devDis: selectedDev.devDis || "",
         }));
       }
     },
@@ -302,71 +316,16 @@ function NewLaunchesForm() {
       );
     }
   }, []);
-  // const handleFileChange = async (event) => {
-  //   for (let i = 0; i < event.target.files.length; i++) {
-  // // console.log(i)
-  //     const storageRef = ref(
-  //       storage,
-  //       "newLaunches/" + event.target.files[i].name
-  //     );
-  //     const uploadTask = uploadBytesResumable(
-  //       storageRef,
-  //       event.target.files[i]
-  //     );
-
-  //     uploadTask.on(
-  //       "state_changed",
-  //       (snapshot) => {
-  //     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-  //         const progress =
-  //           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-  //         // console.log('Upload is ' + progress + '% done');
-  //         setProg(progress);
-  //         if (i < event.target.files.length) {
-  //           setBtn(true);
-  //         }
-  //         switch (snapshot.state) {
-  //           case "paused":
-  //             console.log("Upload is paused");
-  //             break;
-  //           case "running":
-  //             console.log("Upload is running");
-  //             break;
-  //         }
-  //       },
-  //       (error) => {
-  //         // A full list of error codes is available at
-  //         // https://firebase.google.com/docs/storage/web/handle-errors
-  //         switch (error.code) {
-  //           case "storage/unauthorized":
-  //             // User doesn't have permission to access the object
-  //             break;
-  //           case "storage/canceled":
-  //             // User canceled the upload
-  //             break;
-
-  //           // ...
-
-  //           case "storage/unknown":
-  //             // Unknown error occurred, inspect error.serverResponse
-  //             break;
-  //         }
-  //       },
-  //       () => {
-  //       // Upload completed successfully, now we can get the download URL
-  //         getDownloadURL(uploadTask.snapshot.ref).then(
-  //           async (downloadURL) => {
-  //             console.log("File available at", downloadURL);
-  //             setUrl((old) => [...old, downloadURL]);
-  //             setBtn(false);
-  //             // Add a new document in collection "cities"
-  //           }
-  //         );
-  //       }
-  //     );
-  //   }
-  // };
-  const onchange = useCallback((e) => {
+  const onchange = useCallback((parentKey, lang) => (e) => {
+    setNewData((prev) => ({
+      ...prev,
+      [parentKey]: {
+        ...prev[parentKey],
+        [lang]: e.target.value
+      }
+    }));
+  }, []);
+  const onSimpelchange = useCallback((e) => {
     setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
   const sendData = async (dataToSend) => {
@@ -380,6 +339,12 @@ function NewLaunchesForm() {
       });
     } catch (er) { 
       console.log(er)
+    } finally {
+      setMessege(true);
+      setTimeout(() => {
+        setMessege(false);
+        nav("/dashboard");
+      }, 1000);
     }
     setBtn(false);
   };
@@ -387,15 +352,25 @@ function NewLaunchesForm() {
     async (e) => {
       e.preventDefault();
       setMessege(true);
-      console.log(newData)
-      // setTimeout(() => {
-      //   setMessege(false);
-      //   nav("/");
-      // }, 2000);
-      // await sendData(newData);
+      // console.log(newData)
+      await sendData(newData);
     },
     [newData]
   );
+  if (devLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <MavLoading />
+      </div>
+    )
+  }
   return (
     <>
       <Box
@@ -409,7 +384,9 @@ function NewLaunchesForm() {
         }}
       >
         <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-          <Typography variant="h5">New Launches</Typography>
+          <Typography variant="h5">
+            {lang === "ar" ? "وحدات جديده" : "New Launch"}
+          </Typography>
         </Stack>
         <Card
           sx={{
@@ -421,13 +398,6 @@ function NewLaunchesForm() {
             margin: "10px 0 ",
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            Complete The Form
-          </Typography>
-          <Typography variant="caption">
-            Your privacy is important to us. We won't publish or share your
-            information with anyone
-          </Typography>
           <Box
             component="form"
             onSubmit={onsubmit}
@@ -442,45 +412,56 @@ function NewLaunchesForm() {
             }}
           >
             <FormGro
-              label="Dev"
+              inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
               name="dev"
               data={developers}
-              inputLabel="Dev"
-              value={newData.devid || ""} // نخزن ونعرض الـ id
+              value={newData.devid || ""}
               fun={handleDevChange}
+              lang={lang}
             />
             <Input
-              name="launchName"
-              value={newData.launchName}
-              onChange={onchange}
-              // placeholder="اكتب شيئًا هنا"
-              label="Launch Name"
+              value={newData.launchName.en}
+              onChange={onchange("launchName", "en")}
+              label={lang === "ar" ? "اسم الوحده بالانجليزي" : "Launch Name en"}
               id="outlined-multiline-static"
+            />
+            <Input
+              value={newData.launchName.ar}
+              onChange={onchange("launchName", "ar")}
+              label={lang === "ar" ? "اسم الوحده بالعربي" : "Launch Name ar"}
+              id="outlined-multiline-staticar"
             />
             <Input
               name="price"
               value={newData.price}
-              onChange={onchange}
-              // placeholder="اكتب شيئًا هنا"
-              label="Price"
+              type="number"
+              onChange={onSimpelchange}
+              label={lang === "ar" ? "السعر" : "Price"}
               id="outlined-multiline-static"
             />
-            <FileUpload handleFileChange={handleFileChange} prog={prog} title="Upload Your Images ..." />
+            <FileUpload handleFileChange={handleFileChange} multiple={true} prog={prog}
+              title={lang === "ar" ? "رفع الصور" : "Upload Your Images ..."}
+            />
             <Input
-              name="Location"
-              value={newData.Location}
-              onChange={onchange}
-              // placeholder="اكتب شيئًا هنا"
-              label="Location"
-              id="outlined-multiline-static"
+              value={newData.Location.en}
+              onChange={onchange("Location", "en")}
+              label={lang === "ar" ? "الموقع انجليزي" : "Location en"}
+              id="outlined-Location-static"
             />
-            <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title="Master plan Images ..." />
+            <Input
+              value={newData.Location.ar}
+              onChange={onchange("Location", "ar")}
+              label={lang === "ar" ? "الموقع عربي" : "Location ar"}
+              id="outlined-Location-staticar"
+            />
+            <FileUpload handleFileChange={handleMasterplanImgChange} multiple={false} prog={prog3}
+              title={lang === "ar" ? "رفع صوره ماستربلان" : "Master plan Image ..."} />
             <Box sx={{ width: '100%', padding: "5px" }}>
-              <Typography variant="body2">Video ...</Typography>
+              <Typography variant="body2">{lang === "ar" ? "فيديو" : "Video"}
+              </Typography>
               <Button
                 component="label"
                 variant="outlined"
-            // tabIndex={-1}
                 sx={{ padding: "10px", margin: "15px" }}
                 startIcon={<AddPhotoAlternate />}
                 onChange={(e) => {
@@ -516,10 +497,18 @@ function NewLaunchesForm() {
             </Dialog>
             <Input
               name="Dis"
-              value={newData.Dis}
-              onChange={onchange}
-              // placeholder="اكتب شيئًا هنا"
-              label="Details"
+              value={newData.Dis.en}
+              onChange={onchange("Dis", "en")}
+              label={lang === "ar" ? "التفاصيل انجليزي" : "Details en"}
+              id="outlined-Detailsen"
+              multiline
+              rows={4}
+            />
+            <Input
+              name="Dis"
+              value={newData.Dis.ar}
+              onChange={onchange("Dis", "ar")}
+              label={lang === "ar" ? "التفاصيل عربي" : "Details ar"}
               id="outlined-Details"
               multiline
               rows={4}
@@ -534,7 +523,7 @@ function NewLaunchesForm() {
               {btn ? (
                 <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
               ) : (
-                "Send"
+                  lang === "ar" ? "ارسال" : "Send"
               )}
             </Button>
           </Box>
@@ -557,7 +546,7 @@ function NewLaunchesForm() {
           scale: messege ? "1" : "0",
         }}
       >
-        Data has been sent successfully{" "}
+        Data has been sent successfully
         <Info
           style={{ margin: "3px 0 0 10px", fontSize: "20px", color: "teal" }}
         />

@@ -7,17 +7,22 @@ import 'react-phone-input-2/lib/style.css'
 import { HelpOutline, Info } from '@mui/icons-material';
 import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useCollection } from 'react-firebase-hooks/firestore';
 import FormGro from '../FormGro';
 import Input from '../Input';
 import CheckboxCom from '../CheckboxCom';
 import FileUpload from '../FileUpload';
+import MavLoading from '../../Loading/MavLoading';
 
 function DataBase() {
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
   const [devError, setDevError] = useState("");
-
+  const [messege, setMessege] = React.useState(false);
+  const nav = useNavigate()
+  const [open, setOpen] = useState(false);
+  const [btn, setBtn] = useState(false);
+  const [prog3, setProg3] = useState(0)
+  const [prog, setProg] = useState(0)
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
@@ -37,16 +42,6 @@ function DataBase() {
 
     fetchDevelopers();
   }, []);
-  const [open, setOpen] = useState(false);
-
-  // const developers =  useMemo(() => {
-  //     return (
-  //       devData?.docs.map((doc) => ({
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       })) || []
-  //     );
-  //   }, [devData]);
   const [newData, setNewData] = useState({
     devid: "",
     devName: "",
@@ -55,7 +50,7 @@ function DataBase() {
     proj: "",
     projImgs: [],
     district: "",
-    price: "",
+    price: 0,
     projDes: "",
     masterplanImg: [],
     Location: "",
@@ -74,8 +69,6 @@ function DataBase() {
     offer3: "",
     offer4: "",
   });
-  const [messege, setMessege] = React.useState(false);
-  const nav = useNavigate()
   const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
     clipPath: 'inset(50%)',
@@ -87,9 +80,6 @@ function DataBase() {
     whiteSpace: 'nowrap',
     width: 1,
   });
-  const [btn, setBtn] = useState(false);
-  const [prog3, setProg3] = useState(0)
-  const [prog, setProg] = useState(0)
   const handleDevChange = useCallback(
     (e) => {
       const selectedDev = developers.find((dev) => dev.id === e.target.value);
@@ -99,7 +89,8 @@ function DataBase() {
           ...prev,
           devid: selectedDev.id,
           devIcon: selectedDev.img || "",
-          devName: selectedDev.name || "",
+          devName: selectedDev.devName || "",
+          devDis: selectedDev.devDis || "",
         }));
       }
     },
@@ -351,6 +342,12 @@ function DataBase() {
     } catch (err) {
       console.error("❌ خطأ:", err);
       alert("❌ حدث خطأ أثناء حفظ البيانات");
+    } finally {
+      setMessege(true);
+      setTimeout(() => {
+        setMessege(false);
+        nav("/dashboard");
+      }, 1000);
     }
     setBtn(false);
   };
@@ -362,6 +359,20 @@ function DataBase() {
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
+  if (devLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <MavLoading />
+      </div>
+    )
+  }
   return (
     <>
       <Box
@@ -387,25 +398,9 @@ function DataBase() {
             margin: "10px 0 ",
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            Complete The Form
-          </Typography>
-          <Typography variant="caption">
-            Your privacy is important to us. We won't publish or share your
-            information with anyone
-          </Typography>
           <Box
             component="form"
             onSubmit={onsubmit}
-            // onSubmit={async (e) => {
-            //   e.preventDefault();
-            //   sendData();
-            //   setMessege(true);
-            //   setTimeout(() => {
-            //     setMessege(false);
-            //     nav("/");
-            //   }, 2000);
-            // }}
             style={{
               display: "flex",
               justifyContent: "center",
@@ -424,40 +419,6 @@ function DataBase() {
               value={newData.devid || ""} // نخزن ونعرض الـ id
               fun={handleDevChange}
             />
-            <IconButton onClick={() => setOpen(true)}>
-              <HelpOutline />
-            </IconButton>
-            <Dialog open={open} onClose={() => setOpen(false)}>
-              <DialogContent>
-                <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
-                  {`📝 إزاي تستخدم Markdown:
-# عنوان رئيسي 
-## عنوان فرعي 
-### عنوان 
-#### عنوان 
-##### عنوان 
-###### عنوان 
-* نص مائل
-** نص عريض
-~~ نص مشطوب
-- قائمة نقطية
-1. قائمة مرقمة
-> اقتباس
-`}{" "}
-                </Typography>
-              </DialogContent>
-            </Dialog>
-            <Input
-              onChange={handleChange} // نخزن ونعرض الـ id
-              id="Description"
-              label="Description"
-              variant="outlined"
-              type="text"
-              name="devDis"
-              value={newData.devDis} // نخزن ونعرض الـ id
-              multiline
-              rows={4}
-            />
             <CheckboxCom
               data={checkBoxOptions1}
               handleCheckboxChange={handleCheckboxChange}
@@ -474,23 +435,6 @@ function DataBase() {
             />
             <Divider />
             <FileUpload handleFileChange={handleFileChange} prog={prog} title='Upload Your Project Images ...' />
-            {/* <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
-              <Typography variant="body2">
-                Upload Your Project Images ...
-              </Typography>
-              <Button
-                component="label"
-                variant="outlined"
-                sx={{ padding: "10px", margin: "15px" }}
-                startdevIcon={<AddPhotoAlternate />}
-                onChange={(e) => {
-                  handleFileChange(e);
-                }}
-              >
-                <VisuallyHiddenInput type="file" multiple />
-              </Button>
-              <LinearProgress variant="determinate" value={prog} />
-            </Box> */}
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
               id="district"
@@ -622,10 +566,33 @@ function DataBase() {
               name="offer4"
               value={newData.offer4} // نخزن ونعرض الـ id
             />
+            <IconButton onClick={() => setOpen(true)}>
+              <HelpOutline />
+            </IconButton>
+            <Dialog open={open} onClose={() => setOpen(false)}>
+              <DialogContent>
+                <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+                  {`📝 إزاي تستخدم Markdown:
+# عنوان رئيسي 
+## عنوان فرعي 
+### عنوان 
+#### عنوان 
+##### عنوان 
+###### عنوان 
+* نص مائل
+** نص عريض
+~~ نص مشطوب
+- قائمة نقطية
+1. قائمة مرقمة
+> اقتباس
+`}{" "}
+                </Typography>
+              </DialogContent>
+            </Dialog>
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
-              id="projDes"
-              label="projDes"
+              id="projectDes"
+              label="project Des"
               variant="outlined"
               type="text"
               name="projDes"

@@ -332,7 +332,7 @@ function ReSale() {
     setBtn(true);
     try {
       const id = new Date().getTime();
-      await setDoc(doc(db, "Resell", `${id}`), {
+      await setDoc(doc(db, "deals", `${id}`), {
         id: `${id}`,
         imgtext: imgText,
         price: price,

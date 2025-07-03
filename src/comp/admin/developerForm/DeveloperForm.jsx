@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -12,24 +12,32 @@ import {
 } from "@mui/material";
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
-import { HelpOutline } from "@mui/icons-material";
+import { HelpOutline, Info } from "@mui/icons-material";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../../firebase/config";
 import Input from "../Input";
 import FileUpload from "../FileUpload";
+import { useTranslation } from "react-i18next";
 
 function DeveloperForm() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language; // هيطلع "ar" أو "en"
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const [prog, setProg] = useState(0);
   const [btn, setBtn] = useState(false);
   const [messege, setMessege] = useState(false);
   const [newData, setNewData] = useState({
-    // dev: null,
-    // Dis: "",
+    devDis: {
+      ar: "",
+      en: ""
+    },
     img: [],
-    name: "",
+    devName: {
+      ar: "",
+      en: ""
+    },
   });
 
   const handleFileChange = useCallback(async (event) => {
@@ -99,35 +107,46 @@ function DeveloperForm() {
     setBtn(true);
     try {
       const id = new Date().getTime();
-      await setDoc(doc(db, "developers", `${id}`), {
+      await setDoc(doc(db, "developer", `${id}`), {
         id: `${id}`,
         ...dataToSend,
       });
-      setTimeout(() => {
-        setMessege(false);
-        nav("/");
-      }, 2000);
     } catch (er) {
       console.error("Send error:", er);
+    } finally {
+      setMessege(true);
+      setTimeout(() => {
+        setMessege(false);
+        nav("/dashboard");
+      }, 1000);
     }
     setBtn(false);
   };
 
-  const onchange = useCallback((e) => {
-    setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const onchange = useCallback((parentKey, lang) => (e) => {
+    setNewData((prev) => ({
+      ...prev,
+      [parentKey]: {
+        ...prev[parentKey],
+        [lang]: e.target.value
+      }
+    }));
   }, []);
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      // console.log(newData);
       await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
+
   return (
-    <Box sx={{ height: 'calc(100vh - 100px)' }} className="w-full flex flex-col justify-center align-items-center pt-16">
+    <>
+      <Box sx={{
+        minHeight: 'calc(100vh - 100px)'
+      }} className="w-full flex flex-col justify-center align-items-center pt-16" >
       <Stack className="align-items-center mb-2.5">
-        <Typography variant="h5">inventory</Typography>
+          <Typography variant="h5">{lang === "ar" ? "اضف المطور" : "Add developers"}</Typography>
       </Stack>
       <Card
         onSubmit={onsubmit}
@@ -136,26 +155,32 @@ function DeveloperForm() {
         className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
       >
         <Input
-          onChange={onchange}
-          type="text"
-          id="DevName"
-          label="Dev Name"
-          name="name"
-          value={newData.name} // نخزن ونعرض الـ id
-        />
-        {/* <IconButton onClick={() => setOpen(true)}>
+            onChange={onchange("devName", "en")}
+            type="text"
+            id="DevNameEn"
+            label={lang === "ar" ? "اسم المطور انجليزي" : "Developer Name en"}
+            value={newData.devName.en}
+          />
+          <Input
+            onChange={onchange("devName", "ar")}
+            type="text"
+            id="DevNameAr"
+            label={lang === "ar" ? "اسم المطور عربي" : "Developer Name ar"}
+            value={newData.devName.ar}
+          />
+          <IconButton onClick={() => setOpen(true)}>
           <HelpOutline />
         </IconButton>
         <Dialog open={open} onClose={() => setOpen(false)}>
           <DialogContent>
             <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
               {`📝 إزاي تستخدم Markdown:
-# عنوان رئيسي
-## عنوان فرعي
-### عنوان
-#### عنوان
-##### عنوان
-###### عنوان
+# عنوان رئيسي 
+## عنوان فرعي 
+### عنوان 
+#### عنوان 
+##### عنوان 
+###### عنوان 
 * نص مائل
 ** نص عريض
 ~~ نص مشطوب
@@ -165,19 +190,29 @@ function DeveloperForm() {
 `}{" "}
             </Typography>
           </DialogContent>
-        </Dialog> */}
-        {/* <Input
-          name="Dis"
-          value={newData.Dis}
-          onChange={onchange}
-          // placeholder="اكتب شيئًا هنا"
-          rows={4}
-          label="Description"
-          multiline
-          id="outlined-multiline-static"
-        /> */}
-        <FileUpload handleFileChange={handleFileChange} prog={prog} title='imges' />
+          </Dialog>
 
+          <Input
+            onChange={onchange("devDis", "en")}
+            type="text"
+            id="DevDisEn"
+            label={lang === "ar" ? "التفاصيل انجليزي" : "Description (English)"}
+            value={newData.devDis.en}
+            multiline
+            rows={4}
+          />
+
+          <Input
+            onChange={onchange("devDis", "ar")}
+            type="text"
+            id="DevDisAr"
+            label={lang === "ar" ? "التفاصيل عربي" : "Description (Arabic)"}
+            value={newData.devDis.ar}
+            multiline
+            rows={4}
+          />
+          <FileUpload handleFileChange={handleFileChange} prog={prog} title={lang === "ar" ? "ايقونه المطور" : "Develper Icon"}
+          />
         <Button
           disabled={btn}
           variant="contained"
@@ -187,11 +222,34 @@ function DeveloperForm() {
           {btn ? (
             <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
           ) : (
-            "Send"
+                lang === "ar" ? "ارسال" : "Send"
           )}
         </Button>
       </Card>
     </Box>
+      <p
+        style={{
+          zIndex: "10",
+          backgroundColor: "whitesmoke",
+          display: "flex",
+          alignItems: "center",
+          color: "black",
+          padding: "10px",
+          borderRadius: "6px",
+          boxShadow: "rgb(255 255 255 / 25%) 0px 5px 30px 0px",
+          position: "fixed",
+          top: "100px",
+          right: messege ? "20px" : "-230px",
+          transition: "0.8s",
+          scale: messege ? "1" : "0",
+        }}
+      >
+        Data has been sent successfully
+        <Info
+          style={{ margin: "3px 0 0 10px", fontSize: "20px", color: "teal" }}
+        />
+      </p>
+    </>
   );
 }
 

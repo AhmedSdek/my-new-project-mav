@@ -20,7 +20,7 @@ const VisuallyHiddenInput = (props) => (
   />
 );
 
-function UploadSection({ handleFileChange, prog, title }) {
+function UploadSection({ handleFileChange, prog, title, multiple }) {
   return (
     <Box className="mt-2.5 mb-2.5 w-full">
       <Typography variant="body2">{title}</Typography>
@@ -32,7 +32,7 @@ function UploadSection({ handleFileChange, prog, title }) {
       >
         <VisuallyHiddenInput
           type="file"
-          multiple
+          multiple={multiple}
           onChange={handleFileChange}
         />
       </Button>
