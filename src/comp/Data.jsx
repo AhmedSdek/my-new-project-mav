@@ -1156,25 +1156,3 @@ export const data = [
     },
 
 ];
-// [
-//     {
-//         "id": 142,
-//         "image": makeplace,
-//         'name': 'MakePlace',
-//     },
-//     {
-//         "id": 143,
-//         "image": tameer,
-//         'name': 'Tameer',
-//     },
-//     {
-//         "id": 144,
-//         "image": waterway,
-//         'name': 'Waterway',
-//     },
-//     {
-//         "id": 145,
-//         "image": newJersey,
-//         'name': 'New Jersey',
-//     },
-//   ]

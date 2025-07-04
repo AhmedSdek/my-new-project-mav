@@ -30,7 +30,7 @@ import { collection, doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useCollection } from "react-firebase-hooks/firestore";
 import FormGro from "../FormGro";
-
+import { data } from '../../Data'
 function ReSale() {
   const [messege, setMessege] = React.useState(false);
   const nav = useNavigate();
