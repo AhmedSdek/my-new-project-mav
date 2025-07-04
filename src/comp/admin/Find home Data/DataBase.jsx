@@ -26,6 +26,8 @@
 //   const [btn, setBtn] = useState(false);
 //   const [prog3, setProg3] = useState(0)
 //   const [prog, setProg] = useState(0)
+//   const [offers, setOffers] = useState([{ pers: "", year: "", offer: "" }]);
+
 //   useEffect(() => {
 //     const fetchDevelopers = async () => {
 //       try {
@@ -56,6 +58,7 @@
 //     Location: "",
 //     aminatis: [],
 //     type: [],
+//     offers: [],
 //     pers1: "",
 //     year1: "",
 //     pers2: "",
@@ -141,7 +144,7 @@
 //               // User canceled the upload
 //               break;
 
-//             // ...
+//         // ...
 
 //             case "storage/unknown":
 //               // Unknown error occurred, inspect error.serverResponse
@@ -233,7 +236,7 @@
 //               // User canceled the upload
 //               break;
 
-//             // ...
+//   // ...
 
 //             case 'storage/unknown':
 //               // Unknown error occurred, inspect error.serverResponse
@@ -294,6 +297,18 @@
 //     "Duplex",
 //     "Apartment"
 //   ], []);
+//   // Offers Handlers
+//   const handleOfferChange = useCallback((index, field) => (e) => {
+//     const value = e.target.value;
+//     setOffers((prev) => {
+//       const updated = [...prev];
+//       updated[index][field] = value;
+//       return updated;
+//     });
+//   }, []);
+//   const addOffer = () => setOffers((prev) => [...prev, { pers: "", year: "", offer: "" }]);
+//   const removeOffer = (index) => setOffers((prev) => prev.filter((_, i) => i !== index));
+
 //   const sendProjectToFirebase = async () => {
 //     if (!newData.devid || !newData.proj) {
 //       alert("برجاء اختيار مطور وكتابة اسم المشروع");
@@ -326,7 +341,7 @@
 //         offer3: newData.offer3,
 //         offer4: newData.offer4,
 //       };
-//       const docRef = doc(db, "admin", newData.devName);
+//       const docRef = doc(db, "compound", newData.devName);
 //       const docSnap = await getDoc(docRef);
 //       if (!docSnap.exists()) {
 //         await setDoc(docRef, {
@@ -581,7 +596,7 @@
 // ### عنوان
 // #### عنوان
 // ##### عنوان
-// ###### عنوان
+// ###### عنوان 
 // * نص مائل
 // ** نص عريض
 // ~~ نص مشطوب
@@ -855,7 +870,7 @@ function DataBase() {
     };
     try {
       setBtn(true);
-      const docRef = doc(db, "admin", newData.developer.id);
+      const docRef = doc(db, "compound", newData.developer.id);
       const docSnap = await getDoc(docRef);
       if (!docSnap.exists()) {
         await setDoc(docRef, {
