@@ -17,12 +17,22 @@ function FormGro(props) {
       <InputLabel>{inputLabel}</InputLabel>
       <Select label={label} name={name} value={value} onChange={fun}>
         {data?.map((item, index) => {
-          const isObject = typeof item === "object" && item !== null;
-          const itemValue = isObject ? item.id : item;
-
-          let itemLabel = item;
-          if (isObject) {
-            itemLabel = item.devName?.[lang] || item.devName?.en || "";
+          let itemLabel = "";
+          let itemValue = "";
+          if (typeof item === "object" && item !== null) {
+            if ("devName" in item) {
+              // النوع الأول
+              itemLabel = item.devName[lang] || item.devName.en;
+              itemValue = item.id;
+            } else {
+              // النوع التاني
+              itemLabel = item[lang] || item.en;
+              itemValue = item[lang] || item.en;
+            }
+          } else {
+            // لو نص مباشر
+            itemLabel = item;
+            itemValue = item;
           }
           return (
             <MenuItem value={itemValue} key={index}>

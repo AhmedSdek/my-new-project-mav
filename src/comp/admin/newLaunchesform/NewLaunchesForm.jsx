@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 function NewLaunchesForm() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
-  // const [lang, setLang] = useState("en"); // أو "ar"
   const [messege, setMessege] = useState(false);
   const nav = useNavigate()
   const VisuallyHiddenInput = styled('input')({
@@ -51,18 +50,14 @@ function NewLaunchesForm() {
       ar: "",
       en: ""
     },
-    devid: "",
-    icon: "",
-    devName: {
-      ar: "",
-      en: ""
+    developer: {
+
     },
     price: 0,
   });
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
   const [devError, setDevError] = useState("");
-
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
@@ -88,10 +83,7 @@ function NewLaunchesForm() {
       if (selectedDev) {
         setNewData((prev) => ({
           ...prev,
-          devid: selectedDev.id,
-          icon: selectedDev.img || "",
-          devName: selectedDev.devName || "",
-          devDis: selectedDev.devDis || "",
+          developer: selectedDev
         }));
       }
     },
@@ -352,7 +344,7 @@ function NewLaunchesForm() {
     async (e) => {
       e.preventDefault();
       setMessege(true);
-      // console.log(newData)
+      console.log(newData)
       await sendData(newData);
     },
     [newData]
@@ -415,7 +407,7 @@ function NewLaunchesForm() {
               inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
               name="dev"
               data={developers}
-              value={newData.devid || ""}
+              value={newData.developer?.id || ""}
               fun={handleDevChange}
               lang={lang}
             />

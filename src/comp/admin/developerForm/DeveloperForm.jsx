@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -19,6 +19,7 @@ import { db, storage } from "../../../firebase/config";
 import Input from "../Input";
 import FileUpload from "../FileUpload";
 import { useTranslation } from "react-i18next";
+import FormGro from "../FormGro";
 
 function DeveloperForm() {
   const { i18n } = useTranslation();
@@ -38,8 +39,12 @@ function DeveloperForm() {
       ar: "",
       en: ""
     },
+    country: {
+      ar: "",
+      en: ""
+    }
   });
-
+  const CountryOptions = useMemo(() => [{ ar: "مصر", en: "Egypt" }, { ar: "الامارات", en: "UAE" }], []);
   const handleFileChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(
@@ -135,9 +140,25 @@ function DeveloperForm() {
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
+      // console.log(newData)
       await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
+  );
+  const handleSelectChange = useCallback(
+    (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = CountryOptions.find(
+        (item) =>
+          (item[lang] || item.en) === selectedLabel
+      );
+
+      setNewData((prev) => ({
+        ...prev,
+        country: selectedObject || prev.country
+      }));
+    },
+    [CountryOptions, lang]
   );
 
   return (
@@ -168,6 +189,14 @@ function DeveloperForm() {
             label={lang === "ar" ? "اسم المطور عربي" : "Developer Name ar"}
             value={newData.devName.ar}
           />
+          <FormGro
+            inputLabel={lang === "ar" ? "اختر البلد" : "Select Country"}
+            name="country"
+            data={CountryOptions}
+            value={newData.country[lang] || ""}
+            fun={handleSelectChange}
+            lang={lang}
+          /> 
           <IconButton onClick={() => setOpen(true)}>
           <HelpOutline />
         </IconButton>
@@ -191,7 +220,6 @@ function DeveloperForm() {
             </Typography>
           </DialogContent>
           </Dialog>
-
           <Input
             onChange={onchange("devDis", "en")}
             type="text"
@@ -201,7 +229,6 @@ function DeveloperForm() {
             multiline
             rows={4}
           />
-
           <Input
             onChange={onchange("devDis", "ar")}
             type="text"

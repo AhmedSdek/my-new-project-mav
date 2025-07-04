@@ -9,7 +9,6 @@ import { Route, Routes } from "react-router-dom";
 import Developers from "./comp/home content/Developers/Developers";
 import About from "./comp/home content/about/About";
 import { useEffect, useState } from "react";
-import HashLoader from "react-spinners/HashLoader";
 import Signin from "./Auth/Signin";
 import Regester from "./Auth/Regester";
 import { Box, Stack, ThemeProvider, createTheme } from "@mui/material";
@@ -45,46 +44,9 @@ import CityscapeProjects from "./comp/home content/cityscape/CityscapeProjects";
 import EditCity from "./comp/admin/Edit/City/EditCity";
 import Inventory from "./comp/admin/inventory/Inventory";
 import InventoryDetails from "./comp/inventory/InventoryDetails";
-import { data } from "./comp/Data";
-import { collection, doc, getDocs, setDoc } from "firebase/firestore";
-import { db } from "./firebase/config";
 import DeveloperForm from "./comp/admin/developerForm/DeveloperForm";
-import ReactMarkdown from "react-markdown";
 
 function App() {
-  // const [developers, setDevelopers] = useState([]);
-
-  // const getDevelopers = async () => {
-  //   try {
-  //     const querySnapshot = await getDocs(collection(db, "developers"));
-  //     const devs = [];
-  //     querySnapshot.forEach((doc) => {
-  //       devs.push({ id: doc.id, ...doc.data() }); // id لو حابب تستخدمها لاحقًا
-  //     });
-  //     setDevelopers(devs);
-  //   } catch (error) {
-  //     console.error("❌ فشل تحميل المطورين:", error);
-  //   }
-  // };
-  // const uploadBasicDevelopers = async () => {
-  //   try {
-  //     const batchPromises = data.map((dev) => {
-  //       const minimalDev = {
-  //         id: dev.id.toString(),
-  //         name: dev.name,
-  //         img: dev.image,
-  //       };
-
-  //       return setDoc(doc(collection(db, "developers"), dev.id.toString()), minimalDev);
-  //     });
-
-  //     await Promise.all(batchPromises);
-  //     console.log("✅ تم رفع id و name و image فقط لكل مطور.");
-  //   } catch (error) {
-  //     console.error("❌ حصل خطأ أثناء رفع المطورين:", error);
-  //   }
-  // };
-
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(
     localStorage.getItem("mtTheme") === null

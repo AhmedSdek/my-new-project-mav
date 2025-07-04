@@ -94,6 +94,7 @@ function Navs() {
                 </Tooltip>
               </Nav.Link>
               <ToggleButton
+
                 sx={{
                   color: 'white',
                   '&.Mui-selected': {
@@ -105,7 +106,7 @@ function Navs() {
                   i18n.changeLanguage(lang === "ar" ? "en" : "ar");
                 }}
                 value={lang} aria-label="bold">
-                {lang === "ar" ? "عربي" : "English"}
+                {lang === "en" ? "عربي" : "English"}
               </ToggleButton>
             </Nav>
           </Navbar.Collapse>
