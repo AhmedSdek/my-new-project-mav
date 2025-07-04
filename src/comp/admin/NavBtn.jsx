@@ -41,16 +41,16 @@ export default function NavBtn() {
       to: "newlaunchesform",
     },
     {
+      text: lang === "ar" ? "كومباوند" : "Compound",
+      to: "database",
+    },
+    {
       text: lang === "ar" ? "عروض" : "Deals",
       to: "resale",
     },
     {
       text: lang === "ar" ? "بيانات المبيعات" : "Sale Data",
       to: "",
-    },
-    {
-      text: lang === "ar" ? "كومباوند" : "Compound",
-      to: "database",
     },
     {
       text: lang === "ar" ? "اينفينتوري" : "Inventory",

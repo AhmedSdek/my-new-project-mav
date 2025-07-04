@@ -148,11 +148,11 @@ function DeveloperForm() {
   const handleSelectChange = useCallback(
     (e) => {
       const selectedLabel = e.target.value;
+      console.log(selectedLabel)
       const selectedObject = CountryOptions.find(
         (item) =>
           (item[lang] || item.en) === selectedLabel
       );
-
       setNewData((prev) => ({
         ...prev,
         country: selectedObject || prev.country

@@ -7,19 +7,20 @@ import {
 } from "@mui/material";
 import React, { memo } from "react";
 
-function RadioCom({ value, onChange, data, name }) {
-  // console.log(data);
+function RadioCom({ value, onChange, data, label, name, lang }) {
   return (
     <FormControl className="mt-2.5 mb-2.5 w-full">
-      <FormLabel required>{name}</FormLabel>
+      <FormLabel required>{label}</FormLabel>
       <RadioGroup row name={name} value={value} onChange={onChange}>
         {data?.map((item, index) => {
+          const itemLabel = typeof item === "object" ? item[lang] : item;
+          const itemValue = typeof item === "object" ? item.en : item;
           return (
             <FormControlLabel
-              value={item}
+              value={itemValue}
               key={index}
               control={<Radio />}
-              label={item}
+              label={itemLabel}
             />
           );
         })}

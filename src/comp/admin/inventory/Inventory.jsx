@@ -5,26 +5,11 @@ import {
   Box,
   Button,
   Card,
-  Checkbox,
   Dialog,
   DialogContent,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
   IconButton,
-  InputLabel,
-  LinearProgress,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
   Stack,
-  TextField,
-  Tooltip,
   Typography,
-  styled,
 } from "@mui/material";
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
@@ -37,39 +22,68 @@ import FormGro from "../FormGro";
 import FileUpload from "../FileUpload";
 import RadioCom from "../RadioCom";
 import CheckboxCom from "../CheckboxCom";
-
+import { useTranslation } from "react-i18next";
 function Inventory() {
   const nav = useNavigate();
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   const [open, setOpen] = useState(false);
   const [prog, setProg] = useState(0);
   const [prog3, setProg3] = useState(0);
   const [prog2, setProg2] = useState(0);
   const [btn, setBtn] = useState(false);
   const [messege, setMessege] = useState(false);
-  // const [developers, setDevelopers] = useState([]);
-  // console.log(developers[0])
+  const [developers, setDevelopers] = useState([]);
+  const [devLoading, setDevLoading] = useState(true);
+  const [compoundNames, setCompoundNames] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCompounds = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "compound"));
+        const allCompoundNames = [];
+
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          if (Array.isArray(data.compound)) {
+            data.compound.forEach(item => {
+              if (item.compoundName) {
+                allCompoundNames.push(item.compoundName);
+              }
+            });
+          }
+        });
+
+        setCompoundNames(allCompoundNames);
+      } catch (error) {
+        console.error("Error fetching compounds:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompounds();
+  }, []);
+
   const [newData, setNewData] = useState({
-    // dev: null,
-    Dis: "",
-    devid: "",
-    compoundName: "",
+    developer: {},
+    Dis: { ar: "", en: "" },
+    compoundName: { ar: "", en: "" },
     img: [],
-    monyType: "",
-    Area: "",
-    imgtext: "",
+    monyType: { ar: "", en: "" },
+    Area: { ar: "", en: "" },
+    imgtext: { ar: "", en: "" },
     Masterimg: [],
     Layoutimg: [],
     Bed: "",
     Bath: "",
-    Location: "",
-    Sale: "",
-    Finsh: "",
-    icon: "",
-    devname: "",
+    Location: { ar: "", en: "" },
+    Sale: { ar: "", en: "" },
+    Finsh: { ar: "", en: "" },
     aminatis: [],
-    // descriptionList: "",
-    price: "",
-    downPayment: "",
+    price: 0,
+    downPayment: 0,
     remaining: "",
     month: "",
     roofArea: "",
@@ -77,49 +91,54 @@ function Inventory() {
     rental: "",
     refNum: "",
     gardenArea: "",
-    about: "",
-    // description: "",
-    // status: "",
-    sold: "",
-    delivery: "",
-    floor: "",
-    Type: "",
+    about: { ar: "", en: "" },
+    sold: { ar: "", en: "" },
+    delivery: { ar: "", en: "" },
+    floor: { ar: "", en: "" },
+    Type: { ar: "", en: "" },
   });
-  const handleCheckboxChange = useCallback((e) => {
-    const { value, checked } = e.target;
-    if (checked) {
-      setNewData((prev) => ({
-        ...prev,
-        aminatis: [...prev.aminatis, value],
-      }));
-    } else {
-      setNewData((prev) => ({
-        ...prev,
-        aminatis: prev.aminatis.filter((item) => item !== value),
-      }));
-    }
+  const onchange = useCallback((parentKey, lang) => (e) => {
+    setNewData((prev) => ({
+      ...prev,
+      [parentKey]: {
+        ...prev[parentKey],
+        [lang]: e.target.value
+      }
+    }));
   }, []);
-  const [value, loading, error] = useCollection(collection(db, "admin"));
-  const [devData, devLoading, devError] = useCollection(collection(db, "developers"));
-  const developers = devData?.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) || [];
-
-  const [projects, setProjects] = useState([]);
+  const handleCheckboxChange = useCallback((selectedItem) => {
+    setNewData((prev) => {
+      const exists = prev.aminatis.some(
+        (item) => item.en === selectedItem.en && item.ar === selectedItem.ar
+      );
+      return {
+        ...prev,
+        aminatis: exists
+          ? prev.aminatis.filter(
+            (item) =>
+              item.en !== selectedItem.en || item.ar !== selectedItem.ar
+          )
+          : [...prev.aminatis, selectedItem],
+      };
+    });
+  }, []);
   useEffect(() => {
-    const arr = [];
-    if (value) {
-      value.docs.forEach((e) => {
-        e.data().dev.forEach((it) => {
-          if (!arr.includes(it.proj) && it.proj !== "") {
-            arr.push(it.proj);
-          }
-        });
-      });
-    }
-    setProjects(arr);
-  }, [value]);
+    const fetchDevelopers = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "developer"));
+        const devs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDevelopers(devs);
+      } catch (err) {
+        console.error("خطأ أثناء جلب المطورين:", err);
+      } finally {
+        setDevLoading(false);
+      }
+    };
+    fetchDevelopers();
+  }, []);
   const handleFileChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(
@@ -310,114 +329,147 @@ function Inventory() {
     setBtn(false);
   };
 
-  const onchange = useCallback((e) => {
+  const onchangesimple = useCallback((e) => {
     setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      // console.log(newData);
-      await sendData(newData);
+      console.log(newData);
+      // await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
 
-  const monyType = useMemo(() => ["dollar", "pound"], []);
-  const soldOutOptions = useMemo(() => ["SOLD OUT", "Not"], []);
+  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
   const deliveryOptions = useMemo(
     () => [
-      "Delivered",
-      "Rtm",
-      "2024",
-      "2025",
-      "2026",
-      "2027",
-      "2028",
-      "2029",
-      "2030",
-      "2031",
-      "2032",
+      { en: "Delivered", ar: "تم التسليم" },
+      { en: "Rtm", ar: "تحت الإنشاء" },
+      { en: "2024", ar: "٢٠٢٤" },
+      { en: "2025", ar: "٢٠٢٥" },
+      { en: "2026", ar: "٢٠٢٦" },
+      { en: "2027", ar: "٢٠٢٧" },
+      { en: "2028", ar: "٢٠٢٨" },
+      { en: "2029", ar: "٢٠٢٩" },
+      { en: "2030", ar: "٢٠٣٠" },
+      { en: "2031", ar: "٢٠٣١" },
+      { en: "2032", ar: "٢٠٣٢" },
     ],
     []
   );
-  const floorOptions = useMemo(() => ["Typical", "Ground"], []);
+  const floorOptions = useMemo(() => [{ en: "Typical", ar: "متكرر " }, { en: "Ground", ar: "أرضي" }], []);
   const typeOptions = useMemo(
     () => [
-      "Apartment",
-      "Duplex",
-      "Studio",
-      "Penthouse",
-      "Family",
-      "Standalone",
-      "Twin house",
-      "Clinic",
-      "Office",
-      "Retail",
-      "Cabin",
-      "Townhouse",
-      "Chalet",
-      "One storey Villa",
+      { en: "Apartment", ar: "شقة" },
+      { en: "Duplex", ar: "دوبلكس" },
+      { en: "Studio", ar: "استوديو" },
+      { en: "Penthouse", ar: "بنتهاوس" },
+      { en: "Family", ar: "منزل عائلي" },
+      { en: "Standalone", ar: "فيلا مستقلة" },
+      { en: "Twin house", ar: "توين هاوس" },
+      { en: "Clinic", ar: "عيادة" },
+      { en: "Office", ar: "مكتب" },
+      { en: "Retail", ar: "محل تجاري" },
+      { en: "Cabin", ar: "كوخ" },
+      { en: "Townhouse", ar: "تاون هاوس" },
+      { en: "Chalet", ar: "شاليه" },
+      { en: "One storey Villa", ar: "فيلا دور واحد" },
     ],
     []
   );
   const bedroomOptions = useMemo(
-    () => ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+    () => [
+      { en: "1", ar: "١" },
+      { en: "2", ar: "٢" },
+      { en: "3", ar: "٣" },
+      { en: "4", ar: "٤" },
+      { en: "5", ar: "٥" },
+      { en: "6", ar: "٦" },
+      { en: "7", ar: "٧" },
+      { en: "8", ar: "٨" },
+      { en: "9", ar: "٩" },
+      { en: "10", ar: "١٠" },
+    ],
     []
   );
-  const bathroomOptions = useMemo(() => ["1", "2", "3", "4", "5"], []);
-  const finshOptions = useMemo(
-    () => ["Finished", "Semi Finished", "Cor & Shell", "Furnished"],
-    []
-  );
-  const statusOptions = useMemo(() => ["Resale", "Rent", "Primary"], []);
-  const checkBoxOptions = useMemo(() => [
-    "Clubhouse",
-    "Commercial Strip",
-    "Underground Parking",
-    "Outdoor Pools",
-    "Jogging Trail",
-    "Bicycles Lanes",
-    "Business Hub",
-    "Schools",
-    "Sports Clubs",
-    "Livability",
-    "Infrastructure",
-    "mosque",
-    "children area",
-    "kids' area",
-    "gym",
-    "spa",
-    "Educational hub",
-    "Commercial area",
-    "Medical centre",
+  const bathroomOptions = useMemo(() => [
+    { en: "1", ar: "١" },
+    { en: "2", ar: "٢" },
+    { en: "3", ar: "٣" },
+    { en: "4", ar: "٤" },
+    { en: "5", ar: "٥" }
   ], []);
-  // const handleDevChange = useCallback(
-  //   (e) => {
-  //     const selectedDev = data.find((dev) => dev.id === e.target.value);
-  //     setNewData((prev) => ({ ...prev, [e.target.name]: selectedDev }));
-  //   },
-  //   [data]
-  // );
+  const finshOptions = useMemo(
+    () => [
+      { en: "Finished", ar: "تشطيب كامل" },
+      { en: "Semi Finished", ar: "نصف تشطيب" },
+      { en: "Core & Shell", ar: "عظم (أساس فقط)" },
+      { en: "Furnished", ar: "مفروش" },
+    ],
+    []
+  );
+  const statusOptions = useMemo(() => [
+    { en: "Resale", ar: "إعادة بيع" },
+    { en: "Rent", ar: "إيجار" },
+    { en: "Primary", ar: "بيع أولي" },
+  ], []);
+  const checkBoxOptions1 = useMemo(
+    () => [
+      { en: "Clubhouse", ar: "النادي الاجتماعي" },
+      { en: "Commercial Strip", ar: "الشريط التجاري" },
+      { en: "Underground Parking", ar: "مواقف سيارات تحت الأرض" },
+      { en: "Outdoor Pools", ar: "حمامات سباحة خارجية" },
+      { en: "Jogging Trail", ar: "مسار للجري" },
+      { en: "Bicycles Lanes", ar: "مسارات للدراجات" },
+      { en: "Business Hub", ar: "مركز أعمال" },
+      { en: "Schools", ar: "مدارس" },
+      { en: "Sports Clubs", ar: "أندية رياضية" },
+      { en: "Livability", ar: "جودة الحياة" },
+      { en: "Infrastructure", ar: "البنية التحتية" },
+      { en: "mosque", ar: "مسجد" },
+      { en: "children area", ar: "منطقة للأطفال" },
+      { en: "kids' area", ar: "منطقة لعب للأطفال" },
+      { en: "gym", ar: "صالة رياضية (جيم)" },
+      { en: "spa", ar: "مركز سبا" },
+      { en: "Educational hub", ar: "مركز تعليمي" },
+      { en: "Commercial area", ar: "منطقة تجارية" },
+      { en: "Medical centre", ar: "مركز طبي" },
+    ],
+    []
+  );
   const handleDevChange = useCallback(
     (e) => {
       const selectedDev = developers.find((dev) => dev.id === e.target.value);
       if (selectedDev) {
-        console.log(selectedDev)
         setNewData((prev) => ({
           ...prev,
-          devid: selectedDev.id,
-          icon: selectedDev.img || "",
-          devname: selectedDev.name || "",
+          developer: selectedDev,
         }));
       }
     },
     [developers]
   );
+  const handleDynamicSelectChange = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => (item[lang] || item.en) === selectedLabel
+      );
+      setNewData((prev) => ({
+        ...prev,
+        [fieldName]: selectedObject || prev[fieldName]
+      }));
+    },
+    [lang]
+  );
+
   // console.log(developers)
   return (
     <Box className="w-full flex flex-col justify-center align-items-center pt-16">
       <Stack className="align-items-center mb-2.5">
-        <Typography variant="h5">inventory</Typography>
+        <Typography variant="h5">{lang === "ar" ? "الوحدات المتاحة" : "inventory"}</Typography>
       </Stack>
       <Card
         onSubmit={onsubmit}
@@ -426,12 +478,12 @@ function Inventory() {
         className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
       >
         <FormGro
-          label="Dev"
+          inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
           name="dev"
           data={developers}
-          inputLabel="Dev"
-          value={newData.devid || ""} // نخزن ونعرض الـ id
+          value={newData.developer?.id || ""}
           fun={handleDevChange}
+          lang={lang}
         />
         <IconButton onClick={() => setOpen(true)}>
           <HelpOutline />
@@ -457,127 +509,131 @@ function Inventory() {
           </DialogContent>
         </Dialog>
         <Input
-          name="Dis"
-          value={newData.Dis}
-          onChange={onchange}
-          // placeholder="اكتب شيئًا هنا"
+          onChange={onchange("Dis", "en")}
+          label={lang === "ar" ? "التفاصيل انجليزي" : "Description en"}
+          value={newData.Dis.en}
           rows={4}
-          label="Description"
           multiline
           id="outlined-multiline-static"
         />
-        {/* <Input
-              name="descriptionList"
-              value={newData.descriptionList}
-              onChange={onchange}
-              rows={4}
-              label="Dev Description list"
-              multiline
-            /> */}
+        <Input
+          onChange={onchange("Dis", "ar")}
+          label={lang === "ar" ? "التفاصيل عربي" : "Description ar"}
+          value={newData.Dis.ar}
+          rows={4}
+          multiline
+          id="outlined-multiline-staticar"
+        />
         <CheckboxCom
-          data={checkBoxOptions}
+          data={checkBoxOptions1}
           handleCheckboxChange={handleCheckboxChange}
           name={newData.aminatis}
+          lang={lang}
         />
         <FormGro
-          label="Compound"
+          inputLabel={lang === "ar" ? "اختر الكمبوند" : "Select compound"}
           name="compoundName"
-          data={projects}
-          inputLabel="Compound"
-          value={newData.compoundName || ""} // نخزن ونعرض الـ id
-          fun={onchange}
+          data={compoundNames}
+          value={newData.compoundName[lang] || ""}
+          fun={handleDynamicSelectChange(compoundNames, "compoundName")}
+          lang={lang}
         />
         <FileUpload handleFileChange={handleFileChange} prog={prog} title='imges' />
         <Input
-          onChange={onchange}
+          onChange={onchange("imgtext", "en")}
           type="text"
           id="imgtext"
-          label="img text"
-          name="imgtext"
-          value={newData.imgtext} // نخزن ونعرض الـ id
+          label={lang === "ar" ? "تفاصيل الصوره انجليزي" : "img text en"}
+          value={newData.imgtext.en}
+        />
+        <Input
+          onChange={onchange("imgtext", "ar")}
+          type="text"
+          id="imgtextar"
+          label={lang === "ar" ? "تفاصيل الصوره عربي" : "img text ar"}
+          value={newData.imgtext.ar} 
         />
         <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title='Master img' />
         <FormGro
-          label="Money Type"
+          inputLabel={lang === "ar" ? "نوع العمله" : "Money Type"}
           name="monyType"
           data={monyType}
-          value={newData.monyType || ""} // نخزن ونعرض الـ id
-          fun={onchange}
-          inputLabel="Money Type"
+          value={newData.monyType[lang] || ""} // نخزن ونعرض الـ id
+          fun={handleDynamicSelectChange(monyType, "monyType")}
+          lang={lang}
         />
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           id="Price"
-          label="Total Price"
+          name='price'
+          label={lang === "ar" ? "السعر" : "Price"}
           type="number"
-          name="price"
           value={newData.price} // نخزن ونعرض الـ id
         />
         <Input
-          onChange={onchange}
+          onChange={onchange("Location", "en")}
           type="text"
+          label={lang === "ar" ? "الموقع" : "Location"}
           id="Location"
-          label="Location"
-          name="Location"
-          value={newData.Location} // نخزن ونعرض الـ id
+          value={newData.Location.en}
         />
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
+          label={lang === "ar" ? "السعر" : "down Payment"}
           type="number"
           id="downPayment"
-          label="down Payment"
           name="downPayment"
           value={newData.downPayment} // نخزن ونعرض الـ id
         />
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           id="remaining"
-          label="remaining"
+          label={lang === "ar" ? "المتبقي" : "remaining"}
           name="remaining"
-          value={newData.remaining} // نخزن ونعرض الـ id
+          value={newData.remaining}
           type="text"
         />
+
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           id="month"
-          label="Month"
+          label={lang === "ar" ? "الشهور" : "Month"}
           variant="outlined"
           type="number"
           name="month"
           value={newData.month} // نخزن ونعرض الـ id
         />
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           variant="outlined"
           id="RoofArea"
-          label="Roof Area"
+          label={lang === "ar" ? "مساحة السطح" : "Roof Area"}
           type="number"
           name="roofArea"
           value={newData.roofArea} // نخزن ونعرض الـ id
         />
         <Input
-          onChange={onchange} // نخزن ونعرض الـ id
+          onChange={onchangesimple} // نخزن ونعرض الـ id
           id="Land-area"
-          label="Land Area"
+          label={lang === "ar" ? "مساحة الأرض" : "Land Area"}
           variant="outlined"
           type="number"
           name="landArea"
           value={newData.landArea} // نخزن ونعرض الـ id
         />
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           id="rental"
-          label="Minimum rental period"
+          label={lang === "ar" ? "أقل فترة إيجار" : "Minimum rental period"}
           variant="outlined"
           type="number"
           name="rental"
           value={newData.rental} // نخزن ونعرض الـ id
         />
-
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           id="RefNum"
-          label="RefNum"
+          label={lang === "ar" ? "رقم المرجع" : "RefNum"}
           variant="outlined"
           type="number"
           name="refNum"
@@ -585,9 +641,9 @@ function Inventory() {
         />
 
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           id="Garden-area"
-          label="Garden area"
+          label={lang === "ar" ? "الحديقة" : "Garden area"}
           variant="outlined"
           type="number"
           name="gardenArea"
@@ -595,75 +651,79 @@ function Inventory() {
         />
 
         <FormGro
-          label="SOLD OUT"
           name="sold"
           data={soldOutOptions}
-          value={newData.sold || ""} // نخزن ونعرض الـ id
-          fun={onchange}
-          inputLabel="Sold"
+          inputLabel={lang === "ar" ? "التوافر" : "availability"}
+          value={newData.sold[lang] || ""} // نخزن ونعرض الـ id
+          fun={handleDynamicSelectChange(soldOutOptions, "sold")}
+          lang={lang}
         />
 
         <FormGro
-          label="Delivery"
           name="delivery"
+          inputLabel={lang === "ar" ? "تسليم" : "Delivery"}
+          lang={lang}
           data={deliveryOptions}
-          value={newData.delivery || ""} // نخزن ونعرض الـ id
-          fun={onchange}
-          inputLabel="Delivery"
+          value={newData.delivery[lang] || ""} // نخزن ونعرض الـ id
+          fun={handleDynamicSelectChange(deliveryOptions, "delivery")}
         />
         <FormGro
-          label="Floor"
           name="floor"
+          lang={lang}
           data={floorOptions}
-          value={newData.floor || ""} // نخزن ونعرض الـ id
-          fun={onchange}
-          inputLabel="Floor"
+          value={newData.floor[lang] || ""} // نخزن ونعرض الـ id
+          fun={handleDynamicSelectChange(floorOptions, "floor")}
+          inputLabel={lang === "ar" ? "دور " : "Floor"}
         />
         <FormGro
-          label="Type"
           name="Type"
+          lang={lang}
           data={typeOptions}
-          value={newData.Type || ""} // نخزن ونعرض الـ id
-          fun={onchange}
-          inputLabel="Type"
+          value={newData.Type[lang] || ""} // نخزن ونعرض الـ id
+          fun={handleDynamicSelectChange(typeOptions, "Type")}
+          inputLabel={lang === "ar" ? "النوع " : "Type"}
         />
         <Input
-          onChange={onchange}
+          onChange={onchangesimple}
           id="area"
-          label="Area(m)"
+          label={lang === "ar" ? "المساحة (م)" : "Area(m)"}
           variant="outlined"
           type="number"
           name="Area"
           value={newData.Area} // نخزن ونعرض الـ id
         />
         <FormGro
-          label="Bedrooms"
           name="Bed"
           data={bedroomOptions}
-          value={newData.Bed || ""} // نخزن ونعرض الـ id
-          fun={onchange}
-          inputLabel="Bedrooms"
+          lang={lang}
+          value={newData.Bed[lang] || ""} // نخزن ونعرض الـ id
+          fun={handleDynamicSelectChange(bedroomOptions, "Bed")}
+          inputLabel={lang === "ar" ? "غرف نوم" : "Bedrooms"}
         />
         <FormGro
-          label="Bathrooms"
           name="Bath"
+          lang={lang}
           data={bathroomOptions}
-          value={newData.Bath || ""} // نخزن ونعرض الـ id
-          fun={onchange}
-          inputLabel="Bathrooms"
+          value={newData.Bath[lang] || ""} // نخزن ونعرض الـ id
+          fun={handleDynamicSelectChange(bathroomOptions, "Bath")}
+          inputLabel={lang === "ar" ? "حمامات" : "Bathrooms"}
         />
         <RadioCom
           data={finshOptions}
           name="Finsh"
+          lang={lang}
+          label={lang === "ar" ? "الحاله" : "status"}
           value={newData.Finsh}
-          onChange={onchange}
+          onChange={onchangesimple}
         />
-        <FileUpload handleFileChange={handleFiletowChange} prog={prog2} title='Layout img' />
+        <FileUpload handleFileChange={handleFiletowChange} prog={prog2} title="Layout img" />
         <RadioCom
           name="Sale"
+          lang={lang}
+          label={lang === "ar" ? "حاله البيع" : "Sale status"}
           data={statusOptions}
           value={newData.Sale}
-          onChange={onchange}
+          onChange={onchangesimple}
         />
         <Button
           disabled={btn}
@@ -674,7 +734,7 @@ function Inventory() {
           {btn ? (
             <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
           ) : (
-            "Send"
+              lang === "ar" ? "ارسال" : "Send" 
           )}
         </Button>
       </Card>
