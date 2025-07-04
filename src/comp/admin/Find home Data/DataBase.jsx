@@ -12,9 +12,12 @@ import Input from '../Input';
 import CheckboxCom from '../CheckboxCom';
 import FileUpload from '../FileUpload';
 import MavLoading from '../../Loading/MavLoading';
+import { useTranslation } from 'react-i18next';
 
 function DataBase() {
   const [developers, setDevelopers] = useState([]);
+  const { i18n } = useTranslation();
+  const lang = i18n.language; // هيطلع "ar" أو "en"
   const [devLoading, setDevLoading] = useState(true);
   const [devError, setDevError] = useState("");
   const [messege, setMessege] = React.useState(false);
@@ -26,7 +29,7 @@ function DataBase() {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "developers"));
+        const snapshot = await getDocs(collection(db, "developer"));
         const devs = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -43,10 +46,7 @@ function DataBase() {
     fetchDevelopers();
   }, []);
   const [newData, setNewData] = useState({
-    devid: "",
-    devName: "",
-    devIcon: "",
-    devDis: "",
+    developer: {},
     proj: "",
     projImgs: [],
     district: "",
@@ -83,14 +83,11 @@ function DataBase() {
   const handleDevChange = useCallback(
     (e) => {
       const selectedDev = developers.find((dev) => dev.id === e.target.value);
+      console.log(selectedDev)
       if (selectedDev) {
-        // console.log(selectedDev)
         setNewData((prev) => ({
           ...prev,
-          devid: selectedDev.id,
-          devIcon: selectedDev.img || "",
-          devName: selectedDev.devName || "",
-          devDis: selectedDev.devDis || "",
+          developer: selectedDev
         }));
       }
     },
@@ -166,20 +163,27 @@ function DataBase() {
       );
     }
   }, []);
-  const handleCheckboxChange = useCallback((e) => {
-    const { value, checked } = e.target;
-    if (checked) {
-      setNewData((prev) => ({
-        ...prev,
-        aminatis: [...prev.aminatis, value],
-      }));
-    } else {
-      setNewData((prev) => ({
-        ...prev,
-        aminatis: prev.aminatis.filter((item) => item !== value),
-      }));
-    }
+  const handleCheckboxChange = useCallback((selectedItem) => {
+    setNewData((prev) => {
+      const exists = prev.aminatis.some(
+        (item) => item.en === selectedItem.en && item.ar === selectedItem.ar
+      );
+      if (exists) {
+        return {
+          ...prev,
+          aminatis: prev.aminatis.filter(
+            (item) => item.en !== selectedItem.en || item.ar !== selectedItem.ar
+          )
+        };
+      } else {
+        return {
+          ...prev,
+          aminatis: [...prev.aminatis, selectedItem]
+        };
+      }
+    });
   }, []);
+
   const handleCheckbox2Change = useCallback((e) => {
     const { value, checked } = e.target;
     if (checked) {
@@ -252,26 +256,27 @@ function DataBase() {
     }
   }, []);
   const checkBoxOptions1 = useMemo(() => [
-    "Clubhouse",
-    "Commercial Strip",
-    "Underground Parking",
-    "Outdoor Pools",
-    "Jogging Trail",
-    "Bicycles Lanes",
-    "Business Hub",
-    "Schools",
-    "Sports Clubs",
-    "Livability",
-    "Infrastructure",
-    "mosque",
-    "children area",
-    "kids' area",
-    "gym",
-    "spa",
-    "Educational hub",
-    "Commercial area",
-    "Medical centre",
-  ], []);
+    { en: "Clubhouse", ar: "النادي الاجتماعي" },
+    { en: "Commercial Strip", ar: "الشريط التجاري" },
+    { en: "Underground Parking", ar: "مواقف سيارات تحت الأرض" },
+    { en: "Outdoor Pools", ar: "حمامات سباحة خارجية" },
+    { en: "Jogging Trail", ar: "مسار للجري" },
+    { en: "Bicycles Lanes", ar: "مسارات للدراجات" },
+    { en: "Business Hub", ar: "مركز أعمال" },
+    { en: "Schools", ar: "مدارس" },
+    { en: "Sports Clubs", ar: "أندية رياضية" },
+    { en: "Livability", ar: "جودة الحياة" },
+    { en: "Infrastructure", ar: "البنية التحتية" },
+    { en: "mosque", ar: "مسجد" },
+    { en: "children area", ar: "منطقة للأطفال" },
+    { en: "kids' area", ar: "منطقة لعب للأطفال" },
+    { en: "gym", ar: "صالة رياضية (جيم)" },
+    { en: "spa", ar: "مركز سبا" },
+    { en: "Educational hub", ar: "مركز تعليمي" },
+    { en: "Commercial area", ar: "منطقة تجارية" },
+    { en: "Medical centre", ar: "مركز طبي" }
+  ]
+    , []);
   const checkBoxOptions2 = useMemo(() => [
     "Villa",
     "Retail",
@@ -354,8 +359,8 @@ function DataBase() {
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      // console.log(newData);
-      await sendProjectToFirebase(newData);
+      console.log(newData);
+      // await sendProjectToFirebase(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
@@ -412,33 +417,36 @@ function DataBase() {
             }}
           >
             <FormGro
-              label="Dev"
+              inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
               name="dev"
               data={developers}
-              inputLabel="Dev"
-              value={newData.devid || ""} // نخزن ونعرض الـ id
+              value={newData.developer?.id || ""}
               fun={handleDevChange}
+              lang={lang}
             />
             <CheckboxCom
               data={checkBoxOptions1}
               handleCheckboxChange={handleCheckboxChange}
               name={newData.aminatis}
+              lang={lang}
             />
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
               id="Compound Name"
-              label="Compound Name"
+              label={lang === "ar" ? "اسم الكومباوند" : "Compound Name"}
               variant="outlined"
               type="text"
               name="proj"
               value={newData.proj} // نخزن ونعرض الـ id
             />
             <Divider />
-            <FileUpload handleFileChange={handleFileChange} prog={prog} title='Upload Your Project Images ...' />
+            <FileUpload handleFileChange={handleFileChange} prog={prog}
+              title={lang === "ar" ? "ارفع صور المشروع" : 'Upload Your Project Images ...'}
+            />
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
               id="district"
-              label="District"
+              label={lang === "ar" ? "المنطقة" : "District"}
               variant="outlined"
               type="text"
               name="district"
@@ -447,7 +455,7 @@ function DataBase() {
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
               id="price"
-              label="price"
+              label={lang === "ar" ? "السعر" : "price"}
               variant="outlined"
               type="number"
               name="price"
@@ -480,11 +488,11 @@ function DataBase() {
               name="offer1"
               value={newData.offer1} // نخزن ونعرض الـ id
             />
-            <CheckboxCom
+            {/* <CheckboxCom
               data={checkBoxOptions2}
               handleCheckboxChange={handleCheckbox2Change}
               name={newData.type}
-            />
+            /> */}
             <Input
               onChange={handleChange} // نخزن ونعرض الـ id
               id="pers2"
@@ -651,5 +659,4 @@ function DataBase() {
     </>
   );
 }
-
 export default DataBase
