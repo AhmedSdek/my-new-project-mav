@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 function Navs() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
+  console.log(lang)
   const [value, loading, error] = useCollection(collection(db, "admin"));
   var arr = [];
   value &&
@@ -23,6 +24,12 @@ function Navs() {
       })
     );
   const [ope, setOpe] = useState(false);
+  const handleToggleLanguage = () => {
+    window.location.reload()
+    const newLang = lang === "ar" ? "en" : "ar";
+    i18n.changeLanguage(newLang);
+    localStorage.setItem("i18nextLng", newLang);  // تحطها صريح عشان مفيش حاجة تلعب فيها
+  };
   return (
     <>
       <Navbar
@@ -94,18 +101,17 @@ function Navs() {
                 </Tooltip>
               </Nav.Link>
               <ToggleButton
-
                 sx={{
                   color: 'white',
                   '&.Mui-selected': {
                     color: 'white',
-                    backgroundColor: '#1976d2', // لون الخلفية عند selected
+                    backgroundColor: '#1976d2',
                   },
                 }}
-                onChange={() => {
-                  i18n.changeLanguage(lang === "ar" ? "en" : "ar");
-                }}
-                value={lang} aria-label="bold">
+                onClick={handleToggleLanguage}
+                value={lang}
+                aria-label="language toggle"
+              >
                 {lang === "en" ? "عربي" : "English"}
               </ToggleButton>
             </Nav>

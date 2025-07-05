@@ -69,7 +69,7 @@ function EditDeveloper() {
           {lang === "ar" ? "تعديل الدفيلوبر" : "Developer Edit page"}
       </h2>
       <Container>
-          {developers &&
+          {developers.length > 0 ?
           <Stack style={{ gap: 2, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', padding: '30px 0' }}>
               {developers.map((product) => {
               // console.log(product.data())
@@ -103,6 +103,10 @@ function EditDeveloper() {
               )
             })}
           </Stack>
+            :
+            <Typography>
+              no Data !
+            </Typography>
         }
       </Container>
     </Box>

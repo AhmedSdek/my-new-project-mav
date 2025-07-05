@@ -45,8 +45,10 @@ import EditCity from "./comp/admin/Edit/City/EditCity";
 import Inventory from "./comp/admin/inventory/Inventory";
 import InventoryDetails from "./comp/inventory/InventoryDetails";
 import DeveloperForm from "./comp/admin/developerForm/DeveloperForm";
+import { useTranslation } from "react-i18next";
 
 function App() {
+  const { i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(
     localStorage.getItem("mtTheme") === null
@@ -69,6 +71,9 @@ function App() {
           }),
     },
   });
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  }, [i18n.language]);
   useEffect(() => {
     setLoading(true);
     setLoading(false);
