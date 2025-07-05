@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { db, storage } from "../../../firebase/config";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,153 +7,73 @@ import {
   Card,
   Dialog,
   DialogContent,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
   IconButton,
-  InputLabel,
-  LinearProgress,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
   Stack,
-  TextField,
-  Tooltip,
   Typography,
   styled,
 } from "@mui/material";
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
 import { AddPhotoAlternate, HelpOutline, Info } from "@mui/icons-material";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useCollection } from "react-firebase-hooks/firestore";
 import FormGro from "../FormGro";
-import { data } from '../../Data'
+import { useTranslation } from "react-i18next";
+import Input from "../Input";
+import FileUpload from "../FileUpload";
+import RadioCom from "../RadioCom";
+import CheckboxCom from "../CheckboxCom";
 function ReSale() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   const [messege, setMessege] = React.useState(false);
-  const nav = useNavigate();
-  const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
+  const [newData, setNewData] = useState({
+    developer: {},
+    dealName: { ar: "", en: "" },
+    Dis: { ar: "", en: "" },
+    compoundName: { ar: "", en: "" },
+    img: [],
+    Layoutimg: [],
+    Masterimg: [],
+    imgtext: { ar: "", en: "" },
+    monyType: { ar: "", en: "" },
+    Area: 0,
+    Bed: "",
+    Bath: "",
+    Location: { ar: "", en: "" },
+    Sale: { ar: "", en: "" },
+    Finsh: { ar: "", en: "" },
+    aminatis: [],
+    price: 0,
+    downPayment: 0,
+    remaining: 0,
+    month: 0,
+    roofArea: 0,
+    landArea: 0,
+    rental: 0,
+    refNum: 0,
+    gardenArea: 0,
+    sold: { ar: "", en: "" },
+    delivery: { ar: "", en: "" },
+    floor: { ar: "", en: "" },
+    Type: { ar: "", en: "" },
   });
+  const [loading, setLoading] = useState(true);
+  const [developers, setDevelopers] = useState([]);
+  const [compoundNames, setCompoundNames] = useState([]);
+  const nav = useNavigate();
+  const [devLoading, setDevLoading] = useState(true);
   const [open, setOpen] = React.useState(false);
   const [btn, setBtn] = useState(false);
-  const [imgText, setImgText] = React.useState("");
-  const [sold, setSold] = React.useState("");
-  const [monyType, setMoneyType] = React.useState("");
-  const [floor, setFloor] = React.useState("");
-  const [devname, setDevname] = React.useState("");
-  const [compoundName, setCompoundName] = React.useState("");
-  const [price, setPrice] = React.useState("");
-  const [downPayment, setDownPayment] = React.useState("");
-  const [remaining, setRemaining] = React.useState("");
-  const [month, setMonth] = React.useState("");
-  const [rental, setRental] = React.useState("");
-  const [refNum, setRefNum] = React.useState("");
-  const [delivery, setDelivery] = React.useState("");
-  const [type, setType] = React.useState("");
-  const [area, setArea] = React.useState("");
-  // console.log(area)
-  const [bed, setBed] = React.useState("");
-  const [bath, setBath] = React.useState("");
-  const [finsh, setFinsh] = React.useState("");
-  const [location, setLocation] = React.useState("");
-  const [sale, setSale] = React.useState("");
-  const [dis, setDis] = React.useState("");
-  // const [dis2, setDis2] = React.useState('');
-  const [gardenArea, setGardenArea] = React.useState("");
-  const [dis3, setDis3] = React.useState("");
   const [prog, setProg] = useState(0);
   const [prog2, setProg2] = useState(0);
   const [prog3, setProg3] = useState(0);
-  const [url, setUrl] = useState([]);
-  const [url2, setUrl2] = useState([]);
-  const [url3, setUrl3] = useState([]);
-  const [icon, setIcon] = useState("");
-  const [landArea, setLandArea] = useState("");
-  const [roofArea, setRoofArea] = useState("");
-  const [projects, setProjects] = useState([]);
-  const [value, loading, error] = useCollection(collection(db, "admin"));
-  const handleimgTextChange = (event) => {
-    setImgText(event.target.value);
-  };
-  const handleRoofAreaChange = (event) => {
-    setRoofArea(Number(event.target.value));
-  };
-  const handleCompoundNameChange = (event) => {
-    setCompoundName(event.target.value);
-  };
-  const handlePriceChange = (event) => {
-    setPrice(Number(event.target.value));
-  };
-  const handledownPaymentChange = (event) => {
-    setDownPayment(Number(event.target.value));
-  };
-  const handleremainingChange = (event) => {
-    setRemaining(event.target.value);
-  };
-  const handleMonthChange = (event) => {
-    setMonth(Number(event.target.value));
-  };
-  const handleRentalChange = (event) => {
-    setRental(event.target.value);
-  };
-  const handleDeliveryChange = (event) => {
-    setDelivery(event.target.value);
-  };
-  const handleLandAreaChange = (event) => {
-    setLandArea(Number(event.target.value));
-  };
-  const handleTypeChange = (event) => {
-    setType(event.target.value);
-  };
-  const handleAreaChange = (event) => {
-    setArea(Number(event.target.value));
-  };
-  const handlebedChange = (event) => {
-    setBed(event.target.value);
-  };
-  const handlebathChange = (event) => {
-    setBath(event.target.value);
-  };
-  const handleRefNumChange = (event) => {
-    setRefNum(event.target.value);
-  };
-  const handleGardenareaChange = (event) => {
-    setGardenArea(Number(event.target.value));
-  };
-  const handleFinshChange = (event) => {
-    setFinsh(event.target.value);
-  };
-  const handlelocationChange = (event) => {
-    setLocation(event.target.value);
-  };
-  const handleSaleChange = (event) => {
-    setSale(event.target.value);
-  };
-  const handleDisChange = (event) => {
-    setDis(event.target.value);
-  };
-  // const handleDis2Change = (event) => {
-  //     setDis2(event.target.value);
-  // };
-  const handleDis3Change = (event) => {
-    setDis3(event.target.value);
-  };
-  const handleFileChange = async (event) => {
+  const handleFileChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
-      // console.log(event.target.files.length);
-      // console.log(i)
-      const storageRef = ref(storage, "resale/" + event.target.files[i].name);
+      const storageRef = ref(
+        storage,
+        "deals/" + event.target.files[i].name
+      );
       const uploadTask = uploadBytesResumable(
         storageRef,
         event.target.files[i]
@@ -201,77 +121,23 @@ function ReSale() {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
             console.log("File available at", downloadURL);
-            setUrl((old) => [...old, downloadURL]);
+            setNewData((prev) => ({
+              ...prev,
+              img: [...prev.img, downloadURL],
+            }));
             setBtn(false);
             // Add a new document in collection "cities"
           });
         }
       );
     }
-  };
-  const handleFiletowChange = async (event) => {
+  }, []);
+  const handleMasterplanImgChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
-      // console.log(i)
-      const storageRef = ref(storage, event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(
-        storageRef,
-        event.target.files[i]
+      const storageRef = ref(
+        storage,
+        "deals/" + event.target.files[i].name
       );
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          // console.log('Upload is ' + progress + '% done');
-          setProg2(progress);
-          if (i < event.target.files.length) {
-            setBtn(true);
-          }
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
-        },
-        (error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
-          switch (error.code) {
-            case "storage/unauthorized":
-              // User doesn't have permission to access the object
-              break;
-            case "storage/canceled":
-              // User canceled the upload
-              break;
-
-            // ...
-
-            case "storage/unknown":
-              // Unknown error occurred, inspect error.serverResponse
-              break;
-          }
-        },
-        () => {
-          // Upload completed successfully, now we can get the download URL
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            console.log("File available at", downloadURL);
-            setUrl2((old) => [...old, downloadURL]);
-            setBtn(false);
-            // Add a new document in collection "cities"
-          });
-        }
-      );
-    }
-  };
-  const handleFile3Change = async (event) => {
-    for (let i = 0; i < event.target.files.length; i++) {
-      // console.log(i)
-      const storageRef = ref(storage, event.target.files[i].name);
       const uploadTask = uploadBytesResumable(
         storageRef,
         event.target.files[i]
@@ -319,75 +185,281 @@ function ReSale() {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
             console.log("File available at", downloadURL);
-            setUrl3((old) => [...old, downloadURL]);
+            setNewData((prev) => ({
+              ...prev,
+              Masterimg: downloadURL,
+            }));
             setBtn(false);
             // Add a new document in collection "cities"
           });
         }
       );
     }
-  };
-  const sendData = async () => {
+  }, []);
+  const handleFiletowChange = useCallback(
+    async (event) => {
+      for (let i = 0; i < event.target.files.length; i++) {
+        const storageRef = ref(
+          storage,
+          "deals/" + event.target.files[i].name
+        );
+        const uploadTask = uploadBytesResumable(
+          storageRef,
+          event.target.files[i]
+        );
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProg2(progress);
+            if (i < event.target.files.length) {
+              setBtn(true);
+            }
+          },
+          (error) => {
+            switch (error.code) {
+              case "storage/unauthorized":
+              case "storage/canceled":
+              case "storage/unknown":
+                break;
+            }
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setNewData((prev) => ({
+                ...prev,
+                Layoutimg: downloadURL,
+              }));
+              setBtn(false);
+            });
+          }
+        );
+      }
+    },
+    [storage]
+  );
+  useEffect(() => {
+    const fetchCompounds = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "compound"));
+        const allCompoundNames = [];
+
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          if (Array.isArray(data.compound)) {
+            data.compound.forEach(item => {
+              if (item.compoundName) {
+                allCompoundNames.push(item.compoundName);
+              }
+            });
+          }
+        });
+
+        setCompoundNames(allCompoundNames);
+      } catch (error) {
+        console.error("Error fetching compounds:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompounds();
+  }, []);
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "developer"));
+        const devs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDevelopers(devs);
+      } catch (err) {
+        console.error("خطأ أثناء جلب المطورين:", err);
+      } finally {
+        setDevLoading(false);
+      }
+    };
+    fetchDevelopers();
+  }, []);
+  const handleDevChange = useCallback(
+    (e) => {
+      const selectedDev = developers.find((dev) => dev.id === e.target.value);
+      if (selectedDev) {
+        setNewData((prev) => ({
+          ...prev,
+          developer: selectedDev,
+        }));
+      }
+    },
+    [developers]
+  );
+  const onchange = useCallback((parentKey, lang) => (e) => {
+    setNewData((prev) => ({
+      ...prev,
+      [parentKey]: {
+        ...prev[parentKey],
+        [lang]: e.target.value
+      }
+    }));
+  }, []);
+  const handleDynamicSelectChange = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => (item[lang] || item.en) === selectedLabel
+      );
+      setNewData((prev) => ({
+        ...prev,
+        [fieldName]: selectedObject || prev[fieldName]
+      }));
+    },
+    [lang]
+  );
+  const handleCheckboxChange = useCallback((selectedItem) => {
+    setNewData((prev) => {
+      const exists = prev.aminatis.some(
+        (item) => item.en === selectedItem.en && item.ar === selectedItem.ar
+      );
+      return {
+        ...prev,
+        aminatis: exists
+          ? prev.aminatis.filter(
+            (item) =>
+              item.en !== selectedItem.en || item.ar !== selectedItem.ar
+          )
+          : [...prev.aminatis, selectedItem],
+      };
+    });
+  }, []);
+  const onchangesimple = useCallback((e) => {
+    setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
+  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
+  const deliveryOptions = useMemo(
+    () => [
+      { en: "Delivered", ar: "تم التسليم" },
+      { en: "Rtm", ar: "تحت الإنشاء" },
+      { en: "2024", ar: "٢٠٢٤" },
+      { en: "2025", ar: "٢٠٢٥" },
+      { en: "2026", ar: "٢٠٢٦" },
+      { en: "2027", ar: "٢٠٢٧" },
+      { en: "2028", ar: "٢٠٢٨" },
+      { en: "2029", ar: "٢٠٢٩" },
+      { en: "2030", ar: "٢٠٣٠" },
+      { en: "2031", ar: "٢٠٣١" },
+      { en: "2032", ar: "٢٠٣٢" },
+    ],
+    []
+  );
+  const floorOptions = useMemo(() => [{ en: "Typical", ar: "متكرر " }, { en: "Ground", ar: "أرضي" }], []);
+  const typeOptions = useMemo(
+    () => [
+      { en: "Apartment", ar: "شقة" },
+      { en: "Duplex", ar: "دوبلكس" },
+      { en: "Studio", ar: "استوديو" },
+      { en: "Penthouse", ar: "بنتهاوس" },
+      { en: "Family", ar: "منزل عائلي" },
+      { en: "Standalone", ar: "فيلا مستقلة" },
+      { en: "Twin house", ar: "توين هاوس" },
+      { en: "Clinic", ar: "عيادة" },
+      { en: "Office", ar: "مكتب" },
+      { en: "Retail", ar: "محل تجاري" },
+      { en: "Cabin", ar: "كوخ" },
+      { en: "Townhouse", ar: "تاون هاوس" },
+      { en: "Chalet", ar: "شاليه" },
+      { en: "One storey Villa", ar: "فيلا دور واحد" },
+    ],
+    []
+  );
+  const bedroomOptions = useMemo(
+    () => [
+      { en: "1", ar: "١" },
+      { en: "2", ar: "٢" },
+      { en: "3", ar: "٣" },
+      { en: "4", ar: "٤" },
+      { en: "5", ar: "٥" },
+      { en: "6", ar: "٦" },
+      { en: "7", ar: "٧" },
+      { en: "8", ar: "٨" },
+      { en: "9", ar: "٩" },
+      { en: "10", ar: "١٠" },
+    ],
+    []
+  );
+  const bathroomOptions = useMemo(() => [
+    { en: "1", ar: "١" },
+    { en: "2", ar: "٢" },
+    { en: "3", ar: "٣" },
+    { en: "4", ar: "٤" },
+    { en: "5", ar: "٥" }
+  ], []);
+  const finshOptions = useMemo(
+    () => [
+      { en: "Finished", ar: "تشطيب كامل" },
+      { en: "Semi Finished", ar: "نصف تشطيب" },
+      { en: "Core & Shell", ar: "عظم (أساس فقط)" },
+      { en: "Furnished", ar: "مفروش" },
+    ],
+    []
+  );
+  const statusOptions = useMemo(() => [
+    { en: "Resale", ar: "إعادة بيع" },
+    { en: "Rent", ar: "إيجار" },
+    { en: "Primary", ar: "بيع أولي" },
+  ], []);
+  const checkBoxOptions1 = useMemo(
+    () => [
+      { en: "Clubhouse", ar: "النادي الاجتماعي" },
+      { en: "Commercial Strip", ar: "الشريط التجاري" },
+      { en: "Underground Parking", ar: "مواقف سيارات تحت الأرض" },
+      { en: "Outdoor Pools", ar: "حمامات سباحة خارجية" },
+      { en: "Jogging Trail", ar: "مسار للجري" },
+      { en: "Bicycles Lanes", ar: "مسارات للدراجات" },
+      { en: "Business Hub", ar: "مركز أعمال" },
+      { en: "Schools", ar: "مدارس" },
+      { en: "Sports Clubs", ar: "أندية رياضية" },
+      { en: "Livability", ar: "جودة الحياة" },
+      { en: "Infrastructure", ar: "البنية التحتية" },
+      { en: "mosque", ar: "مسجد" },
+      { en: "children area", ar: "منطقة للأطفال" },
+      { en: "kids' area", ar: "منطقة لعب للأطفال" },
+      { en: "gym", ar: "صالة رياضية (جيم)" },
+      { en: "spa", ar: "مركز سبا" },
+      { en: "Educational hub", ar: "مركز تعليمي" },
+      { en: "Commercial area", ar: "منطقة تجارية" },
+      { en: "Medical centre", ar: "مركز طبي" },
+    ],
+    []
+  );
+  const sendData = async (dataToSend) => {
     setBtn(true);
     try {
       const id = new Date().getTime();
       await setDoc(doc(db, "deals", `${id}`), {
         id: `${id}`,
-        imgtext: imgText,
-        price: price,
-        monyType: monyType,
-        refNum: refNum,
-        delivery: delivery,
-        Type: type,
-        Area: area,
-        compoundName: compoundName,
-        icon: icon,
-        Bed: bed,
-        Bath: bath,
-        Finsh: finsh,
-        Location: location,
-        Sale: sale,
-        Dis: dis,
-        rental: rental,
-        month: month,
-        downPayment: downPayment,
-        remaining: remaining,
-        // dis2: dis2,
-        dis3: dis3,
-        img: url,
-        Layoutimg: url2,
-        Masterimg: url3,
-        sold: sold,
-        like: 0,
-        devname: devname,
-        floor: floor,
-        gardenArea: gardenArea,
-        RoofArea: roofArea,
-        landArea: landArea,
+        ...dataToSend,
       });
-      setMessege(true);
       setTimeout(() => {
         setMessege(false);
         nav("/");
       }, 2000);
     } catch (er) {
-      console.log(er);
+      console.error("Send error:", er);
     }
     setBtn(false);
   };
-  useEffect(() => {
-    const arr = [];
-    if (value) {
-      value.docs.forEach((e) => {
-        e.data().dev.forEach((it) => {
-          if (!arr.includes(it.proj) && it.proj !== "") {
-            arr.push(it.proj);
-          }
-        });
-      });
-    }
-    setProjects(arr);
-  }, [value]);
+  const onsubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      // console.log(newData);
+      await sendData(newData);
+    },
+    [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
+  );
   return (
     <>
       <Box
@@ -401,620 +473,228 @@ function ReSale() {
         }}
       >
         <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-          <Typography variant="h5">Resale</Typography>
+          <Typography variant="h5">{lang === "ar" ? "اضف العرض" : "Add Deal"}</Typography>
         </Stack>
         <Card
-          sx={{
-            width: { xs: "90%", sm: "80%" },
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-            padding: "20px",
-            margin: "10px 0 ",
-          }}
+          onSubmit={onsubmit}
+          component="form"
+          sx={{ gap: '10px' }}
+          className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
         >
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            Complete The Form
-          </Typography>
-          <Typography variant="caption">
-            Your privacy is important to us. We won't publish or share your
-            information with anyone
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              sendData();
-            }}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-              width: "100%",
-              margin: "15px 0 0",
-            }}
-          >
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={imgText}
-              id="imgText"
-              label="Title"
-              variant="outlined"
-              type="text"
-              onChange={(e) => {
-                handleimgTextChange(e);
-              }}
+
+          <Input
+            onChange={onchange("dealName", "en")}
+            label={lang === "ar" ? "اسم العرض انجليزي" : "Deal Name en"}
+            value={newData.dealName.en}
+            id="outlined-title-static"
+          />
+          <Input
+            onChange={onchange("dealName", "ar")}
+            label={lang === "ar" ? "اسم العرض عربي" : "Deal Name ar"}
+            value={newData.dealName.ar}
+            id="outlined-title-static-ar"
             />
             <FormGro
-              label="Compond Name"
-              // name="proj"
-              data={projects}
-              inputLabel="Compond Name"
-              value={compoundName || ""} // نخزن ونعرض الـ id
-              fun={handleCompoundNameChange}
+            inputLabel={lang === "ar" ? "اختر الكمبوند" : "Select compound"}
+            name="compoundName"
+            data={compoundNames}
+            value={newData.compoundName[lang] || ""}
+            fun={handleDynamicSelectChange(compoundNames, "compoundName")}
+            lang={lang}
             />
-            {/* <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={compoundName}
-              id="imgText"
-              label="Compound Name"
-              variant="outlined"
+          <Input
+            onChange={onchange("Location", "en")}
               type="text"
-              onChange={(e) => {
-                handleCompoundNameChange(e);
-              }}
-            /> */}
-
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="demo-simple-select-label">DevIcon</InputLabel>
-                <Select
-                  required
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={icon}
-                  label="DevIcon"
-                  onChange={(e) => {
-                    setIcon(e.target.value);
-                  }}
-                >
-                  {data.map((devName) => {
-                    return (
-                      <MenuItem key={devName.id} value={devName.image}>
-                        {devName.name}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </Stack>
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="demo-simple-select-label">DevName</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="ddevname"
-                  id="name"
-                  value={devname}
-                  label="DevName"
-                  onChange={(e) => {
-                    setDevname(e.target.value);
-                  }}
-                >
-                  {data.map((devName) => {
-                    return (
-                      <MenuItem key={devName.id} value={devName.name}>
-                        {devName.name}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </Stack>
-
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="mony-type-label">Money Type</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="soldlap"
-                  id="demo-sold"
-                  value={monyType}
-                  label="Money Type"
-                  onChange={(e) => {
-                    setMoneyType(e.target.value);
-                  }}
-                >
-                  <MenuItem value={"dollar"}>Dollar</MenuItem>
-                  <MenuItem value={"pound"}>Pound</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={price}
+            label={lang === "ar" ? "الموقع" : "Location"}
+            id="Location"
+            value={newData.Location.en}
+          />
+          <Input
+            onChange={onchange("Location", "ar")}
+            type="text"
+            label={lang === "ar" ? "الموقع عربي" : "Location ar"}
+            id="Locationar"
+            value={newData.Location.ar}
+          />
+          <FormGro
+            inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
+            name="dev"
+            data={developers}
+            value={newData.developer?.id || ""}
+            fun={handleDevChange}
+            lang={lang}
+          />
+          <CheckboxCom
+            data={checkBoxOptions1}
+            handleCheckboxChange={handleCheckboxChange}
+            name={newData.aminatis}
+            lang={lang}
+          />
+          <FormGro
+            inputLabel={lang === "ar" ? "نوع العمله" : "Money Type"}
+            name="monyType"
+            data={monyType}
+            value={newData.monyType[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(monyType, "monyType")}
+            lang={lang}
+          />
+          <FileUpload handleFileChange={handleFileChange} prog={prog} title='Upload Your Images ...' />
+          <Input
+            onChange={onchangesimple}
               id="Price"
-              label="Total Price"
-              variant="outlined"
+            name='price'
+            label={lang === "ar" ? "السعر" : "Price"}
               type="number"
-              onChange={(e) => {
-                handlePriceChange(e);
-              }}
+            value={newData.price} // نخزن ونعرض الـ id
             />
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={downPayment}
+          <Input
+            onChange={onchangesimple}
+            label={lang === "ar" ? "السعر" : "down Payment"}
+            type="number"
               id="downPayment"
-              label="down Payment"
-              variant="outlined"
-              type="number"
-              onChange={(e) => {
-                handledownPaymentChange(e);
-              }}
+            name="downPayment"
+            value={newData.downPayment} // نخزن ونعرض الـ id
             />
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={remaining}
+          <Input
+            onChange={onchangesimple}
               id="remaining"
-              label="remaining"
-              variant="outlined"
-              type="text"
-              onChange={(e) => {
-                handleremainingChange(e);
-              }}
+            label={lang === "ar" ? "المتبقي" : "remaining"}
+            name="remaining"
+            value={newData.remaining}
+            type="text"
             />
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={month}
+          <Input
+            onChange={onchangesimple}
               id="month"
-              label="Month"
+            label={lang === "ar" ? "الشهور" : "Month"}
               variant="outlined"
               type="number"
-              onChange={(e) => {
-                handleMonthChange(e);
-              }}
+            name="month"
+            value={newData.month}
             />
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={roofArea}
-              id="RoofArea"
-              label="Roof Area"
+          <Input
+            onChange={onchangesimple}
               variant="outlined"
+            id="RoofArea"
+            label={lang === "ar" ? "مساحة السطح" : "Roof Area"}
               type="number"
-              onChange={(e) => {
-                handleRoofAreaChange(e);
-              }}
+            name="roofArea"
+            value={newData.roofArea}
             />
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={landArea}
+          <Input
+            onChange={onchangesimple}
               id="Land-area"
-              label="Land Area"
+            label={lang === "ar" ? "مساحة الأرض" : "Land Area"}
               variant="outlined"
               type="number"
-              onChange={(e) => {
-                handleLandAreaChange(e);
-              }}
+            name="landArea"
+            value={newData.landArea}
             />
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={rental}
-              id="month"
-              label="Minimum rental period"
+          <Input
+            onChange={onchangesimple}
+            id="rental"
+            label={lang === "ar" ? "أقل فترة إيجار" : "Minimum rental period"}
               variant="outlined"
               type="number"
-              onChange={(e) => {
-                handleRentalChange(e);
-              }}
+            name="rental"
+            value={newData.rental}
             />
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={refNum}
+          <Input
+            onChange={onchangesimple}
               id="RefNum"
-              label="RefNum"
+            label={lang === "ar" ? "رقم المرجع" : "RefNum"}
               variant="outlined"
               type="number"
-              onChange={(e) => {
-                handleRefNumChange(e);
-              }}
+            name="refNum"
+            value={newData.refNum}
             />
-
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              value={gardenArea}
+          <Input
+            onChange={onchangesimple}
               id="Garden-area"
-              label="Garden area"
+            label={lang === "ar" ? "الحديقة" : "Garden area"}
               variant="outlined"
               type="number"
-              onChange={(e) => {
-                handleGardenareaChange(e);
-              }}
+            name="gardenArea"
+            value={newData.gardenArea}
             />
 
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="sold-label">Sold</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="soldlap"
-                  id="demo-sold"
-                  value={sold}
-                  label="SOLD OUT"
-                  onChange={(e) => {
-                    setSold(e.target.value);
-                  }}
-                >
-                  <MenuItem value={"SOLD OUT"}>SOLD OUT</MenuItem>
-                  <MenuItem value={"Not"}>Not</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
+          <FormGro
+            name="sold"
+            data={soldOutOptions}
+            inputLabel={lang === "ar" ? "التوافر" : "availability"}
+            value={newData.sold[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(soldOutOptions, "sold")}
+            lang={lang}
+            />
 
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="demo-simple-select-label">Delivery</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="Delivery"
-                  id="Delivery-select"
-                  value={delivery}
-                  label="Delivery"
-                  onChange={handleDeliveryChange}
-                >
-                  <MenuItem value="Delivered">Delivered</MenuItem>
-                  <MenuItem value="Rtm">Rtm</MenuItem>
-                  <MenuItem value="2024">2024</MenuItem>
-                  <MenuItem value="2025">2025</MenuItem>
-                  <MenuItem value="2026">2026</MenuItem>
-                  <MenuItem value="2027">2027</MenuItem>
-                  <MenuItem value="2028">2028</MenuItem>
-                  <MenuItem value="2029">2029</MenuItem>
-                  <MenuItem value="2030">2030</MenuItem>
-                  <MenuItem value="2031">2031</MenuItem>
-                  <MenuItem value="2032">2032</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
+          <FormGro
+            name="delivery"
+            inputLabel={lang === "ar" ? "تسليم" : "Delivery"}
+            lang={lang}
+            data={deliveryOptions}
+            value={newData.delivery[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(deliveryOptions, "delivery")}
+          />
+          <FormGro
+            name="floor"
+            lang={lang}
+            data={floorOptions}
+            value={newData.floor[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(floorOptions, "floor")}
+            inputLabel={lang === "ar" ? "دور " : "Floor"}
+          />
+          <FormGro
+            name="Type"
+            lang={lang}
+            data={typeOptions}
+            value={newData.Type[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(typeOptions, "Type")}
+            inputLabel={lang === "ar" ? "النوع " : "Type"}
+          />
+          <FileUpload handleFileChange={handleFiletowChange} prog={prog2} title="Layout img" />
 
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="Floor-label">Floor</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="soldlap"
-                  id="demo-Floor "
-                  value={floor}
-                  label="Floor"
-                  onChange={(e) => {
-                    setFloor(e.target.value);
-                  }}
-                >
-                  <MenuItem value={"Typical"}>Typical</MenuItem>
-                  <MenuItem value={"Ground"}>Ground</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={type}
-                  label="Type"
-                  onChange={handleTypeChange}
-                >
-                  <MenuItem value="Apartment">Apartment</MenuItem>
-                  <MenuItem value="Duplex">Duplex</MenuItem>
-                  <MenuItem value="Studio">Studio</MenuItem>
-                  <MenuItem value="Penthouse">Penthouse</MenuItem>
-                  <MenuItem value="Family">Family house</MenuItem>
-                  <MenuItem value="Standalone">Standalone</MenuItem>
-                  <MenuItem value="Twin house">Twin house</MenuItem>
-                  <MenuItem value="One storey Villa">One storey Villa</MenuItem>
-                  <MenuItem value="Chalet">Chalet</MenuItem>
-                  <MenuItem value="Townhouse">Townhouse</MenuItem>
-                  <MenuItem value="Cabin">Cabin</MenuItem>
-                  <MenuItem value="Clinic">Clinic</MenuItem>
-                  <MenuItem value="Office">Office</MenuItem>
-                  <MenuItem value="Retail">Retail</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              id="arya"
-              label="Area(m)"
+          <Input
+            onChange={onchangesimple}
+            id="area"
+            label={lang === "ar" ? "المساحة (م)" : "Area(m)"}
               variant="outlined"
-              type="number"
-              value={area}
-              onChange={(e) => {
-                handleAreaChange(e);
-              }}
+            type="number"
+            name="Area"
+            value={newData.Area} // نخزن ونعرض الـ id
+          />
+          <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title='Master img' />
+          <FormGro
+            name="Bed"
+            data={bedroomOptions}
+            lang={lang}
+            value={newData.Bed[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(bedroomOptions, "Bed")}
+            inputLabel={lang === "ar" ? "غرف نوم" : "Bedrooms"}
+          />
+          <FormGro
+            name="Bath"
+            lang={lang}
+            data={bathroomOptions}
+            value={newData.Bath[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(bathroomOptions, "Bath")}
+            inputLabel={lang === "ar" ? "حمامات" : "Bathrooms"}
             />
-
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="Bedrooms">Bedrooms</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="demo-simple-select-label"
-                  id="Bedroom"
-                  value={bed}
-                  label="Bedrooms"
-                  onChange={handlebedChange}
-                >
-                  <MenuItem value={1}>1</MenuItem>
-                  <MenuItem value={2}>2</MenuItem>
-                  <MenuItem value={3}>3</MenuItem>
-                  <MenuItem value={4}>4</MenuItem>
-                  <MenuItem value={5}>5</MenuItem>
-                  <MenuItem value={6}>6</MenuItem>
-                  <MenuItem value={7}>7</MenuItem>
-                  <MenuItem value={8}>8</MenuItem>
-                  <MenuItem value={9}>9</MenuItem>
-                  <MenuItem value={10}>10</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-
-            <Stack
-              sx={{
-                flexDirection: "row",
-                width: { xs: "100%", md: "50%" },
-                padding: "5px",
-              }}
-            >
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="Bathrooms">Bathrooms</InputLabel>
-                <Select
-                  sx={{ minWidth: "fit-content" }}
-                  labelId="demo-simple-select-label"
-                  id="Bathroom"
-                  value={bath}
-                  label="Bathrooms"
-                  onChange={handlebathChange}
-                >
-                  <MenuItem value={1}>1</MenuItem>
-                  <MenuItem value={2}>2</MenuItem>
-                  <MenuItem value={3}>3</MenuItem>
-                  <MenuItem value={4}>4</MenuItem>
-                  <MenuItem value={5}>5</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-
-            <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
-              <Typography variant="body2">Upload Your Images ...</Typography>
-              <Button
-                component="label"
-                variant="outlined"
-                // tabIndex={-1}
-                sx={{ padding: "10px", margin: "15px" }}
-                startIcon={<AddPhotoAlternate />}
-                onChange={(e) => {
-                  handleFileChange(e);
-                }}
-              >
-                <VisuallyHiddenInput type="file" multiple />
-              </Button>
-              <LinearProgress variant="determinate" value={prog} />
-            </Box>
-
-            <FormControl
-              sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}
-            >
-              <FormLabel required id="demo-row-radio-buttons-group-label">
-                Finishing
-              </FormLabel>
-              <RadioGroup
-                row
-                aria-labelledby="demo-row-radio-buttons-group-label"
-                itemProp="required"
-                name="row-radio-buttons-group"
-                value={finsh}
-                onChange={(e) => {
-                  handleFinshChange(e);
-                }}
-              >
-                <FormControlLabel
-                  value="Finished"
-                  control={<Radio />}
-                  label="Finished"
-                />
-                <FormControlLabel
-                  value="Semi Finished"
-                  control={<Radio />}
-                  label="Semi Finished"
-                />
-                <FormControlLabel
-                  value="Cor & Shell"
-                  control={<Radio />}
-                  label="Cor & Shell"
-                />
-                <FormControlLabel
-                  value="Furnished"
-                  control={<Radio />}
-                  label="Furnished"
-                />
-              </RadioGroup>
-            </FormControl>
-
-            <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
-              <Typography variant="body2">Layout Images ...</Typography>
-              <Button
-                component="label"
-                variant="outlined"
-                sx={{ padding: "10px", margin: "15px" }}
-                startIcon={<AddPhotoAlternate />}
-                onChange={(e) => {
-                  handleFiletowChange(e);
-                }}
-              >
-                <VisuallyHiddenInput type="file" multiple />
-              </Button>
-              <LinearProgress variant="determinate" value={prog2} />
-            </Box>
-
-            <Box sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}>
-              <Typography variant="body2">Master plan Images ...</Typography>
-              <Button
-                component="label"
-                variant="outlined"
-                sx={{ padding: "10px", margin: "15px" }}
-                startIcon={<AddPhotoAlternate />}
-                onChange={(e) => {
-                  handleFile3Change(e);
-                }}
-              >
-                <VisuallyHiddenInput type="file" multiple />
-              </Button>
-              <LinearProgress variant="determinate" value={prog3} />
-            </Box>
-
-            <TextField
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              id="Location"
-              label="Location"
-              variant="outlined"
-              type="text"
-              value={location}
-              onChange={(e) => {
-                handlelocationChange(e);
-              }}
-            />
-
-            <FormControl
-              required
-              sx={{ width: { xs: "100%", md: "50%" }, padding: "5px" }}
-            >
-              <RadioGroup
-                row
-                aria-labelledby="demo-row-radio-buttons-group-label"
-                name="row-radio-buttons-group"
-                value={sale}
-                onChange={(e) => {
-                  handleSaleChange(e);
-                }}
-              >
-                <FormControlLabel
-                  value="Resale"
-                  control={<Radio />}
-                  label="Resale"
-                />
-                <FormControlLabel
-                  value="Rent"
-                  control={<Radio />}
-                  label="Rent"
-                />
-              </RadioGroup>
-            </FormControl>
-
+          <RadioCom
+            data={finshOptions}
+            name="Finsh"
+            lang={lang}
+            label={lang === "ar" ? "الحاله" : "status"}
+            value={newData.Finsh}
+            onChange={onchangesimple}
+          />
+          <RadioCom
+            name="Sale"
+            lang={lang}
+            label={lang === "ar" ? "حاله البيع" : "Sale status"}
+            data={statusOptions}
+            value={newData.Sale}
+            onChange={onchangesimple}
+          />
             <IconButton onClick={() => setOpen(true)}>
               <HelpOutline />
             </IconButton>
@@ -1040,39 +720,22 @@ function ReSale() {
                 </Typography>
               </DialogContent>
             </Dialog>
-
-            <TextField
+          <Input
+            onChange={onchange("Dis", "en")}
+            label={lang === "ar" ? "التفاصيل انجليزي" : "Description en"}
+            value={newData.Dis.en}
+            rows={4}
+            multiline
               id="outlined-multiline-static"
-              label="Description"
+          />
+          <Input
+            onChange={onchange("Dis", "ar")}
+            label={lang === "ar" ? "التفاصيل عربي" : "Description ar"}
+            value={newData.Dis.ar}
+            rows={4}
               multiline
-              value={dis}
-              rows={4}
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              onChange={(e) => {
-                handleDisChange(e);
-              }}
-            />
-
-            <TextField
-              id="About-multiline-static"
-              label="About"
-              multiline
-              value={dis3}
-              rows={4}
-              sx={{
-                margin: "10px",
-                padding: "5px",
-                width: { xs: "100%", md: "50%" },
-              }}
-              onChange={(e) => {
-                handleDis3Change(e);
-              }}
-            />
-
+            id="outlined-multiline-staticar"
+          />
             <Button
               disabled={btn}
               variant="contained"
@@ -1083,10 +746,9 @@ function ReSale() {
               {btn ? (
                 <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
               ) : (
-                "Send"
+                lang === "ar" ? "ارسال" : "Send"
               )}
-            </Button>
-          </Box>
+          </Button>
         </Card>
       </Box>
       <p

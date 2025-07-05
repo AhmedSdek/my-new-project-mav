@@ -337,7 +337,7 @@ function DataBase() {
         }}
       >
         <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-          <Typography variant="h5">DataBase</Typography>
+          <Typography variant="h5">{lang === "ar" ? "اضف كومباوند" : "Add Compound"}</Typography>
         </Stack>
         <Card
           sx={{

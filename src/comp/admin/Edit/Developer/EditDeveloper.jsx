@@ -1,61 +1,132 @@
-import { Box, Button, Container, IconButton, Stack } from '@mui/material'
-import { collection, deleteDoc, doc } from 'firebase/firestore';
-import React from 'react'
-import { Col, Row } from 'react-bootstrap'
-import { useCollection } from 'react-firebase-hooks/firestore';
+import { Box, Button, Card, CardMedia, Container, Dialog, DialogContent, IconButton, Stack, Typography } from '@mui/material'
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { db } from '../../../../firebase/config';
 import { Delete, Edit } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import MavLoading from '../../../Loading/MavLoading';
+import ReactLoading from "react-loading";
 
 function EditDeveloper() {
-  const [value, loading, error] = useCollection(collection(db, 'admin'));
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const [devLoading, setDevLoading] = useState(true);
+  const [deletLoading, setDeletLoading] = useState(false);
+  const [developers, setDevelopers] = useState([]);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "developer"));
+        const devs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDevelopers(devs);
+      } catch (err) {
+        console.error("خطأ أثناء جلب المطورين:", err);
+      } finally {
+        setDevLoading(false);
+      }
+    };
+
+    fetchDevelopers();
+  }, []);
   const handleDelete = async (id) => {
     try {
-      await deleteDoc(doc(db, "admin", id));
+      setDeletLoading(true)
+      await deleteDoc(doc(db, "developer", id));
+      setDevelopers(prev => prev.filter(dev => dev.id !== id));
+      setOpenConfirm(false);
+      setDeletLoading(false)
       console.log("✅ تم الحذف بنجاح");
     } catch (error) {
+      setDeletLoading(false)
       console.error("❌ خطأ أثناء الحذف:", error);
     }
   };
+  if (devLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <MavLoading />
+      </div>
+    );
+  }
   return (
-    <Box sx={{ minHeight: 'calc(100vh - 140px)', padding: '70px 0' }}>
+    <>
+      <Box sx={{ minHeight: 'calc(100vh - 100px)', padding: '70px 0' }}>
       <h2>
-        Developer Edit page
+          {lang === "ar" ? "تعديل الدفيلوبر" : "Developer Edit page"}
       </h2>
       <Container>
-        {value &&
+          {developers &&
           <Stack style={{ gap: 2, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', padding: '30px 0' }}>
-            {value.docs.map((product) => {
-              console.log(product.data())
+              {developers.map((product) => {
+              // console.log(product.data())
               return (
-                <Stack key={product.id} className="col-xl-2 col-sm-3 col-6" style={{ backgroundColor: 'rgb(228 228 228)', justifyContent: 'center', alignItems: 'center' }}>
-                  <Box style={{ height: '118px !important ', width: '118px', padding: '5px 0 0 0', borderRadius: '50%' }} className="logo hoveredLogo d-flex align-items-center flex-column  inner" >
-                    <img style={{ height: '118px !important ', width: '118px' }} className="img-fluid img shadow-filter rounded-circle" src={product.data().devIcon} alt={product.data().devName}></img>
-                  </Box>
+                <Card key={product.id} className="col-xl-2 col-sm-3 col-6" style={{ backgroundColor: 'rgb(228 228 228)', justifyContent: 'center', alignItems: 'center' }}>
+                  <CardMedia >
+                    <img src={product.img} alt={product.devName[lang]}></img>
+                  </CardMedia>
                   <Stack sx={{ flexDirection: 'row' }}>
                     <IconButton
-                      onClick={async (e) => {
-                        console.log(product.data())
-                        handleDelete(handleDelete(product.id))
-                        // await deleteDoc(doc(db, 'admin', product.data().id));
+                      onClick={() => {
+                        setSelectedId(product.id);
+                        setOpenConfirm(true);
                       }}
-                      sx={{ width: '50px', height: '50px' }}>
+                      sx={{ width: '50px', height: '50px' }}
+                    >
                       <Delete color='error' />
                     </IconButton>
-                    <Link to={`${product.data().devName}`} >
+
+
+                    <Typography>
+                      {`${product.devName[lang]}`}
+                    </Typography>
+                    <Link to={`${product.id}`} >
                       <IconButton sx={{ width: '50px', height: '50px' }}>
                         <Edit />
                       </IconButton>
                     </Link>
                   </Stack>
-                </Stack>
+                </Card>
               )
             })}
           </Stack>
         }
       </Container>
     </Box>
+      <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+        <DialogContent>
+          <Typography>{lang === "ar" ? "هل انت متأكد من انك تريد الحذف؟" : "Are you sure you want to delete?"}</Typography>
+          <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
+            <Button variant="contained" color="error" onClick={() => {
+              handleDelete(selectedId);
+            }}>
+              {deletLoading ? (
+                <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+              ) : (
+                lang === "ar" ? "نعم، احذف" : "Yes, delete")}
+            </Button>
+            <Button variant="outlined" onClick={() => setOpenConfirm(false)}>
+              {lang === "ar" ? "إلغاء" : "Cancel"}
+            </Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
+
 
 export default EditDeveloper

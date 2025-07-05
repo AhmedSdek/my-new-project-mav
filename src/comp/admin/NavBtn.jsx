@@ -45,6 +45,10 @@ export default function NavBtn() {
       to: "database",
     },
     {
+      text: lang === "ar" ? "اينفينتوري" : "Inventory",
+      to: "inventory",
+    },
+    {
       text: lang === "ar" ? "عروض" : "Deals",
       to: "resale",
     },
@@ -53,21 +57,17 @@ export default function NavBtn() {
       to: "",
     },
     {
-      text: lang === "ar" ? "اينفينتوري" : "Inventory",
-      to: "inventory",
-    },
-    {
       text: lang === "ar" ? "تعديل المطور" : "Edit Developer",
       to: "editDeveloper",
     },
-    {
-      text: lang === "ar" ? "تعديل العروض" : "Edit Deals",
-      to: "editDeals",
-    },
-    {
-      text: lang === "ar" ? "تعديل الجديد" : "Edit luanches",
-      to: "editluanches",
-    },
+    // {
+    //   text: lang === "ar" ? "تعديل العروض" : "Edit Deals",
+    //   to: "editDeals",
+    // },
+    // {
+    //   text: lang === "ar" ? "تعديل الجديد" : "Edit luanches",
+    //   to: "editluanches",
+    // },
     // {
     //   text: "Cityscape",
     //   to: "cityscape",

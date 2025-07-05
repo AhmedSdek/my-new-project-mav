@@ -1,137 +1,248 @@
-import { Box, Button, Card, CardContent, IconButton, Stack, TextField, Typography } from '@mui/material'
-import { arrayRemove, doc, updateDoc } from 'firebase/firestore';
-import React, { useState } from 'react'
-import { useDocument } from 'react-firebase-hooks/firestore';
-import { useParams } from 'react-router-dom'
-import { db } from '../../../../firebase/config';
-import { Col } from 'react-bootstrap';
-import { Delete, Edit } from '@mui/icons-material';
-import ReactLoading from 'react-loading';
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import { doc, updateDoc } from "firebase/firestore";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDocument } from "react-firebase-hooks/firestore";
+import { useParams, useNavigate } from "react-router-dom";
+import { db, storage } from "../../../../firebase/config";
+import { HelpOutline, Info } from "@mui/icons-material";
+import Input from "../../Input";
+import FormGro from "../../FormGro";
+import FileUpload from "../../FileUpload";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import ReactLoading from "react-loading";
+import { useTranslation } from "react-i18next";
 
 function Editdevdetails() {
-    const { editDeveloperId } = useParams()
-    const [value, loading, error] = useDocument(doc(db, 'admin', editDeveloperId));
-    const [btn, setBtn] = useState(false);
-    const [devDis, setDevDis] = React.useState('');
-    const [devDis2, setDevDis2] = React.useState('');
-    const [devDis6, setDevDis6] = React.useState('');
-    const handleDevDisChange = (event) => {
-        setDevDis(event.target.value);
-    };
-    const handleDevDis2Change = (event) => {
-        setDevDis2(event.target.value);
-    };
-    const handleDevDis6Change = (event) => {
-        setDevDis6(event.target.value);
-    };
-    if (value) {
-        function data1() {
-            setDevDis(value.data().devDis);
-        }
-        function data2() {
-            setDevDis2(value.data().devDis2);
-        }
-        function data3() {
-            setDevDis6(value.data().devDis6);
-        }
-        const sendData = async () => {
-            setBtn(true);
-            try {
-                await updateDoc(doc(db, 'admin', value.data().devName), {
-                    devDis: devDis,
-                    devDis2: devDis2,
-                    devDis6: devDis6
-                });
-            } catch (er) {
-                console.log(er)
-            }
-            setBtn(false)
-        }
-        return (
-            <Box
-                sx={{ minHeight: 'calc(100vh - 140px)', padding: '70px 0' }}>
-                Editdevdetails
-                <Stack component='form'
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        sendData();
-                    }}>
-                    <TextField
-                        id="outlined-multiline-static"
-                        label=" Description"
-                        value={devDis}
-                        multiline
-                        onFocus={() => data1()}
-                        rows={4}
-                        sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                        onChange={(e) => {
-                            handleDevDisChange(e)
-                        }}
-                    />
-                    <TextField
-                        id="outlined-multiline-static2"
-                        label=" Description bold"
-                        // defaultValue={value.data().devDis2}
-                        value={devDis2}
-                        onFocus={() => data2()}
-                        rows={4}
-                        sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                        onChange={(e) => {
-                            handleDevDis2Change(e)
-                        }}
-                    />
-                    <TextField
-                        id="outlined-multiline-static3"
-                        label="Dev Description list"
-                        multiline
-                        // defaultValue={value.data().devDis6}
-                        value={devDis6}
-                        onFocus={() => data3()}
-                        rows={4}
-                        sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                        onChange={(e) => {
-                            handleDevDis6Change(e)
-                        }}
-                    />
-                    <Button disabled={btn} variant="contained" type="submit" style={{ width: '50%' }}
-                        className="btn">
-                        {btn ? <ReactLoading type={'spin'} height={'20px'} width={'20px'} /> : "Update"}
-                    </Button>
-                </Stack>
-                {value.data().dev.map((project, index) => {
-                    return (
-                        <Col key={index} className="col-md-6 col-12 col-lg-4" style={{ margin: '15px', position: 'relative' }} >
-                            <Card sx={{ position: 'relative' }}>
-                                <Box sx={{ height: '216px' }}>
-                                    <img style={{ height: '100%', width: '100%', objectFit: 'cover' }} src={project.projImgs[0]} alt='' />
-                                </Box>
-                                <CardContent>
-                                    <Stack sx={{ marginBottom: '10px' }}>
-                                        <Typography sx={{ lineHeight: '1.3', fontWeight: 'bold', color: 'rgb(30, 65, 100)' }} variant="body1">
-                                            {project.proj}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ color: " rgb(100, 100, 100) ", lineHeight: '1', padding: '0 0 0 5px' }}>
-                                            {project.Location}
-                                        </Typography>
-                                    </Stack>
-                                </CardContent>
-                                <Stack sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                    <IconButton x={{ width: '50px', height: '50px' }} onClick={async () => {
-                                        await updateDoc(doc(db, 'admin', value.data().devName), {
-                                            dev: arrayRemove(project)
-                                        });
-                                    }}>
-                                        <Delete color='error' />
-                                    </IconButton>
-                                </Stack>
-                            </Card>
-                        </Col>
-                    )
-                })}
-            </Box>
-        )
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const { editDeveloperId } = useParams();
+  const [value, loading] = useDocument(doc(db, "developer", editDeveloperId));
+  const [messege, setMessege] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [prog, setProg] = useState(0);
+  const [btn, setBtn] = useState(false);
+  const nav = useNavigate();
 
+  const [developerData, setDeveloperData] = useState({
+    devName: { en: "", ar: "" },
+    devDis: { en: "", ar: "" },
+    country: { en: "", ar: "" },
+    img: "",
+  });
+
+  useEffect(() => {
+    if (value) {
+      const data = value.data();
+      setDeveloperData({
+        devName: data.devName || { en: "", ar: "" },
+        devDis: data.devDis || { en: "", ar: "" },
+        country: data.country || { en: "", ar: "" },
+        img: data.img || [],
+      });
     }
+  }, [value]);
+
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setDeveloperData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
+
+  const CountryOptions = [{ ar: "مصر", en: "Egypt" }, { ar: "الامارات", en: "UAE" }];
+
+  const handleSelectChange = useCallback(
+    (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = CountryOptions.find(
+        (item) => (item[lang] || item.en) === selectedLabel
+      );
+      setDeveloperData((prev) => ({
+        ...prev,
+        country: selectedObject || prev.country,
+      }));
+    },
+    [CountryOptions, lang]
+  );
+
+  const handleFileChange = useCallback(async (event) => {
+    for (let i = 0; i < event.target.files.length; i++) {
+      const file = event.target.files[i];
+      const storageRef = ref(storage, "developer/" + file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          setProg((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setBtn(true);
+        },
+        (err) => console.error(err),
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setDeveloperData((prev) => ({
+              ...prev,
+              img: downloadURL,
+            }));
+            setBtn(false);
+          });
+        }
+      );
+    }
+  }, []);
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const docRef = doc(db, "developer", editDeveloperId);
+      await updateDoc(docRef, {
+        devName: developerData.devName,
+        devDis: developerData.devDis,
+        country: developerData.country,
+        img: developerData.img,
+      });
+      setMessege(true);
+      setTimeout(() => {
+        setMessege(false);
+        nav("/dashboard");
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to update");
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        minHeight: "calc(100vh - 100px)",
+        padding: "70px 0",
+        width: "100%",
+        flexDirection: "column",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Card
+        component="form"
+        sx={{ gap: '10px' }}
+        onSubmit={handleUpdate}
+        className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5"
+      >
+        <Input
+          onChange={onchange("devName", "en")}
+          label={lang === "ar" ? "اسم الدفيلوبر انجليزي" : "Developer Name EN"}
+          value={developerData.devName.en}
+        />
+        <Input
+          onChange={onchange("devName", "ar")}
+          label={lang === "ar" ? "اسم الدفيلوبر عربي" : "Developer Name AR"}
+          value={developerData.devName.ar}
+        />
+        <FormGro
+          inputLabel={lang === "ar" ? "اختر البلد" : "Select Country"}
+          name="country"
+          data={CountryOptions}
+          value={developerData.country[lang] || ""}
+          fun={handleSelectChange}
+          lang={lang}
+        />
+        <IconButton onClick={() => setOpen(true)}>
+          <HelpOutline />
+        </IconButton>
+        
+        <Dialog open={open} onClose={() => setOpen(false)}>
+          <DialogContent>
+            <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+              {`📝 إزاي تستخدم Markdown:
+# عنوان رئيسي 
+## عنوان فرعي 
+### عنوان 
+#### عنوان 
+##### عنوان 
+###### عنوان 
+* نص مائل
+** نص عريض
+~~ نص مشطوب
+- قائمة نقطية
+1. قائمة مرقمة
+> اقتباس
+`}{" "}
+            </Typography>
+          </DialogContent>
+        </Dialog>
+        <Input
+          onChange={onchange("devDis", "en")}
+          label={lang === "ar" ? "التفاصيل انجليزي" : "Description EN"}
+          value={developerData.devDis.en}
+          multiline
+          rows={4}
+        />
+        <Input
+          onChange={onchange("devDis", "ar")}
+          label={lang === "ar" ? "التفاصيل عربي" : "Description AR"}
+          value={developerData.devDis.ar}
+          multiline
+          rows={4}
+        />
+        <FileUpload
+          handleFileChange={handleFileChange}
+          prog={prog}
+          title={lang === "ar" ? "ايقونه المطور" : "Developer Icon"}
+        />
+        <Button
+          disabled={btn}
+          type="submit"
+          variant="contained"
+          className="btn w-1/2"
+        >
+          {btn ? (
+            <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+          ) : lang === "ar" ? (
+            "تحديث"
+          ) : (
+            "Update"
+          )}
+        </Button>
+      </Card>
+      <p
+        style={{
+          zIndex: "10",
+          backgroundColor: "whitesmoke",
+          display: "flex",
+          alignItems: "center",
+          color: "black",
+          padding: "10px",
+          borderRadius: "6px",
+          boxShadow: "rgb(255 255 255 / 25%) 0px 5px 30px 0px",
+          position: "fixed",
+          top: "100px",
+          right: messege ? "20px" : "-230px",
+          transition: "0.8s",
+          scale: messege ? "1" : "0",
+        }}
+      >
+        Data has been updated successfully{" "}
+        <Info
+          style={{ margin: "0 0 0 10px", fontSize: "20px", color: "teal" }}
+        />
+      </p>
+    </Box>
+  );
 }
 
-export default Editdevdetails
+export default Editdevdetails;

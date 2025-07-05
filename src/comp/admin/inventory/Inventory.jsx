@@ -71,11 +71,11 @@ function Inventory() {
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
     img: [],
-    monyType: { ar: "", en: "" },
-    Area: { ar: "", en: "" },
-    imgtext: { ar: "", en: "" },
     Masterimg: [],
     Layoutimg: [],
+    monyType: { ar: "", en: "" },
+    Area: 0,
+    imgtext: { ar: "", en: "" },
     Bed: "",
     Bath: "",
     Location: { ar: "", en: "" },
@@ -84,13 +84,13 @@ function Inventory() {
     aminatis: [],
     price: 0,
     downPayment: 0,
-    remaining: "",
-    month: "",
-    roofArea: "",
-    landArea: "",
-    rental: "",
-    refNum: "",
-    gardenArea: "",
+    remaining: 0,
+    month: 0,
+    roofArea: 0,
+    landArea: 0,
+    rental: 0,
+    refNum: 0,
+    gardenArea: 0,
     about: { ar: "", en: "" },
     sold: { ar: "", en: "" },
     delivery: { ar: "", en: "" },
@@ -336,7 +336,7 @@ function Inventory() {
     async (e) => {
       e.preventDefault();
       console.log(newData);
-      // await sendData(newData);
+      await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
@@ -576,6 +576,13 @@ function Inventory() {
           label={lang === "ar" ? "الموقع" : "Location"}
           id="Location"
           value={newData.Location.en}
+        />
+        <Input
+          onChange={onchange("Location", "ar")}
+          type="text"
+          label={lang === "ar" ? "الموقع عربي" : "Location ar"}
+          id="Locationar"
+          value={newData.Location.ar}
         />
         <Input
           onChange={onchangesimple}
