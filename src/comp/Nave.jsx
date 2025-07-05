@@ -54,11 +54,9 @@ function Navs() {
           >
             <Nav>
               <Nav.Link as={Link} to="/" eventKey="0">
-                Home
+                {lang === "ar" ? "الصفحه الرئيسيه " : "Home"}
               </Nav.Link>
-              {/* <Button sx={{ color: 'white', width: 'fit-content', p: '2px', minWidth: 'auto' }} onClick={() => i18n.changeLanguage('ar')}>Ar</Button>
-              <Button sx={{ color: 'white', width: 'fit-content', p: '2px', minWidth: 'auto' }} onClick={() => i18n.changeLanguage('en')}>En</Button> */}
-              <NavDropdown title="Districts" id="navbarScrollingDropdown">
+              <NavDropdown title={lang === "ar" ? "المناطق" : "Districts"} id="navbarScrollingDropdown">
                 {arr.map((link, index) => {
                   return (
                     <NavDropdown.Item
@@ -74,19 +72,19 @@ function Navs() {
                 })}
               </NavDropdown>
               <Nav.Link as={Link} to="/sell" eventKey="0">
-                Sell-Rent
+                {lang === "ar" ? "بيع-إيجار" : "Sell-Rent"}
               </Nav.Link>
               <Nav.Link as={Link} to="/newlaunches" eventKey="0">
-                New Launches
+                {lang === "ar" ? "وحدات جديده" : "New Launches"}
               </Nav.Link>
               <Nav.Link as={Link} to="/contact" eventKey="0">
-                Contact Us
+                {lang === "ar" ? "اتصل بنا" : "Contact Us"}
               </Nav.Link>
               <Nav.Link as={Link} to="/about" eventKey="0">
-                about
+                {lang === "ar" ? "عنا" : "About"}
               </Nav.Link>
               <Nav.Link as={Link} to="/maverickdeals" eventKey="0">
-                Maverick Deals
+                {lang === "ar" ? "عروض مافريك" : "Maverick Deals"}
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
