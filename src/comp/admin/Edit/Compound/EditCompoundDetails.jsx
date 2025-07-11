@@ -2,7 +2,7 @@ import { Box, Card, CardMedia, Container, IconButton, Stack, Typography } from '
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from '../../../../firebase/config';
 import Swal from 'sweetalert2';
 import { Delete, Edit } from '@mui/icons-material';
