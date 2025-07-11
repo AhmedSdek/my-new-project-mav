@@ -20,7 +20,8 @@ import Input from "../Input";
 import FileUpload from "../FileUpload";
 import { useTranslation } from "react-i18next";
 import FormGro from "../FormGro";
-
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 function DeveloperForm() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
@@ -28,7 +29,7 @@ function DeveloperForm() {
   const [open, setOpen] = useState(false);
   const [prog, setProg] = useState(0);
   const [btn, setBtn] = useState(false);
-  const [messege, setMessege] = useState(false);
+  // const [messege, setMessege] = useState(false);
   const [newData, setNewData] = useState({
     devDis: {
       ar: "",
@@ -116,16 +117,14 @@ function DeveloperForm() {
         id: `${id}`,
         ...dataToSend,
       });
+      toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
+      nav("/dashboard");
+      setBtn(false);
     } catch (er) {
       console.error("Send error:", er);
-    } finally {
-      setMessege(true);
-      setTimeout(() => {
-        setMessege(false);
-        nav("/dashboard");
-      }, 1000);
+      setBtn(false);
+      toast.error("Oops! Something went wrong.", { autoClose: 2000 });
     }
-    setBtn(false);
   };
 
   const onchange = useCallback((parentKey, lang) => (e) => {
@@ -254,7 +253,7 @@ function DeveloperForm() {
         </Button>
       </Card>
     </Box>
-      <p
+      {/* <p
         style={{
           zIndex: "10",
           backgroundColor: "whitesmoke",
@@ -275,7 +274,7 @@ function DeveloperForm() {
         <Info
           style={{ margin: "3px 0 0 10px", fontSize: "20px", color: "teal" }}
         />
-      </p>
+      </p> */}
     </>
   );
 }

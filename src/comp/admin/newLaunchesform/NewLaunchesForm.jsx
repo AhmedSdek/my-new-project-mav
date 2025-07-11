@@ -12,10 +12,12 @@ import FormGro from '../FormGro';
 import FileUpload from '../FileUpload';
 import MavLoading from '../../Loading/MavLoading';
 import { useTranslation } from 'react-i18next';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 function NewLaunchesForm() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
-  const [messege, setMessege] = useState(false);
+  // const [messege, setMessege] = useState(false);
   const nav = useNavigate()
   const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -329,22 +331,18 @@ function NewLaunchesForm() {
         id: `${id}`,
         ...dataToSend,
       });
+      toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
+      nav("/dashboard");
+      setBtn(false);
     } catch (er) { 
       console.log(er)
-    } finally {
-      setMessege(true);
-      setTimeout(() => {
-        setMessege(false);
-        nav("/dashboard");
-      }, 1000);
     }
-    setBtn(false);
   };
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      setMessege(true);
-      console.log(newData)
+      // setMessege(true);
+      // console.log(newData)
       await sendData(newData);
     },
     [newData]
@@ -521,7 +519,7 @@ function NewLaunchesForm() {
           </Box>
         </Card>
       </Box>
-      <p
+      {/* <p
         style={{
           zIndex: "10",
           backgroundColor: "whitesmoke",
@@ -542,7 +540,7 @@ function NewLaunchesForm() {
         <Info
           style={{ margin: "3px 0 0 10px", fontSize: "20px", color: "teal" }}
         />
-      </p>
+      </p> */}
     </>
   );
 }

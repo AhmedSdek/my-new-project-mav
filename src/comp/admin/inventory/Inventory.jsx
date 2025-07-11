@@ -23,6 +23,8 @@ import FileUpload from "../FileUpload";
 import RadioCom from "../RadioCom";
 import CheckboxCom from "../CheckboxCom";
 import { useTranslation } from "react-i18next";
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 function Inventory() {
   const nav = useNavigate();
   const { i18n } = useTranslation();
@@ -32,7 +34,7 @@ function Inventory() {
   const [prog3, setProg3] = useState(0);
   const [prog2, setProg2] = useState(0);
   const [btn, setBtn] = useState(false);
-  const [messege, setMessege] = useState(false);
+  // const [messege, setMessege] = useState(false);
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
   const [compoundNames, setCompoundNames] = useState([]);
@@ -319,14 +321,13 @@ function Inventory() {
         id: `${id}`,
         ...dataToSend,
       });
-      setTimeout(() => {
-        setMessege(false);
-        nav("/");
-      }, 2000);
+      toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
+      nav("/dashboard");
+      setBtn(false);
     } catch (er) {
       console.error("Send error:", er);
+      setBtn(false);
     }
-    setBtn(false);
   };
 
   const onchangesimple = useCallback((e) => {
@@ -335,7 +336,7 @@ function Inventory() {
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      console.log(newData);
+      // console.log(newData);
       await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة

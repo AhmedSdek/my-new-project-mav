@@ -8,29 +8,27 @@ import {
   Typography,
 } from "@mui/material";
 import { doc, updateDoc } from "firebase/firestore";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useParams, useNavigate } from "react-router-dom";
 import { db, storage } from "../../../../firebase/config";
-import { HelpOutline, Info } from "@mui/icons-material";
+import { HelpOutline } from "@mui/icons-material";
 import Input from "../../Input";
 import FormGro from "../../FormGro";
 import FileUpload from "../../FileUpload";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import ReactLoading from "react-loading";
 import { useTranslation } from "react-i18next";
+import MavLoading from "../../../Loading/MavLoading";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 function Editdevdetails() {
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const { editDeveloperId } = useParams();
   const [value, loading] = useDocument(doc(db, "developer", editDeveloperId));
-  const [messege, setMessege] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [prog, setProg] = useState(0);
-  const [btn, setBtn] = useState(false);
-  const nav = useNavigate();
-
+  const [originalData, setOriginalData] = useState(null); // جديد
   const [developerData, setDeveloperData] = useState({
     devName: { en: "", ar: "" },
     devDis: { en: "", ar: "" },
@@ -38,15 +36,29 @@ function Editdevdetails() {
     img: "",
   });
 
+  const [open, setOpen] = useState(false);
+  const [prog, setProg] = useState(0);
+  const [btn, setBtn] = useState(false);
+  const nav = useNavigate();
+  const CountryOptions = useMemo(
+    () => [
+      { ar: "مصر", en: "Egypt" },
+      { ar: "الامارات", en: "UAE" },
+    ],
+    []
+  );
+
   useEffect(() => {
     if (value) {
       const data = value.data();
-      setDeveloperData({
+      const devData = {
         devName: data.devName || { en: "", ar: "" },
         devDis: data.devDis || { en: "", ar: "" },
         country: data.country || { en: "", ar: "" },
         img: data.img || [],
-      });
+      };
+      setDeveloperData(devData);
+      setOriginalData(devData); // جديد
     }
   }, [value]);
 
@@ -62,8 +74,6 @@ function Editdevdetails() {
     },
     []
   );
-
-  const CountryOptions = [{ ar: "مصر", en: "Egypt" }, { ar: "الامارات", en: "UAE" }];
 
   const handleSelectChange = useCallback(
     (e) => {
@@ -106,6 +116,15 @@ function Editdevdetails() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setBtn(true);
+
+    // مقارنة بسيطة بالـ JSON
+    if (JSON.stringify(developerData) === JSON.stringify(originalData)) {
+      toast.info("No changes detected.", { autoClose: 2000 });
+      setBtn(false);
+      return;
+    }
+
     try {
       const docRef = doc(db, "developer", editDeveloperId);
       await updateDoc(docRef, {
@@ -114,16 +133,34 @@ function Editdevdetails() {
         country: developerData.country,
         img: developerData.img,
       });
-      setMessege(true);
-      setTimeout(() => {
-        setMessege(false);
-        nav("/dashboard");
-      }, 2000);
+      toast.success("The data has been updated.", { autoClose: 2000 });
+      nav("/dashboard/editDeveloper");
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to update");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Oops! ❌ Failed to update",
+      });
+    } finally {
+      setBtn(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <MavLoading />
+      </div>
+    );
+  }
 
   return (
     <Box
@@ -139,7 +176,7 @@ function Editdevdetails() {
     >
       <Card
         component="form"
-        sx={{ gap: '10px' }}
+        sx={{ gap: "10px" }}
         onSubmit={handleUpdate}
         className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5"
       >
@@ -164,7 +201,7 @@ function Editdevdetails() {
         <IconButton onClick={() => setOpen(true)}>
           <HelpOutline />
         </IconButton>
-        
+
         <Dialog open={open} onClose={() => setOpen(false)}>
           <DialogContent>
             <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
@@ -181,10 +218,11 @@ function Editdevdetails() {
 - قائمة نقطية
 1. قائمة مرقمة
 > اقتباس
-`}{" "}
+`}
             </Typography>
           </DialogContent>
         </Dialog>
+
         <Input
           onChange={onchange("devDis", "en")}
           label={lang === "ar" ? "التفاصيل انجليزي" : "Description EN"}
@@ -219,28 +257,6 @@ function Editdevdetails() {
           )}
         </Button>
       </Card>
-      <p
-        style={{
-          zIndex: "10",
-          backgroundColor: "whitesmoke",
-          display: "flex",
-          alignItems: "center",
-          color: "black",
-          padding: "10px",
-          borderRadius: "6px",
-          boxShadow: "rgb(255 255 255 / 25%) 0px 5px 30px 0px",
-          position: "fixed",
-          top: "100px",
-          right: messege ? "20px" : "-230px",
-          transition: "0.8s",
-          scale: messege ? "1" : "0",
-        }}
-      >
-        Data has been updated successfully{" "}
-        <Info
-          style={{ margin: "0 0 0 10px", fontSize: "20px", color: "teal" }}
-        />
-      </p>
     </Box>
   );
 }

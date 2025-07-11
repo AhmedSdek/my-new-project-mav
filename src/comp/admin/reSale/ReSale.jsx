@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import ReactLoading from "react-loading";
 import "react-phone-input-2/lib/style.css";
-import { AddPhotoAlternate, HelpOutline, Info } from "@mui/icons-material";
+import { HelpOutline, Info } from "@mui/icons-material";
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import FormGro from "../FormGro";
@@ -23,10 +23,12 @@ import Input from "../Input";
 import FileUpload from "../FileUpload";
 import RadioCom from "../RadioCom";
 import CheckboxCom from "../CheckboxCom";
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 function ReSale() {
   const { i18n } = useTranslation();
   const lang = i18n.language;
-  const [messege, setMessege] = React.useState(false);
+  // const [messege, setMessege] = React.useState(false);
   const [newData, setNewData] = useState({
     developer: {},
     dealName: { ar: "", en: "" },
@@ -240,12 +242,12 @@ function ReSale() {
     },
     [storage]
   );
+
   useEffect(() => {
     const fetchCompounds = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
         const allCompoundNames = [];
-
         querySnapshot.forEach(doc => {
           const data = doc.data();
           if (Array.isArray(data.compound)) {
@@ -256,7 +258,6 @@ function ReSale() {
             });
           }
         });
-
         setCompoundNames(allCompoundNames);
       } catch (error) {
         console.error("Error fetching compounds:", error);
@@ -337,6 +338,14 @@ function ReSale() {
   const onchangesimple = useCallback((e) => {
     setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
+  const handleRadioChange = (fieldName) => (selectedOption) => {
+    console.log(selectedOption[lang])
+    setNewData((prev) => ({
+      ...prev,
+      [fieldName]: selectedOption
+    }));
+  };
+
   const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
   const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
   const deliveryOptions = useMemo(
@@ -443,14 +452,14 @@ function ReSale() {
         id: `${id}`,
         ...dataToSend,
       });
-      setTimeout(() => {
-        setMessege(false);
-        nav("/");
-      }, 2000);
+      toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
+      nav("/dashboard");
+      setBtn(false);
     } catch (er) {
       console.error("Send error:", er);
+      toast.error("Oops! Something went wrong.", { autoClose: 2000 });
+      setBtn(false);
     }
-    setBtn(false);
   };
   const onsubmit = useCallback(
     async (e) => {
@@ -549,7 +558,7 @@ function ReSale() {
             />
           <Input
             onChange={onchangesimple}
-            label={lang === "ar" ? "السعر" : "down Payment"}
+            label={lang === "ar" ? "مقدم سداد" : "down Payment"}
             type="number"
               id="downPayment"
             name="downPayment"
@@ -679,13 +688,29 @@ function ReSale() {
             fun={handleDynamicSelectChange(bathroomOptions, "Bath")}
             inputLabel={lang === "ar" ? "حمامات" : "Bathrooms"}
             />
-          <RadioCom
+          <FormGro
+            inputLabel={lang === "ar" ? "الحاله" : "status"}
+            name="Finsh"
+            data={finshOptions}
+            value={newData.Finsh[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(finshOptions, "Finsh")}
+            lang={lang}
+          />
+          <FormGro
+            inputLabel={lang === "ar" ? "حاله البيع" : "Sale status"}
+            name="Sale"
+            data={statusOptions}
+            value={newData.Sale[lang] || ""} // نخزن ونعرض الـ id
+            fun={handleDynamicSelectChange(statusOptions, "Sale")}
+            lang={lang}
+          />
+          {/* <RadioCom
             data={finshOptions}
             name="Finsh"
             lang={lang}
             label={lang === "ar" ? "الحاله" : "status"}
             value={newData.Finsh}
-            onChange={onchangesimple}
+            onChange={handleRadioChange("Finsh")}
           />
           <RadioCom
             name="Sale"
@@ -693,8 +718,8 @@ function ReSale() {
             label={lang === "ar" ? "حاله البيع" : "Sale status"}
             data={statusOptions}
             value={newData.Sale}
-            onChange={onchangesimple}
-          />
+            onChange={handleRadioChange("Sale")}
+          /> */}
             <IconButton onClick={() => setOpen(true)}>
               <HelpOutline />
             </IconButton>
@@ -751,7 +776,7 @@ function ReSale() {
           </Button>
         </Card>
       </Box>
-      <p
+      {/* <p
         style={{
           zIndex: "10",
           backgroundColor: "whitesmoke",
@@ -772,7 +797,7 @@ function ReSale() {
         <Info
           style={{ margin: "3px 0 0 10px", fontSize: "20px", color: "teal" }}
         />
-      </p>
+      </p> */}
     </>
   );
 }

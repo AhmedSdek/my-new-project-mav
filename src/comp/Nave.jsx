@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 function Navs() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
-  console.log(lang)
+  // console.log(lang)
   const [value, loading, error] = useCollection(collection(db, "admin"));
   var arr = [];
   value &&

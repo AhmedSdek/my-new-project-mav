@@ -60,10 +60,10 @@ export default function NavBtn() {
       text: lang === "ar" ? "تعديل المطور" : "Edit Developer",
       to: "editDeveloper",
     },
-    // {
-    //   text: lang === "ar" ? "تعديل العروض" : "Edit Deals",
-    //   to: "editDeals",
-    // },
+    {
+      text: lang === "ar" ? "تعديل العروض" : "Edit Deals",
+      to: "editDeals",
+    },
     // {
     //   text: lang === "ar" ? "تعديل الجديد" : "Edit luanches",
     //   to: "editluanches",

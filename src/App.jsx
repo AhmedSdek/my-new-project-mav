@@ -46,7 +46,8 @@ import Inventory from "./comp/admin/inventory/Inventory";
 import InventoryDetails from "./comp/inventory/InventoryDetails";
 import DeveloperForm from "./comp/admin/developerForm/DeveloperForm";
 import { useTranslation } from "react-i18next";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function App() {
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -98,6 +99,7 @@ function App() {
         ) : (
           <>
             <Navs />
+              <ToastContainer />
             <Routes>
               <Route path="dashboard" element={<Dashboard />}>
                 <Route index element={<SaleData />} />

@@ -42,11 +42,13 @@
     "react-router-dom": "^6.30.0",
     "react-slick": "^0.29.0",
     "react-spinners": "^0.13.8",
+    "react-toastify": "^11.0.5",
     "react-zoom-pan-pinch": "^3.7.0",
     "redux": "^4.2.1",
     "scrollreveal": "^4.0.9",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.17",
+    "sweetalert2": "^11.22.2",
     "swiper": "^11.2.6",
     "tailwindcss": "^4.1.7",
     "video-react": "^0.16.0"
