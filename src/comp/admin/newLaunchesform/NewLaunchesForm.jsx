@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { db, storage } from '../../../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Card, Dialog, DialogContent, IconButton, LinearProgress, Stack, Typography, styled } from '@mui/material';
@@ -17,7 +17,6 @@ import { toast } from 'react-toastify';
 function NewLaunchesForm() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
-  // const [messege, setMessege] = useState(false);
   const nav = useNavigate()
   const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -56,10 +55,25 @@ function NewLaunchesForm() {
 
     },
     price: 0,
+    monyType: { ar: "", en: "" },
   });
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
   const [devError, setDevError] = useState("");
+  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const handleDynamicSelectChange = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => (item[lang] || item.en) === selectedLabel
+      );
+      setNewData((prev) => ({
+        ...prev,
+        [fieldName]: selectedObject || prev[fieldName]
+      }));
+    },
+    [lang]
+  );
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
@@ -332,7 +346,7 @@ function NewLaunchesForm() {
         ...dataToSend,
       });
       toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
-      nav("/dashboard");
+      nav("/dashboard/editluanches");
       setBtn(false);
     } catch (er) { 
       console.log(er)
@@ -428,6 +442,14 @@ function NewLaunchesForm() {
               onChange={onSimpelchange}
               label={lang === "ar" ? "السعر" : "Price"}
               id="outlined-multiline-static"
+            />
+            <FormGro
+              inputLabel={lang === "ar" ? "نوع العمله" : "Money Type"}
+              name="monyType"
+              data={monyType}
+              value={newData.monyType[lang] || ""} // نخزن ونعرض الـ id
+              fun={handleDynamicSelectChange(monyType, "monyType")}
+              lang={lang}
             />
             <FileUpload handleFileChange={handleFileChange} multiple={true} prog={prog}
               title={lang === "ar" ? "رفع الصور" : "Upload Your Images ..."}

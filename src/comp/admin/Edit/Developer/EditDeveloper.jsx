@@ -14,7 +14,7 @@ function EditDeveloper() {
   const [devLoading, setDevLoading] = useState(true);
   const [deletLoading, setDeletLoading] = useState(false);
   const [developers, setDevelopers] = useState([]);
-  // console.log(developers)
+  console.log(developers)
 
   useEffect(() => {
     const fetchDevelopers = async () => {

@@ -64,10 +64,10 @@ export default function NavBtn() {
       text: lang === "ar" ? "تعديل العروض" : "Edit Deals",
       to: "editDeals",
     },
-    // {
-    //   text: lang === "ar" ? "تعديل الجديد" : "Edit luanches",
-    //   to: "editluanches",
-    // },
+    {
+      text: lang === "ar" ? "تعديل الجديد" : "Edit luanches",
+      to: "editluanches",
+    },
     // {
     //   text: "Cityscape",
     //   to: "cityscape",

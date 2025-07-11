@@ -17,7 +17,6 @@ function EditDeals() {
   const [deletLoading, setDeletLoading] = useState(false);
   const [dealLoading, setDealLoading] = useState(true);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const fetchDeals = async () => {
@@ -42,7 +41,6 @@ function EditDeals() {
       setDeletLoading(true)
       await deleteDoc(doc(db, "deals", id));
       setDeals(prev => prev.filter(deal => deal.id !== id));
-      setOpenConfirm(false);
       setDeletLoading(false)
       console.log("✅ تم الحذف بنجاح");
     } catch (error) {

@@ -30,21 +30,8 @@ import CheckboxCom from "../../CheckboxCom";
 import FileUpload from "../../FileUpload";
 import { HelpOutline } from "@mui/icons-material";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import RadioCom from "../../RadioCom";
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
-// Swal.fire({
-//   position: "top-end",
-//   icon: "success",
-//   title: "Client updated successfully",
-//   showConfirmButton: false,
-//   timer: 900
-// });
-// Swal.fire({
-//   icon: "info",
-//   title: "No changes",
-//   text: "No changes were made to the client data.",
-// });
 function EditDealdetails() {
   const { editeDealdetailsId } = useParams();
   const { i18n } = useTranslation();
@@ -55,7 +42,6 @@ function EditDealdetails() {
   const [prog2, setProg2] = useState(0);
   const [prog3, setProg3] = useState(0);
   // console.log(value.data())
-  const [messege, setMessege] = useState(false);
   const [open, setOpen] = useState(false);
   const [btn, setBtn] = useState(false);
   const nav = useNavigate();
@@ -228,7 +214,6 @@ function EditDealdetails() {
       const docRef = doc(db, "deals", editeDealdetailsId);
       await updateDoc(docRef, changedFields);
       // console.log(changedFields)
-      setMessege(true);
       setBtn(false)
       toast.success("The modification has been made.", { autoClose: 2000 }); // عرض إشعار أنيق
       nav("/dashboard/editDeals");
@@ -243,11 +228,8 @@ function EditDealdetails() {
       // alert("❌ فشل في التعديل");
     } finally {
       setBtn(false)
-      // setMessege(false);
-      // toast.success("anyhvvhg", { autoClose: 5000 }); // عرض إشعار أنيق
     }
   };
-
   const onchange = useCallback((parentKey, lang) => (e) => {
     setNewData((prev) => ({
       ...prev,
@@ -301,135 +283,67 @@ function EditDealdetails() {
     },
     [developers]
   );
-  const handleRadioChange = (fieldName) => (selectedOption) => {
-    setNewData((prev) => ({
-      ...prev,
-      [fieldName]: selectedOption
-    }));
-  };
   const handleFileChange = useCallback(async (event) => {
-    for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(
-        storage,
-        "deals/" + event.target.files[i].name
-      );
-      const uploadTask = uploadBytesResumable(
-        storageRef,
-        event.target.files[i]
-      );
+    if (event.target.files.length > 0) {
+      // افرغ الصور القديمة
+      setNewData((prev) => ({
+        ...prev,
+        img: [],
+      }));
+    }
 
+    for (let i = 0; i < event.target.files.length; i++) {
+      const storageRef = ref(storage, "deals/" + event.target.files[i].name);
+      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          // console.log('Upload is ' + progress + '% done');
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg(progress);
-          if (i < event.target.files.length) {
-            setBtn(true);
-          }
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
+          setBtn(true);
         },
-        (error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
-          switch (error.code) {
-            case "storage/unauthorized":
-              // User doesn't have permission to access the object
-              break;
-            case "storage/canceled":
-              // User canceled the upload
-              break;
-
-            // ...
-
-            case "storage/unknown":
-              // Unknown error occurred, inspect error.serverResponse
-              break;
-          }
-        },
+        (error) => console.error(error),
         () => {
-          // Upload completed successfully, now we can get the download URL
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            console.log("File available at", downloadURL);
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setNewData((prev) => ({
               ...prev,
-              img: [...prev.img, downloadURL],
+              img: [...prev.img, downloadURL], // ضيف الصور وحدة وحدة
             }));
             setBtn(false);
-            // Add a new document in collection "cities"
           });
         }
       );
     }
   }, []);
   const handleMasterplanImgChange = useCallback(async (event) => {
+    if (event.target.files.length > 0) {
+      // امسح الصور القديمة
+      setNewData((prev) => ({
+        ...prev,
+        Masterimg: [],
+      }));
+    }
+
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(
-        storage,
-        "deals/" + event.target.files[i].name
-      );
-      const uploadTask = uploadBytesResumable(
-        storageRef,
-        event.target.files[i]
-      );
+      const storageRef = ref(storage, event.target.files[i].name);
+      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          // console.log('Upload is ' + progress + '% done');
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg3(progress);
-          if (i < event.target.files.length) {
-            setBtn(true);
-          }
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
+          setBtn(true);
         },
-        (error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
-          switch (error.code) {
-            case "storage/unauthorized":
-              // User doesn't have permission to access the object
-              break;
-            case "storage/canceled":
-              // User canceled the upload
-              break;
-
-            // ...
-
-            case "storage/unknown":
-              // Unknown error occurred, inspect error.serverResponse
-              break;
-          }
-        },
+        (error) => console.error(error),
         () => {
-          // Upload completed successfully, now we can get the download URL
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            console.log("File available at", downloadURL);
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          // خليه يحط الصورة الجديدة مكان القديم (واحدة بس)
             setNewData((prev) => ({
               ...prev,
-              Masterimg: downloadURL,
+              Masterimg: [downloadURL],
             }));
             setBtn(false);
-            // Add a new document in collection "cities"
           });
         }
       );
@@ -437,11 +351,16 @@ function EditDealdetails() {
   }, []);
   const handleFiletowChange = useCallback(
     async (event) => {
+      if (event.target.files.length > 0) {
+        // امسح القديم
+        setNewData((prev) => ({
+          ...prev,
+          Layoutimg: "",
+        }));
+      }
+
       for (let i = 0; i < event.target.files.length; i++) {
-        const storageRef = ref(
-          storage,
-          "deals/" + event.target.files[i].name
-        );
+        const storageRef = ref(storage, "deals/" + event.target.files[i].name);
         const uploadTask = uploadBytesResumable(
           storageRef,
           event.target.files[i]
@@ -453,15 +372,14 @@ function EditDealdetails() {
             const progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProg2(progress);
-            if (i < event.target.files.length) {
-              setBtn(true);
-            }
+            setBtn(true);
           },
           (error) => {
             switch (error.code) {
               case "storage/unauthorized":
               case "storage/canceled":
               case "storage/unknown":
+                console.error(error);
                 break;
             }
           },
@@ -469,7 +387,7 @@ function EditDealdetails() {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               setNewData((prev) => ({
                 ...prev,
-                Layoutimg: downloadURL,
+                Layoutimg: downloadURL, // صورة واحدة فقط
               }));
               setBtn(false);
             });
@@ -479,6 +397,7 @@ function EditDealdetails() {
     },
     [storage]
   );
+
   const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
   const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
   const deliveryOptions = useMemo(
@@ -682,7 +601,7 @@ function EditDealdetails() {
             fun={handleDynamicSelectChange(monyType, "monyType")}
             lang={lang}
           />
-          <FileUpload handleFileChange={handleFileChange} prog={prog} title='Upload Your Images ...' />
+          <FileUpload handleFileChange={handleFileChange} prog={prog} multiple={true} title='Upload Your Images ...' />
           <Input
             onChange={onchangesimple}
             id="Price"
