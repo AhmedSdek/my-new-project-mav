@@ -1,9 +1,7 @@
 import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
-import { useCollection } from 'react-firebase-hooks/firestore';
 import { db } from '../../../../firebase/config';
-import { Box, Card, CardContent, CardMedia, Container, IconButton, Stack, Typography } from '@mui/material';
-import { Col, Row } from 'react-bootstrap';
+import { Box, Card, CardMedia, Container, IconButton, Stack, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Delete, Edit } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';

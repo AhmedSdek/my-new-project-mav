@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardMedia, Container, Dialog, DialogContent, IconButton, Stack, Typography } from '@mui/material'
+import { Box, Card, CardMedia, Container, IconButton, Stack, Typography } from '@mui/material'
 import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'

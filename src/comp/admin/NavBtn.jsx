@@ -42,7 +42,7 @@ export default function NavBtn() {
     },
     {
       text: lang === "ar" ? "كومباوند" : "Compound",
-      to: "database",
+      to: "compound",
     },
     {
       text: lang === "ar" ? "اينفينتوري" : "Inventory",
@@ -67,6 +67,10 @@ export default function NavBtn() {
     {
       text: lang === "ar" ? "تعديل الجديد" : "Edit luanches",
       to: "editluanches",
+    },
+    {
+      text: lang === "ar" ? "تعديل الكومبوند" : "Edit Compound",
+      to: "editcompound",
     },
     // {
     //   text: "Cityscape",

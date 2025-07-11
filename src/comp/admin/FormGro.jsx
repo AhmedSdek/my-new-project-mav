@@ -9,11 +9,12 @@ function FormGro(props) {
     value,
     fun,
     data,
-    lang
+    lang,
+    disabled
   } = props;
 
   return (
-    <FormControl className="mt-2.5 mb-2.5 w-full">
+    <FormControl disabled={disabled} className="mt-2.5 mb-2.5 w-full">
       <InputLabel>{inputLabel}</InputLabel>
       <Select label={label} name={name} value={value} onChange={fun}>
         {data?.map((item, index) => {

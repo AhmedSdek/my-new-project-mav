@@ -1,69 +1,32 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { db, storage } from "../../../firebase/config";
-import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Card,
-  Dialog,
-  DialogContent,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-  styled,
-} from "@mui/material";
-import ReactLoading from "react-loading";
-import { Delete, HelpOutline, Info, Remove } from "@mui/icons-material";
-import {
-  arrayUnion,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import FormGro from "../FormGro";
-import Input from "../Input";
-import CheckboxCom from "../CheckboxCom";
-import FileUpload from "../FileUpload";
-import MavLoading from "../../Loading/MavLoading";
-import { useTranslation } from "react-i18next";
-import Swal from 'sweetalert2';
+import { Box, Button, Card, Container, Dialog, DialogContent, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { db, storage } from '../../../../firebase/config';
+import FormGro from '../../FormGro';
+import Input from '../../Input';
+import FileUpload from '../../FileUpload';
+import CheckboxCom from '../../CheckboxCom';
+import { Delete, HelpOutline } from '@mui/icons-material';
+import isEqual from "lodash.isequal";
 import { toast } from 'react-toastify';
-function DataBase() {
-  const [developers, setDevelopers] = useState([]);
-  const [devLoading, setDevLoading] = useState(true);
+import ReactLoading from "react-loading";
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+
+function EditCompoundProject() {
+  const { editcompoundprojId, editcompoundId } = useParams();
+  // console.log(editcompoundprojId)
   const { i18n } = useTranslation();
   const lang = i18n.language;
-  // const [messege, setMessege] = useState(false);
+  const [developers, setDevelopers] = useState([]);
+  // console.log(developers)
+  const [devLoading, setDevLoading] = useState(true);
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const [btn, setBtn] = useState(false);
   const [prog3, setProg3] = useState(0);
   const [prog, setProg] = useState(0);
-
-  useEffect(() => {
-    const fetchDevelopers = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "developer"));
-        const devs = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setDevelopers(devs);
-      } catch (err) {
-        console.error("خطأ أثناء جلب المطورين:", err);
-      } finally {
-        setDevLoading(false);
-      }
-    };
-
-    fetchDevelopers();
-  }, []);
-
   const [newData, setNewData] = useState({
     developer: {},
     compoundName: {
@@ -87,8 +50,86 @@ function DataBase() {
     },
     aminatis: [],
     type: [],
+    monyType: { ar: "", en: "" },
+    offers: [{ pers: "", year: "", offer: "" }]
   });
+
+  console.log(newData)
+  const [oldData, setOldData] = useState({
+    developer: {},
+    compoundName: {
+      ar: "",
+      en: ""
+    },
+    compoundImgs: [],
+    district: {
+      ar: "",
+      en: ""
+    },
+    price: 0,
+    compoundDes: {
+      ar: "",
+      en: ""
+    },
+    masterplanImg: [],
+    Location: {
+      ar: "",
+      en: ""
+    },
+    aminatis: [],
+    type: [],
+    monyType: { ar: "", en: "" },
+    offers: [{ pers: "", year: "", offer: "" }]
+  });
+  console.log(oldData)
+  useEffect(() => {
+    const fetchCompoundData = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "compound"));
+        let found = false;
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const compounds = data.compounds || [];
+          const targetCompound = compounds.find(comp => comp.id === editcompoundprojId);
+          console.log(targetCompound)
+          if (targetCompound) {
+            setNewData(targetCompound);
+            setOldData(targetCompound);
+            setOffers(targetCompound.offers || [{ pers: "", year: "", offer: "" }]);
+            found = true;
+          }
+        });
+        if (!found) {
+          console.warn("🚨 لم يتم العثور على الكمباوند المطلوب");
+        }
+      } catch (err) {
+        console.error("❌ خطأ أثناء تحميل بيانات الكمباوند:", err);
+      }
+    };
+
+    fetchCompoundData();
+  }, [editcompoundprojId]);
+
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "developer"));
+        const devs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDevelopers(devs);
+      } catch (err) {
+        console.error("خطأ أثناء جلب المطورين:", err);
+      } finally {
+        setDevLoading(false);
+      }
+    };
+
+    fetchDevelopers();
+  }, []);
   const [offers, setOffers] = useState([{ pers: "", year: "", offer: "" }]);
+  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
 
   const handleDevChange = useCallback(
     (e) => {
@@ -119,29 +160,31 @@ function DataBase() {
     }));
   }, []);
   const handleFileChange = useCallback(async (event) => {
+    if (event.target.files.length > 0) {
+      // افرغ الصور القديمة
+      setNewData((prev) => ({
+        ...prev,
+        compoundImgs: [],
+      }));
+    }
+
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(
-        storage,
-        "compound/" + event.target.files[i].name
-      );
-      const uploadTask = uploadBytesResumable(
-        storageRef,
-        event.target.files[i]
-      );
+      const storageRef = ref(storage, "compound/" + event.target.files[i].name);
+      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg(progress);
-          if (i < event.target.files.length) setBtn(true);
+          setBtn(true);
         },
         (error) => console.error(error),
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setNewData((prev) => ({
               ...prev,
-              compoundImgs: [...prev.compoundImgs, downloadURL],
+              compoundImgs: [...prev.compoundImgs, downloadURL], // ضيف الصور وحدة وحدة
             }));
             setBtn(false);
           });
@@ -150,27 +193,34 @@ function DataBase() {
     }
   }, []);
 
+
+
   const handleMasterplanImgChange = useCallback(async (event) => {
+    if (event.target.files.length > 0) {
+      // افرغ الصور القديمة
+      setNewData((prev) => ({
+        ...prev,
+        masterplanImg: [],
+      }));
+    }
+
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(storage, "compound/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(
-        storageRef,
-        event.target.files[i]
-      );
+      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg3(progress);
-          if (i < event.target.files.length) setBtn(true);
+          setBtn(true);
         },
         (error) => console.error(error),
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setNewData((prev) => ({
               ...prev,
-              masterplanImg: [...prev.masterplanImg, downloadURL],
+              masterplanImg: [...prev.masterplanImg, downloadURL], // ضيف الصور وحدة وحدة
             }));
             setBtn(false);
           });
@@ -225,7 +275,19 @@ function DataBase() {
     },
     []
   );
-
+  const handleDynamicSelectChange = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => (item[lang] || item.en) === selectedLabel
+      );
+      setNewData((prev) => ({
+        ...prev,
+        [fieldName]: selectedObject || prev[fieldName]
+      }));
+    },
+    [lang]
+  );
   const addOffer = () =>
     setOffers((prev) => [...prev, { pers: "", year: "", offer: "" }]);
 
@@ -276,69 +338,61 @@ function DataBase() {
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      const id = new Date().getTime();
-      const projectObject = {
-        ...newData,
-        offers,
-        id: id.toString(),
-      };
+
+      // ✅ لو مفيش اي تغيير في الداتا مش نعمل حاجة
+      if (isEqual(newData, oldData)) {
+        toast.info("No changes detected", { autoClose: 2000 });
+        return;
+      }
+
       try {
         setBtn(true);
+
+        const projectObject = {
+          ...newData,
+          offers,
+          id: newData.id, // نحتفظ بنفس id مش نغيره
+        };
+
+        // احنا محتاجين نجيب الـ developer document
         const docRef = doc(db, "compound", newData.developer.id);
         const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) {
-          await setDoc(docRef, {
-            // developer: { ...newData.developer },
-            compound: [projectObject],
-          });
-        } else {
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const compounds = data.compounds || [];
+
+          // نعمل map ونستبدل الكمباوند بالـ id ده بالـ data الجديدة
+          const updatedCompounds = compounds.map(comp =>
+            comp.id === newData.id ? projectObject : comp
+          );
+
           await updateDoc(docRef, {
-            compound: arrayUnion(projectObject),
+            compounds: updatedCompounds,
           });
+
+          toast.success("Data updated successfully!", { autoClose: 2000 });
+          nav(`/dashboard/editcompound/${editcompoundId}`);
+        } else {
+          console.error("⚠️ هذا المطور غير موجود");
         }
-        toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
-        nav("/dashboard");
+
         setBtn(false);
       } catch (err) {
         console.error("❌ خطأ:", err);
         setBtn(false);
-      } finally {
-        setBtn(false);
       }
     },
-    [newData, offers, nav]
+    [newData, oldData, offers, nav]
   );
 
-  if (devLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <MavLoading />
-      </div>
-    );
-  }
 
   return (
-    <>
-      <Box
-        style={{
-          width: "100%",
-          flexDirection: "column",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "70px 0 0",
-        }}
-      >
-        <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-          <Typography variant="h5">{lang === "ar" ? "اضف كومباوند" : "Add Compound"}</Typography>
-        </Stack>
+    <Box sx={{ minHeight: 'calc(100vh - 100px)', padding: '70px 0' }}>
+      <h2>
+        {lang === "ar" ? "تعديل الكومباوند" : "Edit Compound page"}
+      </h2>
+      <Container>
         <Card
           sx={{
             width: { xs: "90%", sm: "80%" },
@@ -365,6 +419,7 @@ function DataBase() {
             <FormGro
               inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
               name="dev"
+              disabled
               data={developers}
               value={newData.developer?.id || ""}
               fun={handleDevChange}
@@ -422,6 +477,14 @@ function DataBase() {
               type="number"
               name="price"
               value={newData.price}
+            />
+            <FormGro
+              inputLabel={lang === "ar" ? "نوع العمله" : "Money Type"}
+              name="monyType"
+              data={monyType}
+              value={newData.monyType[lang] || ""} // نخزن ونعرض الـ id
+              fun={handleDynamicSelectChange(monyType, "monyType")}
+              lang={lang}
             />
             {offers.map((offer, index) => (
               <Stack
@@ -543,31 +606,9 @@ function DataBase() {
             </Button>
           </Box>
         </Card>
-      </Box>
-      {/* <p
-        style={{
-          zIndex: "10",
-          backgroundColor: "whitesmoke",
-          display: "flex",
-          alignItems: "center",
-          color: "black",
-          padding: "10px",
-          borderRadius: "6px",
-          boxShadow: "rgb(255 255 255 / 25%) 0px 5px 30px 0px",
-          position: "fixed",
-          top: "100px",
-          right: messege ? "20px" : "-230px",
-          transition: "0.8s",
-          scale: messege ? "1" : "0",
-        }}
-      >
-        Data has been sent successfully{" "}
-        <Info
-          style={{ margin: "3px 0 0 10px", fontSize: "20px", color: "teal" }}
-        />
-      </p> */}
-    </>
-  );
+      </Container>
+    </Box>
+  )
 }
 
-export default DataBase;
+export default EditCompoundProject

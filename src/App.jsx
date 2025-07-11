@@ -17,7 +17,6 @@ import Dashboard from "./comp/admin/Dashboard";
 import ReSale from "./comp/admin/reSale/ReSale";
 import SaleData from "./comp/admin/SaleData";
 import MaverickDeals from "./comp/deals/MaverickDeals";
-import DataBase from "./comp/admin/Find home Data/DataBase";
 import DealDetails from "./comp/deals/DealDetails";
 import DeveloperDetails from "./comp/home content/Developers/DeveloperDetails";
 import ProjectDe from "./comp/home content/Developers/ProjectDe";
@@ -48,6 +47,10 @@ import DeveloperForm from "./comp/admin/developerForm/DeveloperForm";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CompoundsForm from "./comp/admin/Compound/CompoundsForm";
+import EditCompound from "./comp/admin/Edit/Compound/EditCompound";
+import EditCompoundDetails from "./comp/admin/Edit/Compound/EditCompoundDetails";
+import EditCompoundProject from "./comp/admin/Edit/Compound/EditCompoundProject";
 function App() {
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -105,7 +108,16 @@ function App() {
                 <Route index element={<SaleData />} />
                   <Route path="developerform" element={<DeveloperForm />} />
                 <Route path="resale" element={<ReSale />} />
-                <Route path="database" element={<DataBase />} />
+                  <Route path="compound" element={<CompoundsForm />} />
+                  <Route path="editcompound" element={<EditCompound />} />
+                  <Route
+                    path="editcompound/:editcompoundId"
+                    element={<EditCompoundDetails />}
+                  />
+                      <Route
+                    path="editcompound/:editcompoundId/:editcompoundprojId"
+                    element={<EditCompoundProject />}
+                  />
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="details/:id" element={<SellDetails />} />
                 <Route path="newlaunchesform" element={<NewLaunchesForm />} />

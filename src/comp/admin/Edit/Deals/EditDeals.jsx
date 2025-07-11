@@ -16,7 +16,6 @@ function EditDeals() {
   // console.log(deals)
   const [deletLoading, setDeletLoading] = useState(false);
   const [dealLoading, setDealLoading] = useState(true);
-  const [openConfirm, setOpenConfirm] = useState(false);
 
   useEffect(() => {
     const fetchDeals = async () => {
