@@ -21,13 +21,13 @@ export default function NavBtn() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
   const [open, setOpen] = React.useState(false);
-  const [user] = useAuthState(auth);
   const nav = useNavigate();
   const containerRef = useRef(null);
-  const adminData = [
-    "arB4bTAtCiaMCBprrnOTRz6YbmT2",
-    "YZia9oRhhzdNFG1JOXteZOpcdw83",
-  ];
+  const handleLogout = () => {
+    auth.signOut();
+    localStorage.removeItem("userData");
+    nav("/");
+  };
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
@@ -72,6 +72,10 @@ export default function NavBtn() {
       text: lang === "ar" ? "تعديل الكومبوند" : "Edit Compound",
       to: "editcompound",
     },
+    {
+      text: lang === "ar" ? "تعديل اينفينتوري" : "Edit Inventory",
+      to: "editinventory",
+    },
     // {
     //   text: "Cityscape",
     //   to: "cityscape",
@@ -108,51 +112,23 @@ export default function NavBtn() {
           justifyContent: { xs: "center", sm: "end" },
         }}
       >
-        {!user ? (
-          <>
-            <Link className="nav-link" to="/signup">
-              Register
-            </Link>
-            <Link className="nav-link" to="/signin">
-              Log in
-            </Link>
-          </>
-        ) : (
-          <>
-            <Stack
-              sx={{
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "10px",
-              }}
-            >
-              <Button
-                sx={{ fontWeight: "bold" }}
-                onClick={() => {
-                  const auth = getAuth();
-                  signOut(auth)
-                    .then(() => {
-                      // Sign-out successful.
-                    })
-                    .catch((error) => {
-                      // An error happened.
-                    });
-                  nav("/");
-                }}
-                variant="contained"
-                color="error"
-              >
-                  {lang === "ar" ? "تسجيل الخروج" : "Log Out"}
-
-              </Button>
-
-              {/* {adminData.includes(user.uid) &&
-                                <Link className="btn" style={{ color: 'black !important', width: '100%', textAlign: 'center',background }} to='/dashboard'>dash</Link>
-                            } */}
-            </Stack>
-          </>
-        )}
+        <Stack
+          sx={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "10px",
+          }}
+        >
+          <Button
+            sx={{ fontWeight: "bold" }}
+            onClick={handleLogout}
+            variant="contained"
+            color="error"
+          >
+            {lang === "ar" ? "تسجيل الخروج" : "Log Out"}
+          </Button>
+        </Stack>
       </Stack>
     </Box>
   );
@@ -175,11 +151,13 @@ export default function NavBtn() {
         sx={{
           [`& .MuiPaper-root`]: {
             height: "  calc(100% - 58px )",
-            top: '58px',
+            top: "58px",
             borderRadius: " 0 10px 10px 0",
-          }
+          },
         }}
-        open={open} onClose={toggleDrawer(false)}>
+        open={open}
+        onClose={toggleDrawer(false)}
+      >
         {DrawerList}
       </Drawer>
     </>

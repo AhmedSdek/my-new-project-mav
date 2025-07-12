@@ -14,7 +14,7 @@ function FormGro(props) {
   } = props;
 
   return (
-    <FormControl disabled={disabled} className="mt-2.5 mb-2.5 w-full">
+    <FormControl fullWidth disabled={disabled} className="mt-2.5 mb-2.5 w-full">
       <InputLabel>{inputLabel}</InputLabel>
       <Select label={label} name={name} value={value} onChange={fun}>
         {data?.map((item, index) => {

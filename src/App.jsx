@@ -51,6 +51,10 @@ import CompoundsForm from "./comp/admin/Compound/CompoundsForm";
 import EditCompound from "./comp/admin/Edit/Compound/EditCompound";
 import EditCompoundDetails from "./comp/admin/Edit/Compound/EditCompoundDetails";
 import EditCompoundProject from "./comp/admin/Edit/Compound/EditCompoundProject";
+import LoginForm from "./Auth/Login";
+import RegisterForm from "./Auth/SignUp";
+import EditInventory from "./comp/admin/Edit/Inventory/EditInventory";
+import EditinventoryDetails from "./comp/admin/Edit/Inventory/EditinventoryDetails";
 function App() {
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -64,15 +68,15 @@ function App() {
       mode,
       ...(mode === "light"
         ? {
-            background: {
-              default: "#f0f2f5",
-            },
-          }
+          background: {
+            default: "#f0f2f5",
+          },
+        }
         : {
-            background: {
-              default: "#000000eb",
-            },
-          }),
+          background: {
+            default: "#000000eb",
+          },
+        }),
     },
   });
   useEffect(() => {
@@ -114,11 +118,13 @@ function App() {
                     path="editcompound/:editcompoundId"
                     element={<EditCompoundDetails />}
                   />
-                      <Route
+                  <Route
                     path="editcompound/:editcompoundId/:editcompoundprojId"
                     element={<EditCompoundProject />}
                   />
                 <Route path="inventory" element={<Inventory />} />
+                  <Route path="editinventory" element={<EditInventory />} />
+                  <Route path="editinventory/:inventoryId" element={<EditinventoryDetails />} />
                 <Route path="details/:id" element={<SellDetails />} />
                 <Route path="newlaunchesform" element={<NewLaunchesForm />} />
                 <Route path="editDeveloper" element={<EditDeveloper />} />
@@ -165,16 +171,19 @@ function App() {
               <Route path="/maverickdeals/:dealId" element={<DealDetails />} />
               <Route path="/*" element={<Err />} />
               <Route path="/sell" element={<Sell />} />
-              <Route path="/signin" element={<Signin />} />
+                {/* <Route path="/signin" element={<Signin />} /> */}
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegisterForm />} />
               <Route path="/contact" element={<ContactPage />} />
-              <Route path="/signup" element={<Regester />} />
+                {/* <Route path="/signup" element={<Regester />} /> */}
+
               <Route path="/developers" element={<Developers />} />
               <Route path="/developers/:devId" element={<DeveloperDetails />} />
               <Route
                 path="/developers/:devId/:projId"
                 element={<ProjectDe />}
               />
-                  <Route
+                <Route
                 path="/developers/:devId/:projId/:compId"
                 element={<InventoryDetails />}
               />

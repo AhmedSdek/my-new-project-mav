@@ -17,9 +17,9 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 function Editluanchesdetails() {
   const { editluanchesdetailsId } = useParams();
   const { i18n } = useTranslation();
+  const lang = i18n.language;
   const [btn, setBtn] = useState(false);
   const [developers, setDevelopers] = useState([]);
-  const lang = i18n.language;
   const nav = useNavigate();
   const [value, loading] = useDocument(doc(db, "newlaunch", editluanchesdetailsId));
   const [oldData, setOldData] = useState({
@@ -290,7 +290,7 @@ function Editluanchesdetails() {
         alignItems: "center",
       }}>
         <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-          <Typography variant="h5">{lang === "ar" ? "تعديل العرض" : "ُEdit Deal"}</Typography>
+          <Typography variant="h5">{lang === "ar" ? "تعديل لونش" : "ُEdit Luanch"}</Typography>
         </Stack>
         <Card
           onSubmit={handleUpdate}
@@ -300,13 +300,13 @@ function Editluanchesdetails() {
         >
           <Input
             onChange={onchange("launchName", "en")}
-            label={lang === "ar" ? "اسم العرض انجليزي" : "launchName en"}
+            label={lang === "ar" ? "اسم اللونش انجليزي" : "launchName en"}
             value={newData.launchName.en}
             id="outlined-title-static"
           />
           <Input
             onChange={onchange("launchName", "ar")}
-            label={lang === "ar" ? "اسم العرض عربي" : "launchName ar"}
+            label={lang === "ar" ? "اسم اللونش عربي" : "launchName ar"}
             value={newData.launchName.ar}
             id="outlined-title-static-ar"
           />

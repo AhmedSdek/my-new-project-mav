@@ -7,10 +7,8 @@ import { BrowserRouter } from "react-router-dom";
 import ScrollTop from "./comp/ScrollTop";
 import './i18n'; // 👈 مهم جدًا تكتبه هنا
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
     <BrowserRouter>
       <ScrollTop />
       <App />
-    </BrowserRouter>
-  </React.StrictMode>
+  </BrowserRouter>
 );

@@ -1,36 +1,66 @@
-import { Outlet } from "react-router-dom"
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase/config";
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Container, Stack } from "@mui/material";
 import NavBtn from "./NavBtn";
-import Err from "../Err/Err";
-
+import MavLoading from "../Loading/MavLoading";
+import { auth, db } from "../../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 function Dashboard() {
-    const [user] = useAuthState(auth);
-    const adminData = ['arB4bTAtCiaMCBprrnOTRz6YbmT2', 'YZia9oRhhzdNFG1JOXteZOpcdw83']
-    if (user) {
-        if (adminData.includes(user.uid)) {
-            return (
-                <>
-                <Stack >
-                        <NavBtn />
-                        <Container>
-                            <Outlet />
-                        </Container>
-                    </Stack >
-                </>
-            )
+  const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // هات الدور من Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          if (data.role !== "admin") {
+            navigate("/"); // مش ادمن
+          } else {
+            setRole("admin"); // ادمن
+          }
         } else {
-            return (
-                <Err />
-            )
+          navigate("/"); // مفيش بيانات
         }
-    } else {
-        return (
-            <Err />
-        )
-    }
+      } else {
+        navigate("/"); // مش مسجل دخول
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <MavLoading />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Stack>
+        <NavBtn />
+        <Container>
+          <Outlet />
+        </Container>
+      </Stack>
+    </>
+  );
 }
 
-export default Dashboard
+export default Dashboard;

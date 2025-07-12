@@ -164,14 +164,15 @@ function DeveloperForm() {
     <>
       <Box sx={{
         minHeight: 'calc(100vh - 100px)'
-      }} className="w-full flex flex-col justify-center align-items-center pt-16" >
+      }}
+        className="w-full flex flex-col justify-center align-items-center pt-16" >
       <Stack className="align-items-center mb-2.5">
           <Typography variant="h5">{lang === "ar" ? "اضف المطور" : "Add developers"}</Typography>
       </Stack>
       <Card
         onSubmit={onsubmit}
         component="form"
-        sx={{ gap: '10px' }}
+          sx={{ gap: '10px', width: '100%' }}
         className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
       >
         <Input

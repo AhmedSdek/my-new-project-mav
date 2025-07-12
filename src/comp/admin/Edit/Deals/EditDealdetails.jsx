@@ -148,8 +148,8 @@ function EditDealdetails() {
         const allCompoundNames = [];
         querySnapshot.forEach(doc => {
           const data = doc.data();
-          if (Array.isArray(data.compound)) {
-            data.compound.forEach(item => {
+          if (Array.isArray(data.compounds)) {
+            data.compounds.forEach(item => {
               if (item.compoundName) {
                 allCompoundNames.push(item.compoundName);
               }
