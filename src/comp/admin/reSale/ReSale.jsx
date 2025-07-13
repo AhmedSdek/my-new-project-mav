@@ -336,7 +336,11 @@ function ReSale() {
     });
   }, []);
   const onchangesimple = useCallback((e) => {
-    setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value, type } = e.target;
+    setNewData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
   }, []);
   const handleRadioChange = (fieldName) => (selectedOption) => {
     console.log(selectedOption[lang])

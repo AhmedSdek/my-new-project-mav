@@ -1,466 +1,412 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Card, FormControl, FormControlLabel, FormLabel, InputLabel, LinearProgress, MenuItem, Radio, RadioGroup, Select, Stack, TextField, Typography, styled } from '@mui/material';
+import { Box, Button, Card, Dialog, DialogContent, Divider, FormControl, FormControlLabel, FormLabel, IconButton, InputLabel, LinearProgress, MenuItem, Radio, RadioGroup, Select, Stack, TextField, Typography, styled } from '@mui/material';
 import ReactLoading from 'react-loading';
 import 'react-phone-input-2/lib/style.css'
-import { AddPhotoAlternate, Info } from '@mui/icons-material';
-import { doc, setDoc } from "firebase/firestore";
+import { AddPhotoAlternate, Delete, HelpOutline, Info } from '@mui/icons-material';
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from '../../../firebase/config';
-import { data } from '../../Data';
+import FormGro from '../FormGro';
+import Input from '../Input';
+import CheckboxCom from '../CheckboxCom';
+import FileUpload from '../FileUpload';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 function Cityscape() {
-    const [messege, setMessege] = React.useState(false);
     const nav = useNavigate()
-    const VisuallyHiddenInput = styled('input')({
-        clip: 'rect(0 0 0 0)',
-        clipPath: 'inset(50%)',
-        height: 1,
-        overflow: 'hidden',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        whiteSpace: 'nowrap',
-        width: 1,
-    });
-    const [btn, setBtn] = useState(false);
-    const [devname, setDevname] = React.useState('');
-    const [projectName, setProjectName] = React.useState('')
-    const [pers1, setPers1] = React.useState('');
-    const [pers2, setPers2] = React.useState('');
-    const [pers3, setPers3] = React.useState('');
-    const [pers4, setPers4] = React.useState('');
-    const [offerText1, setOfferText1] = React.useState('');
-    const [offerText2, setOfferText2] = React.useState('');
-    const [offerText3, setOfferText3] = React.useState('');
-    const [offerText4, setOfferText4] = React.useState('');
-    const [year1, setYear1] = React.useState('');
-    const [year2, setYear2] = React.useState('');
-    const [year3, setYear3] = React.useState('');
-    const [year4, setYear4] = React.useState('');
-    const [downPayment, setDownPayment] = React.useState('');
+  const [developers, setDevelopers] = useState([]);
+  const [devLoading, setDevLoading] = useState(true);
+  const [prog, setProg] = useState(0);
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const [btn, setBtn] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [newData, setNewData] = useState({
+    developer: {},
+    cityscapeName: {
+      ar: "",
+      en: ""
+    },
+    cityscapeImgs: [],
+    monyType: { ar: "", en: "" },
+    downPayment: 0,
+    years: 0,
+    cashDiscount: 0,
+    Location: {
+      ar: "",
+      en: ""
+    },
+    price: 0,
+    discription: { ar: "", en: "" },
+    offers: [{ pers: "", year: "", offer: "" }]
+  });
+  const [offers, setOffers] = useState([{ pers: "", year: "", offer: "" }]);
+  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "developer"));
+        const devs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDevelopers(devs);
+      } catch (err) {
+        console.error("خطأ أثناء جلب المطورين:", err);
+      } finally {
+        setDevLoading(false);
+      }
+    };
+    fetchDevelopers();
+  }, []);
+  const handleDevChange = useCallback(
+    (e) => {
+      const selectedDev = developers.find((dev) => dev.id === e.target.value);
+      if (selectedDev) {
+        setNewData((prev) => ({
+          ...prev,
+          developer: selectedDev,
+        }));
+      }
+    },
+    [developers]
+  );
+  const onchange = useCallback((parentKey, lang) => (e) => {
+    setNewData((prev) => ({
+      ...prev,
+      [parentKey]: {
+        ...prev[parentKey],
+        [lang]: e.target.value
+      }
+    }));
+  }, []);
+  const handleFileChange = useCallback(async (event) => {
+    // أول ما تختار صور جديدة امسح الصور القديمة
+    setNewData((prev) => ({
+      ...prev,
+      cityscapeImgs: [],
+    }));
 
-    const [years, setYears] = React.useState('');
-
-    const [location, setLocation] = React.useState('');
-
-    const [prog, setProg] = useState(0)
-
-    const [url, setUrl] = useState([]);
-
-    const [icon, setIcon] = useState('')
-    const [dis, setDis] = React.useState('');
-
-    const [cashDiscount, setCashDiscount] = useState('')
-
-    const handleCashDiscountChange = (event) => {
-        setCashDiscount(event.target.value);
-    };
-    const handleDisChange = (event) => {
-        setDis(event.target.value);
-    };
-    const handledownPaymentChange = (event) => {
-        setDownPayment(event.target.value);
-    };
-
-    const handleYearsChange = (event) => {
-        setYears(event.target.value);
-    };
-    const handleProjectNameChange = (event) => {
-        setProjectName(event.target.value);
-    };
-    const handlePers1Change = (event) => {
-        setPers1(event.target.value);
-    };
-    const handlePers2Change = (event) => {
-        setPers2(event.target.value);
-    };
-    const handlePers3Change = (event) => {
-        setPers3(event.target.value);
-    };
-    const handlePers4Change = (event) => {
-        setPers4(event.target.value);
-    };
-    const handleYear1Change = (event) => {
-        setYear1(event.target.value);
-    };
-    const handleYear2Change = (event) => {
-        setYear2(event.target.value);
-    };
-    const handleYear3Change = (event) => {
-        setYear3(event.target.value);
-    };
-    const handleYear4Change = (event) => {
-        setYear4(event.target.value);
-    };
-    const handleOfferText1Change = (event) => {
-        setOfferText1(event.target.value);
-    };
-    const handleOfferText2Change = (event) => {
-        setOfferText2(event.target.value);
-    };
-    const handleOfferText3Change = (event) => {
-        setOfferText3(event.target.value);
-    };
-    const handleOfferText4Change = (event) => {
-        setOfferText4(event.target.value);
-    };
-
-
-    const handlelocationChange = (event) => {
-        setLocation(event.target.value);
-    };
-
-
-    const handleFileChange = async (event) => {
-        for (let i = 0; i < event.target.files.length; i++) {
-            console.log(event.target.files.length)
-            // console.log(i)
-            const storageRef = ref(storage, event.target.files[i].name);
-            const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
-
-            uploadTask.on('state_changed',
-                (snapshot) => {
-                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    // console.log('Upload is ' + progress + '% done');
-                    setProg(progress);
-                    if (i < event.target.files.length) {
-                        setBtn(true)
-                    }
-                    switch (snapshot.state) {
-                        case 'paused':
-                            console.log('Upload is paused');
-                            break;
-                        case 'running':
-                            console.log('Upload is running');
-                            break;
-                    }
-                },
-                (error) => {
-                    // A full list of error codes is available at
-                    // https://firebase.google.com/docs/storage/web/handle-errors
-                    switch (error.code) {
-                        case 'storage/unauthorized':
-                            // User doesn't have permission to access the object
-                            break;
-                        case 'storage/canceled':
-                            // User canceled the upload
-                            break;
-
-                        // ...
-
-                        case 'storage/unknown':
-                            // Unknown error occurred, inspect error.serverResponse
-                            break;
-                    }
-                },
-                () => {
-                    // Upload completed successfully, now we can get the download URL
-                    getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-                        console.log('File available at', downloadURL);
-                        setUrl((old) => [...old, downloadURL]);
-                        setBtn(false)
-                        // Add a new document in collection "cities"
-                    });
-                }
-            );
+    for (let i = 0; i < event.target.files.length; i++) {
+      const storageRef = ref(
+        storage,
+        "cityscape/" + event.target.files[i].name
+      );
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProg(progress);
+          setBtn(true);
+        },
+        (error) => console.error(error),
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setNewData((prev) => ({
+              ...prev,
+              cityscapeImgs: [...prev.cityscapeImgs, downloadURL],
+            }));
+            setBtn(false);
+          });
         }
-    };
-    const sendData = async () => {
-        setBtn(true)
-        try {
-            const id = new Date().getTime()
-            await setDoc(doc(db, 'cityscape', `${id}`), {
-                id: `${id}`,
-                projectName: projectName,
-                icon: icon,
-                downPayment: downPayment,
-                img: url,
-                devname: devname,
-                years: years,
-                CashDiscount: cashDiscount,
-                location: location,
-                dis: dis,
-                pers1: pers1,
-                // pers2: pers2,
-                // pers3: pers3,
-                // pers4: pers4,
-                offer1: offerText1,
-                // offer2: offerText2,
-                // offer3: offerText3,
-                // offer4: offerText4,
-                year1: year1,
-                // year2: year2,
-                // year3: year3,
-                // year4: year4,
-
-            });
-        } catch (er) {
-        }
-        setBtn(false)
+      );
     }
-    return (
-        <>
-            <Box style={{ width: '100%', flexDirection: 'column', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '70px 0 0' }}>
-                <Stack sx={{ alignItems: 'center', marginBottom: '10px' }}>
-                    <Typography variant='h5'>
-                        cityscape
-                    </Typography>
-                </Stack>
-                <Card sx={{ width: { xs: '90%', sm: '80%' }, display: 'flex', alignItems: 'center', flexDirection: 'column', padding: '20px', margin: '10px 0 ' }}>
-                    <Box component='form'
-                        onSubmit={async (e) => {
-                            e.preventDefault();
-                            sendData();
-                            setMessege(true);
-                            setTimeout(() => {
-                                setMessege(false)
-                                nav('/')
-                            }, 2000);
-                        }}
-                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', width: '100%', margin: '15px 0 0' }}>
+  }, []);
+  const handleChange = useCallback((e) => {
+    const { name, value, type } = e.target;
+    setNewData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
+  }, []);
 
+  const handleDynamicSelectChange = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => (item[lang] || item.en) === selectedLabel
+      );
+      setNewData((prev) => ({
+        ...prev,
+        [fieldName]: selectedObject || prev[fieldName]
+      }));
+    },
+    [lang]
+  );
+  const handleOfferChange = useCallback(
+    (index, field) => (e) => {
+      const value = e.target.value;
+      setOffers((prev) => {
+        const updated = [...prev];
+        updated[index][field] = value;
+        return updated;
+      });
+    },
+    []
+  );
 
-                        <Stack sx={{ flexDirection: 'row', width: { xs: '100%', md: '50%' }, padding: '5px' }}>
-                            <FormControl sx={{ width: '100%' }}>
-                                <InputLabel id="demo-simple-select-label">DevIcon</InputLabel>
-                                <Select
-                                    required
-                                    sx={{ minWidth: 'fit-content' }}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={icon}
-                                    label="DevIcon"
-                                    onChange={(e) => {
-                                        setIcon(e.target.value);
+  const addOffer = () =>
+    setOffers((prev) => [...prev, { pers: "", year: "", offer: "" }]);
 
-                                    }}
-                                >
-                                    {data.map((devName) => {
-                                        return (
-                                            <MenuItem key={devName.id} value={devName.image}>{devName.name}</MenuItem>
-                                        )
-                                    })}
-                                </Select>
-                            </FormControl>
-                        </Stack>
-                        <Stack sx={{ flexDirection: 'row', width: { xs: '100%', md: '50%' }, padding: '5px' }}>
-                            <FormControl sx={{ width: '100%' }}>
-                                <InputLabel id="demo-simple-select-label">DevName</InputLabel>
-                                <Select
-                                    sx={{ minWidth: 'fit-content' }}
-                                    labelId="ddevname"
-                                    id="name"
-                                    value={devname}
-                                    label="DevName"
-                                    onChange={(e) => {
-                                        setDevname(e.target.value);
-                                    }}
-                                >
-                                    {data.map((devName) => {
-                                        return (
-                                            <MenuItem key={devName.id} value={devName.name}>{devName.name}</MenuItem>
-                                        )
-                                    })}
-                                </Select>
-                            </FormControl>
-                        </Stack>
+  const removeOffer = (index) =>
+    setOffers((prev) => prev.filter((_, i) => i !== index));
 
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            value={projectName}
-                            id="projectName" label="project Name"
-                            variant="outlined" type="text"
-                            onChange={(e) => {
-                                handleProjectNameChange(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            value={downPayment}
-                            id="downPayment" label="down Payment"
-                            variant="outlined" type="text"
-                            onChange={(e) => {
-                                handledownPaymentChange(e)
-                            }}
-                        />
+  const sendData = async (dataToSend) => {
+    setBtn(true);
+    try {
+      const id = new Date().getTime();
+      await setDoc(doc(db, "cityscape", `${id}`), {
+        id: `${id}`,
+        ...dataToSend,
+      });
+      toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
+      nav("/dashboard");
+      setBtn(false);
+    } catch (er) {
+      console.error("Send error:", er);
+      toast.error("Oops! Something went wrong.", { autoClose: 2000 });
+      setBtn(false);
+    }
+  };
+  const onsubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      // اربط الـ offers بالـ newData
+      const dataToSend = { ...newData, offers };
+      console.log(newData);
+      await sendData(dataToSend);
+    },
+    [newData, offers] // لازم تحط offers هنا كمان
+  );
 
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            value={years}
-                            id="years" label="years"
-                            variant="outlined" type="number"
-                            onChange={(e) => {
-                                handleYearsChange(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            value={cashDiscount}
-                            id="CashDiscount" label="Cash Discount"
-                            variant="outlined" type="text"
-                            onChange={(e) => {
-                                handleCashDiscountChange(e)
-                            }}
-                        />
-                        <Box sx={{ width: { xs: '100%', md: '50%' }, padding: '5px' }}>
-                            <Typography variant='body2'>
-                                Upload Your Images ...
-                            </Typography>
-                            <Button
-                                component="label"
-                                variant="outlined"
-                                // tabIndex={-1}
-                                sx={{ padding: '10px', margin: '15px' }}
-                                startIcon={<AddPhotoAlternate />}
-                                onChange={(e) => {
-                                    handleFileChange(e)
-                                }}
-                            >
-                                <VisuallyHiddenInput type="file" multiple />
-                            </Button>
-                            <LinearProgress variant="determinate" value={prog} />
-                        </Box>
+  return (
+    <>
+      <Box
+        style={{
+          width: "100%",
+          flexDirection: "column",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "70px 0 0",
+        }}
+      >
+        <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
+          <Typography variant="h5">{lang === "ar" ? "اضف سكيب" : "Add cityscape"}</Typography>
+        </Stack>
+        <Card
+          sx={{
+            width: { xs: "90%", sm: "80%" },
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+            padding: "20px",
+            margin: "10px 0 ",
+          }}
+        >
+          <Box
+            component="form"
+            onSubmit={onsubmit}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              width: "100%",
+              margin: "15px 0 0",
+              gap: "10px",
+            }}
+          >
+            <FormGro
+              inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
+              name="dev"
+              data={developers}
+              value={newData.developer?.id || ""}
+              fun={handleDevChange}
+              lang={lang}
+            />
+            <Input
+              onChange={onchange("cityscapeName", "en")}
+              id="cityscape Name en"
+              label={lang === "ar" ? "اسم السيتي سكيب انجليزي" : "cityscape Name en"}
+              type="text"
+              value={newData.cityscapeName.en}
+            />
 
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="Location" label="Location" variant="outlined" type="text"
-                            value={location}
-                            onChange={(e) => {
-                                handlelocationChange(e)
-                            }}
-                        />
+            <Input
+              onChange={onchange("cityscapeName", "ar")}
+              id="cityscape Name ar"
+              label={lang === "ar" ? "اسم السيتي سكيب عربي" : "cityscape Name ar"}
+              type="text"
+              value={newData.cityscapeName.ar}
+            />
+            <Divider />
+            <FileUpload
+              handleFileChange={handleFileChange}
+              multiple
+              prog={prog}
+              title={
+                lang === "ar"
+                  ? "ارفع صور المشروع"
+                  : "Upload Your Project Images ..."
+              }
+            />
+            <Input
+              onChange={handleChange}
+              id="price"
+              label={lang === "ar" ? "السعر" : "Price"}
+              type="number"
+              name="price"
+              value={newData.price}
+            />
+            <Input
+              onChange={handleChange}
+              id="cashDiscount"
+              label={lang === "ar" ? "الخصم" : "cashDiscount"}
+              type="number"
+              name="cashDiscount"
+              value={newData.cashDiscount}
+            />
+            <Input
+              onChange={handleChange}
+              id="years"
+              label={lang === "ar" ? "عدد السنين" : "years"}
+              type="number"
+              name="years"
+              value={newData.years}
+            />
+            <Input
+              onChange={handleChange}
+              id="downPayment"
+              label={lang === "ar" ? "مقدم" : "downPayment"}
+              type="number"
+              name="downPayment"
+              value={newData.downPayment}
+            />
+            <FormGro
+              inputLabel={lang === "ar" ? "نوع العمله" : "Money Type"}
+              name="monyType"
+              data={monyType}
+              value={newData.monyType[lang] || ""} // نخزن ونعرض الـ id
+              fun={handleDynamicSelectChange(monyType, "monyType")}
+              lang={lang}
+            />
+            {offers.map((offer, index) => (
+              <Stack
+                key={index}
+                sx={{ gap: "10px", alignItems: "center", flexDirection: 'row', width: '100%' }}
+              >
+                <Input
+                  onChange={handleOfferChange(index, "pers")}
+                  label={`Pers ${index + 1}`}
+                  type="number"
+                  value={offer.pers}
+                />
+                <Input
+                  onChange={handleOfferChange(index, "year")}
+                  label={`Year ${index + 1}`}
+                  type="text"
+                  value={offer.year}
+                />
+                <Input
+                  onChange={handleOfferChange(index, "offer")}
+                  label={`Offer ${index + 1}`}
+                  type="text"
+                  value={offer.offer}
+                />
+                <Button
+                  onClick={() => removeOffer(index)}
+                  variant="outlined"
+                  color="error"
+                >
+                  <Delete />
+                </Button>
+              </Stack>
+            ))}
+            <Button
+              onClick={addOffer}
+              variant="contained"
+              style={{ margin: "10px 0" }}
+            >
+              {lang === "ar" ? "اضافه عرض +" : "+ Add Offer"}
+            </Button>
+            <IconButton onClick={() => setOpen(true)}>
+              <HelpOutline />
+            </IconButton>
+            <Dialog open={open} onClose={() => setOpen(false)}>
+              <DialogContent>
+                <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+                  {`📝 إزاي تستخدم Markdown:
+ # عنوان رئيسي
+ ## عنوان فرعي
+ ### عنوان
+ #### عنوان
+ ##### عنوان
+ ###### عنوان
+ * نص مائل
+ ** نص عريض
+ ~~ نص مشطوب
+ - قائمة نقطية
+ 1. قائمة مرقمة
+ > اقتباس
+ `}{" "}
+                </Typography>
+              </DialogContent>
+            </Dialog>
 
-                        <TextField
-                            id="outlined-multiline-static"
-                            label="Description"
-                            multiline
-                            value={dis}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleDisChange(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="1%" label="%1" variant="outlined" type="number"
-                            value={pers1}
-                            onChange={(e) => {
-                                handlePers1Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year1" label="year1" variant="outlined" type="number"
-                            value={year1}
-                            onChange={(e) => {
-                                handleYear1Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer text"
-                            label=" offer text"
-                            multiline
-                            value={offerText1}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText1Change(e)
-                            }}
-                        />
-
-                        {/* <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="2%" label="%2" variant="outlined" type="number"
-                            value={pers2}
-                            onChange={(e) => {
-                                handlePers2Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year2" label="year2" variant="outlined" type="number"
-                            value={year2}
-                            onChange={(e) => {
-                                handleYear2Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer text2"
-                            label=" offer text2"
-                            multiline
-                            value={offerText2}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText2Change(e)
-                            }}
-                        />
-
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="3%" label="%3" variant="outlined" type="number"
-                            value={pers3}
-                            onChange={(e) => {
-                                handlePers3Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year3" label="year3" variant="outlined" type="number"
-                            value={year3}
-                            onChange={(e) => {
-                                handleYear3Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer-text3"
-                            label=" offer text3"
-                            multiline
-                            value={offerText3}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText3Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="4%" label="%4" variant="outlined" type="number"
-                            value={pers4}
-                            onChange={(e) => {
-                                handlePers4Change(e)
-                            }}
-                        />
-                        <TextField
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            id="year4" label="year4" variant="outlined" type="number"
-                            value={year4}
-                            onChange={(e) => {
-                                handleYear4Change(e)
-                            }}
-                        />
-                        <TextField
-                            id="offer-text4"
-                            label=" offer text4"
-                            multiline
-                            value={offerText4}
-                            rows={4}
-                            sx={{ margin: '10px', padding: '5px', width: { xs: '100%', md: '50%' } }}
-                            onChange={(e) => {
-                                handleOfferText4Change(e)
-                            }}
-                        /> */}
-                        <Button disabled={btn} variant="contained" type="submit" style={{ width: '50%' }}
-
-                            className="btn">
-                            {btn ? <ReactLoading type={'spin'} height={'20px'} width={'20px'} /> : "Send"}
-                        </Button>
-                    </Box>
-                </Card>
-            </Box>
-            <p style={{ zIndex: '10', backgroundColor: 'whitesmoke', display: 'flex', alignItems: 'center', color: 'black', padding: '10px', borderRadius: '6px', boxShadow: 'rgb(255 255 255 / 25%) 0px 5px 30px 0px', position: 'fixed', top: '100px', right: messege ? '20px' : '-230px', transition: '0.8s', scale: messege ? "1" : '0' }}>Data has been sent successfully <Info style={{ margin: '3px 0 0 10px', fontSize: '20px', color: 'teal' }} /></p>
+            <Input
+              onChange={onchange("discription", "en")}
+              id="discription"
+              label={lang === "ar" ? "تفاصيل انجليزي" : " Description en"}
+              type="text"
+              value={newData.discription.en}
+              multiline
+              rows={4}
+            />
+            <Input
+              onChange={onchange("discription", "ar")}
+              id="discriptioner"
+              label={lang === "ar" ? "تفاصيل عربي" : "Description ar"}
+              type="text"
+              value={newData.discription.ar}
+              multiline
+              rows={4}
+            />
+            <Input
+              onChange={onchange("Location", "en")}
+              id="location"
+              label={lang === "ar" ? "الموقع انجليزي" : "Location en"}
+              type="text"
+              value={newData.Location.en}
+            />
+            <Input
+              onChange={onchange("Location", "ar")}
+              id="location"
+              label={lang === "ar" ? "الموقع عربي" : "Location ar"}
+              type="text"
+              value={newData.Location.ar}
+            />
+            <Button
+              disabled={btn}
+              variant="contained"
+              type="submit"
+              style={{ width: "50%" }}
+            >
+              {btn ? (
+                <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+              ) : (
+                lang === "ar" ? "ارسال" : "Send"
+              )}
+            </Button>
+          </Box>
+        </Card>
+      </Box>
         </>
     )
 }

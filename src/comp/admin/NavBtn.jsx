@@ -76,10 +76,10 @@ export default function NavBtn() {
       text: lang === "ar" ? "تعديل اينفينتوري" : "Edit Inventory",
       to: "editinventory",
     },
-    // {
-    //   text: "Cityscape",
-    //   to: "cityscape",
-    // },
+    {
+      text: "Cityscape",
+      to: "cityscape",
+    },
     // {
     //   text: "Edit City",
     //   to: "editcity",

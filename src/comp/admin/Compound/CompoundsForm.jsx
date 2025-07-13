@@ -107,9 +107,10 @@ function CompoundsForm() {
   );
 
   const handleChange = useCallback((e) => {
+    const { name, value, type } = e.target;
     setNewData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: type === "number" ? Number(value) : value,
     }));
   }, []);
   const onchange = useCallback((parentKey, lang) => (e) => {
@@ -122,6 +123,12 @@ function CompoundsForm() {
     }));
   }, []);
   const handleFileChange = useCallback(async (event) => {
+    // أول ما تختار صور جديدة امسح الصور القديمة
+    setNewData((prev) => ({
+      ...prev,
+      compoundImgs: [],
+    }));
+
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(
         storage,
@@ -137,7 +144,7 @@ function CompoundsForm() {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg(progress);
-          if (i < event.target.files.length) setBtn(true);
+          setBtn(true);
         },
         (error) => console.error(error),
         () => {
@@ -152,6 +159,7 @@ function CompoundsForm() {
       );
     }
   }, []);
+
 
   const handleMasterplanImgChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {

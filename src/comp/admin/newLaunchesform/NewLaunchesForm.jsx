@@ -334,7 +334,11 @@ function NewLaunchesForm() {
     }));
   }, []);
   const onSimpelchange = useCallback((e) => {
-    setNewData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value, type } = e.target;
+    setNewData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
   }, []);
   const sendData = async (dataToSend) => {
     // console.log(dataToSend)
