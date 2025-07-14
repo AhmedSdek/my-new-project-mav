@@ -55,6 +55,7 @@ import LoginForm from "./Auth/Login";
 import RegisterForm from "./Auth/SignUp";
 import EditInventory from "./comp/admin/Edit/Inventory/EditInventory";
 import EditinventoryDetails from "./comp/admin/Edit/Inventory/EditinventoryDetails";
+import EditcityDetails from "./comp/admin/Edit/City/EditcityDetails";
 function App() {
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -106,25 +107,28 @@ function App() {
         ) : (
           <>
             <Navs />
-              <ToastContainer />
+            <ToastContainer />
             <Routes>
               <Route path="dashboard" element={<Dashboard />}>
                 <Route index element={<SaleData />} />
-                  <Route path="developerform" element={<DeveloperForm />} />
+                <Route path="developerform" element={<DeveloperForm />} />
                 <Route path="resale" element={<ReSale />} />
-                  <Route path="compound" element={<CompoundsForm />} />
-                  <Route path="editcompound" element={<EditCompound />} />
-                  <Route
-                    path="editcompound/:editcompoundId"
-                    element={<EditCompoundDetails />}
-                  />
-                  <Route
-                    path="editcompound/:editcompoundId/:editcompoundprojId"
-                    element={<EditCompoundProject />}
-                  />
+                <Route path="compound" element={<CompoundsForm />} />
+                <Route path="editcompound" element={<EditCompound />} />
+                <Route
+                  path="editcompound/:editcompoundId"
+                  element={<EditCompoundDetails />}
+                />
+                <Route
+                  path="editcompound/:editcompoundId/:editcompoundprojId"
+                  element={<EditCompoundProject />}
+                />
                 <Route path="inventory" element={<Inventory />} />
-                  <Route path="editinventory" element={<EditInventory />} />
-                  <Route path="editinventory/:inventoryId" element={<EditinventoryDetails />} />
+                <Route path="editinventory" element={<EditInventory />} />
+                <Route
+                  path="editinventory/:inventoryId"
+                  element={<EditinventoryDetails />}
+                />
                 <Route path="details/:id" element={<SellDetails />} />
                 <Route path="newlaunchesform" element={<NewLaunchesForm />} />
                 <Route path="editDeveloper" element={<EditDeveloper />} />
@@ -144,6 +148,10 @@ function App() {
                 />
                 <Route path="cityscape" element={<Cityscape />} />
                 <Route path="editcity" element={<EditCity />} />
+                <Route
+                  path="editcity/:editcityId"
+                  element={<EditcityDetails />}
+                />
               </Route>
 
               <Route path="findhome" element={<FindHomeDetails />}>
@@ -171,11 +179,11 @@ function App() {
               <Route path="/maverickdeals/:dealId" element={<DealDetails />} />
               <Route path="/*" element={<Err />} />
               <Route path="/sell" element={<Sell />} />
-                {/* <Route path="/signin" element={<Signin />} /> */}
-                <Route path="/login" element={<LoginForm />} />
-                <Route path="/register" element={<RegisterForm />} />
+              {/* <Route path="/signin" element={<Signin />} /> */}
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/register" element={<RegisterForm />} />
               <Route path="/contact" element={<ContactPage />} />
-                {/* <Route path="/signup" element={<Regester />} /> */}
+              {/* <Route path="/signup" element={<Regester />} /> */}
 
               <Route path="/developers" element={<Developers />} />
               <Route path="/developers/:devId" element={<DeveloperDetails />} />
@@ -183,12 +191,12 @@ function App() {
                 path="/developers/:devId/:projId"
                 element={<ProjectDe />}
               />
-                <Route
+              <Route
                 path="/developers/:devId/:projId/:compId"
                 element={<InventoryDetails />}
               />
             </Routes>
-              {/* {
+            {/* {
                 developers.length > 0 &&
                 developers.map((item) => {
                   return (
@@ -196,8 +204,8 @@ function App() {
                   )
                 })
               } */}
-              {/* <button onClick={uploadBasicDevelopers}>Upload Developers</button> */}
-              {/* <img src={developers[0].image} alt="" /> */}
+            {/* <button onClick={uploadBasicDevelopers}>Upload Developers</button> */}
+            {/* <img src={developers[0].image} alt="" /> */}
             <Footer />
           </>
         )}

@@ -27,6 +27,7 @@ function EditDealdetails() {
   const { editeDealdetailsId } = useParams();
   const { i18n } = useTranslation();
   const lang = i18n.language;
+  const [developers, setDevelopers] = useState([]);
   const [value, loading] = useDocument(doc(db, "deals", editeDealdetailsId));
   const [compoundNames, setCompoundNames] = useState([]);
   const [prog, setProg] = useState(0);
@@ -36,7 +37,6 @@ function EditDealdetails() {
   const [open, setOpen] = useState(false);
   const [btn, setBtn] = useState(false);
   const nav = useNavigate();
-  const [developers, setDevelopers] = useState([]);
   const [oldData, setOldData] = useState({
     developer: {},
     dealName: { ar: "", en: "" },

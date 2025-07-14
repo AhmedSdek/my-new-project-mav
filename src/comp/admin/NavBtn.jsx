@@ -57,6 +57,10 @@ export default function NavBtn() {
       to: "",
     },
     {
+      text: "Cityscape",
+      to: "cityscape",
+    },
+    {
       text: lang === "ar" ? "تعديل المطور" : "Edit Developer",
       to: "editDeveloper",
     },
@@ -77,13 +81,9 @@ export default function NavBtn() {
       to: "editinventory",
     },
     {
-      text: "Cityscape",
-      to: "cityscape",
+      text: "Edit City",
+      to: "editcity",
     },
-    // {
-    //   text: "Edit City",
-    //   to: "editcity",
-    // },
   ];
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
