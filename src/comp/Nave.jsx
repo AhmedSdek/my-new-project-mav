@@ -9,9 +9,12 @@ import { collection } from "firebase/firestore";
 import { FavoriteBorder, FormatBold } from "@mui/icons-material";
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
+import { useGlobal } from "../context/GlobalContext";
 function Navs() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
+  const { country, setCountry } = useGlobal();
+  console.log(country);
   // console.log(lang)
   const [value, loading, error] = useCollection(collection(db, "admin"));
   var arr = [];
@@ -25,11 +28,20 @@ function Navs() {
     );
   const [ope, setOpe] = useState(false);
   const handleToggleLanguage = () => {
-    window.location.reload()
+    window.location.reload();
     const newLang = lang === "ar" ? "en" : "ar";
     i18n.changeLanguage(newLang);
-    localStorage.setItem("i18nextLng", newLang);  // تحطها صريح عشان مفيش حاجة تلعب فيها
+    localStorage.setItem("i18nextLng", newLang); // تحطها صريح عشان مفيش حاجة تلعب فيها
   };
+  const handleToggleCountry = () => {
+    const newCountry =
+      country.en === "egypt"
+        ? { en: "UAE", ar: "الامارات" }
+        : { en: "egypt", ar: "مصر" };
+    setCountry(newCountry);
+    localStorage.setItem("selectedCountry", JSON.stringify(newCountry));
+  };
+
   return (
     <>
       <Navbar
@@ -52,11 +64,14 @@ function Navs() {
             id="navbarScroll"
             style={{ justifyContent: "center" }}
           >
-            <Nav>
+            <Nav style={{ fontSize: "15px" }}>
               <Nav.Link as={Link} to="/" eventKey="0">
                 {lang === "ar" ? "الصفحه الرئيسيه " : "Home"}
               </Nav.Link>
-              <NavDropdown title={lang === "ar" ? "المناطق" : "Districts"} id="navbarScrollingDropdown">
+              <NavDropdown
+                title={lang === "ar" ? "المناطق" : "Districts"}
+                id="navbarScrollingDropdown"
+              >
                 {arr.map((link, index) => {
                   return (
                     <NavDropdown.Item
@@ -92,7 +107,7 @@ function Navs() {
             id="navbarScroll2"
             style={{ justifyContent: "end", flexGrow: 0 }}
           >
-            <Nav>
+            <Nav style={{ gap: "1px" }}>
               <Nav.Link as={Link} to="/favoriteList" eventKey="0">
                 <Tooltip title="FavoriteList">
                   <FavoriteBorder />
@@ -100,10 +115,13 @@ function Navs() {
               </Nav.Link>
               <ToggleButton
                 sx={{
-                  color: 'white',
-                  '&.Mui-selected': {
-                    color: 'white',
-                    backgroundColor: '#1976d2',
+                  color: "white",
+                  p: 1,
+                  border: "none",
+                  "&.Mui-selected": {
+                    color: "white",
+                    backgroundColor: "#1976d2",
+                    p: 1,
                   },
                 }}
                 onClick={handleToggleLanguage}
@@ -111,6 +129,29 @@ function Navs() {
                 aria-label="language toggle"
               >
                 {lang === "en" ? "عربي" : "English"}
+              </ToggleButton>
+              <ToggleButton
+                sx={{
+                  color: "white",
+                  p: 1,
+                  border: "none",
+                  "&.Mui-selected": {
+                    color: "white",
+                    backgroundColor: "#1976d2",
+                    p: 1,
+                  },
+                }}
+                onClick={handleToggleCountry}
+                value={country}
+                aria-label="language toggle"
+              >
+                {lang === "en"
+                  ? country.en === "egypt"
+                    ? "UAE"
+                    : "Egypt"
+                  : country.en === "egypt"
+                  ? "الامارات"
+                  : "مصر"}
               </ToggleButton>
             </Nav>
           </Navbar.Collapse>

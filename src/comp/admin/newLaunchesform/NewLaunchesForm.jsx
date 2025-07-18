@@ -37,23 +37,20 @@ function NewLaunchesForm() {
   const [newData, setNewData] = useState({
     Dis: {
       ar: "",
-      en: ""
+      en: "",
     },
     launchName: {
       ar: "",
-      en: ""
+      en: "",
     },
-    img: '',
     video: "",
     img: [],
     masterplan: "",
     Location: {
       ar: "",
-      en: ""
+      en: "",
     },
-    developer: {
-
-    },
+    developer: {},
     price: 0,
     monyType: { ar: "", en: "" },
   });

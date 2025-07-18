@@ -12,6 +12,7 @@ import { CacheProvider } from "@emotion/react";
 import { ThemeProvider } from "@mui/material/styles";
 import { getTheme } from "./theme";
 import rtlPlugin from "stylis-plugin-rtl";
+import { GlobalProvider } from "./context/GlobalContext";
 const lang = i18n.language || "en";
 const cacheRtl = createCache({
   key: lang === "ar" ? "mui-rtl" : "mui",
@@ -20,10 +21,12 @@ const cacheRtl = createCache({
 ReactDOM.createRoot(document.getElementById("root")).render(
   <CacheProvider value={cacheRtl}>
     <ThemeProvider theme={getTheme(lang)}>
-      <BrowserRouter>
-        <ScrollTop />
-        <App />
-      </BrowserRouter>
+      <GlobalProvider>
+        <BrowserRouter>
+          <ScrollTop />
+          <App />
+        </BrowserRouter>
+      </GlobalProvider>
     </ThemeProvider>
   </CacheProvider>
 );

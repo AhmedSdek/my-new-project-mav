@@ -28,32 +28,29 @@ function SahelForm() {
   const lang = i18n.language;
   const [newData, setNewData] = useState({
     developer: {},
-    projectName: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
-    Location: { ar: "", en: "" },
     img: [],
+    projectName: { ar: "", en: "" },
+    Location: { ar: "", en: "" },
     Type: { ar: "", en: "" },
     Area: 0,
+    peopleNumber: 0,
     Bed: "",
     Bath: "",
     price: 0,
-    peopleNumber: 0,
     Layoutimg: [],
     Masterimg: [],
     Dis: { ar: "", en: "" },
     monyType: { ar: "", en: "" },
-    downPayment: 0,
-    roofArea: 0,
-    landArea: 0,
-    refNum: 0,
-    gardenArea: 0,
+    googleMap: "",
     startDate: null,
     endDate: null,
   });
+  const nav = useNavigate();
   const [loading, setLoading] = useState(true);
   const [developers, setDevelopers] = useState([]);
+  // console.log(developers);
   const [compoundNames, setCompoundNames] = useState([]);
-  const nav = useNavigate();
   const [devLoading, setDevLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [btn, setBtn] = useState(false);
@@ -621,6 +618,14 @@ function SahelForm() {
             rows={4}
             multiline
             id="outlined-multiline-staticar"
+          />
+          <Input
+            onChange={onchangesimple}
+            type="text"
+            name="googleMap"
+            label={lang === "ar" ? "الموقع" : "google Map"}
+            id="googleMap"
+            value={newData.googleMap}
           />
           <BasicDateRangeCalendar
             onDateChange={handleDateChange}

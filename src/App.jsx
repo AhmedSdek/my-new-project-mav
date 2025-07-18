@@ -57,8 +57,10 @@ import EditInventory from "./comp/admin/Edit/Inventory/EditInventory";
 import EditinventoryDetails from "./comp/admin/Edit/Inventory/EditinventoryDetails";
 import EditcityDetails from "./comp/admin/Edit/City/EditcityDetails";
 import SahelForm from "./comp/admin/sahelForm/SahelForm";
+import { useGlobal } from "./context/GlobalContext";
 function App() {
   const { i18n } = useTranslation();
+  const { country, setCountry } = useGlobal();
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(
     localStorage.getItem("mtTheme") === null
@@ -70,19 +72,19 @@ function App() {
       mode,
       ...(mode === "light"
         ? {
-          background: {
-            default: "#f0f2f5",
-          },
-        }
+            background: {
+              default: "#f0f2f5",
+            },
+          }
         : {
-          background: {
-            default: "#000000eb",
-          },
-        }),
+            background: {
+              default: "#000000eb",
+            },
+          }),
     },
   });
   useEffect(() => {
-    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
   }, [i18n.language]);
   useEffect(() => {
     setLoading(true);
@@ -91,6 +93,18 @@ function App() {
     // setTimeout(() => {
     // }, 2000)
   }, []);
+  useEffect(() => {
+    const savedCountry = localStorage.getItem("selectedCountry");
+    if (savedCountry) {
+      setCountry(JSON.parse(savedCountry));
+    } else {
+      // قيمة افتراضية "مصر"
+      const defaultCountry = { en: "egypt", ar: "مصر" };
+      setCountry(defaultCountry);
+      localStorage.setItem("selectedCountry", JSON.stringify(defaultCountry));
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <Box>
