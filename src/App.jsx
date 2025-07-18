@@ -56,6 +56,7 @@ import RegisterForm from "./Auth/SignUp";
 import EditInventory from "./comp/admin/Edit/Inventory/EditInventory";
 import EditinventoryDetails from "./comp/admin/Edit/Inventory/EditinventoryDetails";
 import EditcityDetails from "./comp/admin/Edit/City/EditcityDetails";
+import SahelForm from "./comp/admin/sahelForm/SahelForm";
 function App() {
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -152,6 +153,7 @@ function App() {
                   path="editcity/:editcityId"
                   element={<EditcityDetails />}
                 />
+                <Route path="northcoast" element={<SahelForm />} />
               </Route>
 
               <Route path="findhome" element={<FindHomeDetails />}>
@@ -179,11 +181,9 @@ function App() {
               <Route path="/maverickdeals/:dealId" element={<DealDetails />} />
               <Route path="/*" element={<Err />} />
               <Route path="/sell" element={<Sell />} />
-              {/* <Route path="/signin" element={<Signin />} /> */}
               <Route path="/login" element={<LoginForm />} />
               <Route path="/register" element={<RegisterForm />} />
               <Route path="/contact" element={<ContactPage />} />
-              {/* <Route path="/signup" element={<Regester />} /> */}
 
               <Route path="/developers" element={<Developers />} />
               <Route path="/developers/:devId" element={<DeveloperDetails />} />
@@ -196,16 +196,6 @@ function App() {
                 element={<InventoryDetails />}
               />
             </Routes>
-            {/* {
-                developers.length > 0 &&
-                developers.map((item) => {
-                  return (
-                    <img key={item.id} src={item.image} alt="" />
-                  )
-                })
-              } */}
-            {/* <button onClick={uploadBasicDevelopers}>Upload Developers</button> */}
-            {/* <img src={developers[0].image} alt="" /> */}
             <Footer />
           </>
         )}

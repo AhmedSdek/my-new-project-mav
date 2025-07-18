@@ -61,6 +61,10 @@ export default function NavBtn() {
       to: "cityscape",
     },
     {
+      text: lang === "ar" ? "الساحل" : "North Coast",
+      to: "northcoast",
+    },
+    {
       text: lang === "ar" ? "تعديل المطور" : "Edit Developer",
       to: "editDeveloper",
     },
