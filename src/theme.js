@@ -1,11 +1,10 @@
 // src/theme.js
 import { createTheme } from "@mui/material/styles";
-import { arEG, enUS } from "@mui/x-date-pickers/locales";
 
 export const getTheme = (lang) =>
-  createTheme(
-    {
-      direction: lang === "ar" ? "rtl" : "ltr",
+  createTheme({
+    direction: lang === "ar" ? "rtl" : "ltr",
+    typography: {
+      fontFamily: lang === "ar" ? "Cairo, sans-serif" : "Roboto, sans-serif",
     },
-    lang === "ar" ? arEG : enUS
-  );
+  });
