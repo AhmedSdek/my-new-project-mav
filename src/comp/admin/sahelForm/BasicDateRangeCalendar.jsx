@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 function BasicDateRangeCalendar({ onDateChange, startDate, endDate, lang }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box display="flex" gap={2} width="100%" justifyContent="space-between">
+      <Box sx ={{flexDirection:{xs:"column",md:"row"}}} display="flex" gap={2} width="100%" justifyContent="space-between">
         <DatePicker
           value={startDate}
           onChange={(newValue) => onDateChange("startDate", newValue)}
