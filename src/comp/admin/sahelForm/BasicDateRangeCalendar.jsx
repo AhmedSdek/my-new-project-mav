@@ -1,21 +1,13 @@
-// ./BasicDateRangeCalendar.jsx
 import * as React from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Box, Typography } from "@mui/material";
-
+import { Box } from "@mui/material";
 function BasicDateRangeCalendar({ onDateChange, startDate, endDate, lang }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Typography sx={{ textAlign: "start", width: "100%" }} variant="body2">
-        Availability
-      </Typography>
       <Box
-        sx={{
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: "center",
-        }}
+        sx={{ flexDirection: { xs: "column", md: "row" } }}
         display="flex"
         gap={2}
         width="100%"
