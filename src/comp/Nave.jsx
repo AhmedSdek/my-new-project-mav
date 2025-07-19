@@ -3,17 +3,19 @@ import "./min.css";
 import logoPhoto from "./log.webp";
 import { Link } from "react-router-dom";
 import { db } from "../firebase/config";
-import { Button, ToggleButton, Tooltip } from "@mui/material";
+import { Button, Stack, ToggleButton, Tooltip } from "@mui/material";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection } from "firebase/firestore";
 import { FavoriteBorder, FormatBold } from "@mui/icons-material";
 import { useState } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { useGlobal } from "../context/GlobalContext";
 function Navs() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
   const { country, setCountry } = useGlobal();
+  console.log(country);
+  // console.log(lang)
   const [value, loading, error] = useCollection(collection(db, "admin"));
   var arr = [];
   value &&
@@ -107,60 +109,54 @@ function Navs() {
           >
             <Nav
               style={{
-                gap: "1px",
-                display: "flex",
-                flexDirection: "row",
-                gap: "20px",
-                justifyContent: "space-between",
+                gap: "10px",
               }}
             >
               <Nav.Link
-                style={{ width: "100%", textAlign: "center" }}
+                style={{ width: "100%" }}
                 as={Link}
                 to="/favoriteList"
                 eventKey="0"
               >
-                <Tooltip style={{ width: "100%" }} title="Favorite List">
+                <Tooltip title="FavoriteList">
                   <FavoriteBorder />
                 </Tooltip>
               </Nav.Link>
-              <ToggleButton
-                sx={{
-                  color: "white",
-                  p: 1,
-                  width: "100%",
-                  border: "none",
-                  "&.Mui-selected": {
+              <Stack sx={{ flexDirection: "row" }}>
+                <ToggleButton
+                  sx={{
                     color: "white",
-                    backgroundColor: "#1976d2",
                     p: 1,
-                  },
-                }}
-                onClick={handleToggleLanguage}
-                value={lang}
-                aria-label="language toggle"
-              >
-                <Tooltip style={{ width: "100%" }} title="Change Language">
+                    width: "100%",
+                    border: "none",
+                    "&.Mui-selected": {
+                      color: "white",
+                      backgroundColor: "#1976d2",
+                      p: 1,
+                    },
+                  }}
+                  onClick={handleToggleLanguage}
+                  value={lang}
+                  aria-label="language toggle"
+                >
                   {lang === "en" ? "عربي" : "English"}
-                </Tooltip>
-              </ToggleButton>
-              <ToggleButton
-                sx={{
-                  color: "white",
-                  p: 1,
-                  width: "100%",
-                  border: "none",
-                  "&.Mui-selected": {
+                </ToggleButton>
+                <ToggleButton
+                  sx={{
                     color: "white",
-                    backgroundColor: "#1976d2",
                     p: 1,
-                  },
-                }}
-                onClick={handleToggleCountry}
-                value={country}
-                aria-label="language toggle"
-              >
-                <Tooltip style={{ width: "100%" }} title="Change Country">
+                    width: "100%",
+                    border: "none",
+                    "&.Mui-selected": {
+                      color: "white",
+                      backgroundColor: "#1976d2",
+                      p: 1,
+                    },
+                  }}
+                  onClick={handleToggleCountry}
+                  value={country}
+                  aria-label="language toggle"
+                >
                   {lang === "en"
                     ? country.en === "egypt"
                       ? "UAE"
@@ -168,8 +164,8 @@ function Navs() {
                     : country.en === "egypt"
                     ? "الامارات"
                     : "مصر"}
-                </Tooltip>
-              </ToggleButton>
+                </ToggleButton>
+              </Stack>
             </Nav>
           </Navbar.Collapse>
         </Container>
