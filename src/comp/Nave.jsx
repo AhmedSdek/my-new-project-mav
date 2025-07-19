@@ -14,8 +14,6 @@ function Navs() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
   const { country, setCountry } = useGlobal();
-  console.log(country);
-  // console.log(lang)
   const [value, loading, error] = useCollection(collection(db, "admin"));
   var arr = [];
   value &&
@@ -107,9 +105,22 @@ function Navs() {
             id="navbarScroll2"
             style={{ justifyContent: "end", flexGrow: 0 }}
           >
-            <Nav style={{ gap: "1px" }}>
-              <Nav.Link as={Link} to="/favoriteList" eventKey="0">
-                <Tooltip title="FavoriteList">
+            <Nav
+              style={{
+                gap: "1px",
+                display: "flex",
+                flexDirection: "row",
+                gap: "20px",
+                justifyContent: "space-between",
+              }}
+            >
+              <Nav.Link
+                style={{ width: "100%", textAlign: "center" }}
+                as={Link}
+                to="/favoriteList"
+                eventKey="0"
+              >
+                <Tooltip style={{ width: "100%" }} title="Favorite List">
                   <FavoriteBorder />
                 </Tooltip>
               </Nav.Link>
@@ -117,6 +128,7 @@ function Navs() {
                 sx={{
                   color: "white",
                   p: 1,
+                  width: "100%",
                   border: "none",
                   "&.Mui-selected": {
                     color: "white",
@@ -128,12 +140,15 @@ function Navs() {
                 value={lang}
                 aria-label="language toggle"
               >
-                {lang === "en" ? "عربي" : "English"}
+                <Tooltip style={{ width: "100%" }} title="Change Language">
+                  {lang === "en" ? "عربي" : "English"}
+                </Tooltip>
               </ToggleButton>
               <ToggleButton
                 sx={{
                   color: "white",
                   p: 1,
+                  width: "100%",
                   border: "none",
                   "&.Mui-selected": {
                     color: "white",
@@ -145,13 +160,15 @@ function Navs() {
                 value={country}
                 aria-label="language toggle"
               >
-                {lang === "en"
-                  ? country.en === "egypt"
-                    ? "UAE"
-                    : "Egypt"
-                  : country.en === "egypt"
-                  ? "الامارات"
-                  : "مصر"}
+                <Tooltip style={{ width: "100%" }} title="Change Country">
+                  {lang === "en"
+                    ? country.en === "egypt"
+                      ? "UAE"
+                      : "Egypt"
+                    : country.en === "egypt"
+                    ? "الامارات"
+                    : "مصر"}
+                </Tooltip>
               </ToggleButton>
             </Nav>
           </Navbar.Collapse>
