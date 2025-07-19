@@ -1,8 +1,3 @@
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { db, storage } from "../../../firebase/config";
 import {
   Box,
   Button,
@@ -13,19 +8,29 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import Input from "../Input";
-import FormGro from "../FormGro";
-import FileUpload from "../FileUpload";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import FormGro from "../../FormGro";
+import Input from "../../Input";
+import FileUpload from "../../FileUpload";
 import { HelpOutline } from "@mui/icons-material";
+import BasicDateRangeCalendar from "../../sahelForm/BasicDateRangeCalendar";
 import ReactLoading from "react-loading";
-import { toast } from "react-toastify";
-import { collection, doc, getDocs, setDoc } from "firebase/firestore";
-import BasicDateRangeCalendar from "./BasicDateRangeCalendar";
+import { ref } from "firebase/storage";
+import { db, storage } from "../../../../firebase/config";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import { useDocument } from "react-firebase-hooks/firestore";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
-function SahelForm() {
+function EditSahelDetails() {
+  const { sahelid } = useParams();
   const { i18n } = useTranslation();
   const lang = i18n.language;
+  const nav = useNavigate();
+
   const [newData, setNewData] = useState({
     developer: {},
     compoundName: { ar: "", en: "" },
@@ -33,7 +38,6 @@ function SahelForm() {
     Location: { ar: "", en: "" },
     Type: { ar: "", en: "" },
     Area: 0,
-    refNum: 0,
     peopleNumber: 0,
     Bed: "",
     Bath: "",
@@ -45,18 +49,39 @@ function SahelForm() {
     googleMap: "",
     startDate: null,
     endDate: null,
+    refNum: 0,
   });
-  const nav = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [oldData, setOldData] = useState({
+    developer: {},
+    compoundName: { ar: "", en: "" },
+    img: [],
+    Location: { ar: "", en: "" },
+    Type: { ar: "", en: "" },
+    Area: 0,
+    peopleNumber: 0,
+    Bed: "",
+    Bath: "",
+    price: 0,
+    Layoutimg: [],
+    Masterimg: [],
+    Dis: { ar: "", en: "" },
+    monyType: { ar: "", en: "" },
+    googleMap: "",
+    startDate: null,
+    endDate: null,
+    refNum: 0,
+  });
   const [developers, setDevelopers] = useState([]);
-  // console.log(developers);
   const [compoundNames, setCompoundNames] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [btn, setBtn] = useState(false);
   const [prog, setProg] = useState(0);
   const [prog2, setProg2] = useState(0);
   const [prog3, setProg3] = useState(0);
+  const [value, dataloading] = useDocument(doc(db, "northcoast", sahelid));
+
   const handleFileChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(
@@ -228,7 +253,33 @@ function SahelForm() {
     },
     [storage]
   );
-
+  useEffect(() => {
+    if (value) {
+      const data = value.data();
+      const fullData = {
+        developer: {},
+        compoundName: { ar: "", en: "" },
+        img: [],
+        Location: { ar: "", en: "" },
+        Type: { ar: "", en: "" },
+        Area: 0,
+        peopleNumber: 0,
+        Bed: "",
+        Bath: "",
+        price: 0,
+        Layoutimg: [],
+        Masterimg: [],
+        Dis: { ar: "", en: "" },
+        monyType: { ar: "", en: "" },
+        googleMap: "",
+        startDate: null,
+        endDate: null,
+        ...data,
+      };
+      setNewData(fullData);
+      setOldData(fullData); // 💪
+    }
+  }, [value]);
   useEffect(() => {
     const fetchCompounds = async () => {
       try {
@@ -374,32 +425,68 @@ function SahelForm() {
     ],
     []
   );
-
-  const sendData = async (dataToSend) => {
+  const getChangedFields = (newObj, oldObj) => {
+    let changedFields = {};
+    for (let key in newObj) {
+      if (
+        typeof newObj[key] === "object" &&
+        newObj[key] !== null &&
+        !Array.isArray(newObj[key])
+      ) {
+        if (JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])) {
+          // في حالة object (زي dealName) ارسل كامل الـ object
+          changedFields[key] = newObj[key];
+        }
+      } else if (
+        JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])
+      ) {
+        changedFields[key] = newObj[key];
+      }
+    }
+    return changedFields;
+  };
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     setBtn(true);
     try {
-      const id = new Date().getTime();
-      await setDoc(doc(db, "northcoast", `${id}`), {
-        id: `${id}`,
-        ...dataToSend,
-      });
-      toast.success("The data has been sent..", { autoClose: 2000 }); // عرض إشعار أنيق
-      nav("/dashboard");
+      if (!oldData) {
+        Swal.fire({
+          icon: "info",
+          title: "No Data",
+          text: "⚠️ البيانات الأصلية لم تحمل بعد",
+        });
+        // alert();
+        return;
+      }
+      const changedFields = getChangedFields(newData, oldData);
+      if (Object.keys(changedFields).length === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "No changes",
+          text: "No changes were made to the data.",
+        });
+        // alert("⚠️ لا يوجد أي تعديل");
+        return;
+      }
+      const docRef = doc(db, "northcoast", sahelid);
+      await updateDoc(docRef, changedFields);
+      // console.log(changedFields)
       setBtn(false);
-    } catch (er) {
-      console.error("Send error:", er);
-      toast.error("Oops! Something went wrong.", { autoClose: 2000 });
+      toast.success("The modification has been made.", { autoClose: 2000 }); // عرض إشعار أنيق
+      nav("/dashboard/editsahel");
+    } catch (err) {
+      console.error(err);
+      setBtn(false);
+      Swal.fire({
+        icon: "error",
+        title: "error",
+        text: "Oops ! Can't Edit",
+      });
+      // alert("❌ فشل في التعديل");
+    } finally {
       setBtn(false);
     }
   };
-  const onsubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
-      // console.log(newData);
-      await sendData(newData);
-    },
-    [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
-  );
   return (
     <>
       <Box
@@ -418,7 +505,7 @@ function SahelForm() {
           </Typography>
         </Stack>
         <Card
-          onSubmit={onsubmit}
+          onSubmit={handleUpdate}
           component="form"
           sx={{ gap: "10px", width: "100%" }}
           className="flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
@@ -615,4 +702,4 @@ function SahelForm() {
   );
 }
 
-export default SahelForm;
+export default EditSahelDetails;

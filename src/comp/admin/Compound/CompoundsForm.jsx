@@ -361,7 +361,9 @@ function CompoundsForm() {
         }}
       >
         <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-          <Typography variant="h5">{lang === "ar" ? "اضف كومباوند" : "Add Compound"}</Typography>
+          <Typography variant="h5">
+            {lang === "ar" ? "اضف كومباوند" : "Add Compound"}
+          </Typography>
         </Stack>
         <Card
           sx={{
@@ -397,7 +399,9 @@ function CompoundsForm() {
             <Input
               onChange={onchange("compoundName", "en")}
               id="Compound Name en"
-              label={lang === "ar" ? "اسم الكومباوند انجليزي" : "Compound Name en"}
+              label={
+                lang === "ar" ? "اسم الكومباوند انجليزي" : "Compound Name en"
+              }
               type="text"
               value={newData.compoundName.en}
             />
@@ -417,6 +421,7 @@ function CompoundsForm() {
 
             <Divider />
             <FileUpload
+              multiple
               handleFileChange={handleFileChange}
               prog={prog}
               title={
@@ -458,7 +463,12 @@ function CompoundsForm() {
             {offers.map((offer, index) => (
               <Stack
                 key={index}
-                sx={{ gap: "10px", alignItems: "center", flexDirection: 'row', width: '100%' }}
+                sx={{
+                  gap: "10px",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  width: "100%",
+                }}
               >
                 <Input
                   onChange={handleOfferChange(index, "pers")}
@@ -505,7 +515,9 @@ function CompoundsForm() {
             </IconButton>
             <Dialog open={open} onClose={() => setOpen(false)}>
               <DialogContent>
-                <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+                <Typography
+                  style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}
+                >
                   {`📝 إزاي تستخدم Markdown:
  # عنوان رئيسي
  ## عنوان فرعي
@@ -527,7 +539,11 @@ function CompoundsForm() {
             <Input
               onChange={onchange("compoundDes", "en")}
               id="projectDes"
-              label={lang === "ar" ? "تفاصيل الكومباوند انجليزي" : "Compound Description en"}
+              label={
+                lang === "ar"
+                  ? "تفاصيل الكومباوند انجليزي"
+                  : "Compound Description en"
+              }
               type="text"
               value={newData.compoundDes.en}
               multiline
@@ -536,7 +552,11 @@ function CompoundsForm() {
             <Input
               onChange={onchange("compoundDes", "ar")}
               id="projectDesar"
-              label={lang === "ar" ? "تفاصيل الكومباوند عربي" : "Compound Description ar"}
+              label={
+                lang === "ar"
+                  ? "تفاصيل الكومباوند عربي"
+                  : "Compound Description ar"
+              }
               type="text"
               value={newData.compoundDes.ar}
               multiline
@@ -545,7 +565,9 @@ function CompoundsForm() {
             <FileUpload
               handleFileChange={handleMasterplanImgChange}
               prog={prog3}
-              title={lang === "ar" ? " صوره الماستر بلان" : "Master plan Images ..."}
+              title={
+                lang === "ar" ? " صوره الماستر بلان" : "Master plan Images ..."
+              }
             />
             <Input
               onChange={onchange("Location", "en")}
@@ -569,8 +591,10 @@ function CompoundsForm() {
             >
               {btn ? (
                 <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+              ) : lang === "ar" ? (
+                "ارسال"
               ) : (
-                lang === "ar" ? "ارسال" : "Send"
+                "Send"
               )}
             </Button>
           </Box>

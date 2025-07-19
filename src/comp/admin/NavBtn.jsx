@@ -88,6 +88,10 @@ export default function NavBtn() {
       text: "Edit City",
       to: "editcity",
     },
+    {
+      text: lang === "ar" ? "تعديل الساحل" : "Edit North Coast",
+      to: "editsahel",
+    },
   ];
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>

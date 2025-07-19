@@ -58,6 +58,8 @@ import EditinventoryDetails from "./comp/admin/Edit/Inventory/EditinventoryDetai
 import EditcityDetails from "./comp/admin/Edit/City/EditcityDetails";
 import SahelForm from "./comp/admin/sahelForm/SahelForm";
 import { useGlobal } from "./context/GlobalContext";
+import EditSahel from "./comp/admin/Edit/sahel/EditSahel";
+import EditSahelDetails from "./comp/admin/Edit/sahel/EditSahelDetails";
 function App() {
   const { i18n } = useTranslation();
   const { country, setCountry } = useGlobal();
@@ -168,6 +170,11 @@ function App() {
                   element={<EditcityDetails />}
                 />
                 <Route path="northcoast" element={<SahelForm />} />
+                <Route path="editsahel" element={<EditSahel />} />
+                <Route
+                  path="editsahel/:sahelid"
+                  element={<EditSahelDetails />}
+                />
               </Route>
 
               <Route path="findhome" element={<FindHomeDetails />}>
