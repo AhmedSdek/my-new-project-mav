@@ -30,7 +30,6 @@ function EditSahelDetails() {
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const nav = useNavigate();
-
   const [newData, setNewData] = useState({
     developer: {},
     compoundName: { ar: "", en: "" },
@@ -501,7 +500,7 @@ function EditSahelDetails() {
       >
         <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
           <Typography variant="h5">
-            {lang === "ar" ? "اضف مشروع" : "Add Project"}
+            {lang === "ar" ? "تعديل مشروع" : "Edit Project"}
           </Typography>
         </Stack>
         <Card

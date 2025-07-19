@@ -69,9 +69,7 @@ function EditSahel() {
   return (
     <>
       <Box sx={{ minHeight: "calc(100vh - 100px)", padding: "70px 0" }}>
-        <h2>
-          {lang === "ar" ? "تعديل المشاريع الجديده" : "New luanches Edit page"}
-        </h2>
+        <h2>{lang === "ar" ? "تعديل الساحل" : "Sahel Edit page"}</h2>
         <Container>
           {sahel.length > 0 ? (
             <Stack

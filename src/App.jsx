@@ -4,30 +4,17 @@ import Navs from "./comp/Nave";
 import Footer from "./comp/Footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Home from "./comp/home content/Home";
 import { Route, Routes } from "react-router-dom";
-import Developers from "./comp/home content/Developers/Developers";
-import About from "./comp/home content/about/About";
 import { useEffect, useState } from "react";
-import Signin from "./Auth/Signin";
-import Regester from "./Auth/Regester";
 import { Box, Stack, ThemeProvider, createTheme } from "@mui/material";
-import Sell from "./comp/Sell/Sell";
 import Dashboard from "./comp/admin/Dashboard";
 import ReSale from "./comp/admin/reSale/ReSale";
 import SaleData from "./comp/admin/SaleData";
-import MaverickDeals from "./comp/deals/MaverickDeals";
-import DealDetails from "./comp/deals/DealDetails";
-import DeveloperDetails from "./comp/home content/Developers/DeveloperDetails";
-import ProjectDe from "./comp/home content/Developers/ProjectDe";
 import FindHomeDetails from "./comp/Find a Home/FindHomeDetails";
 import SellDetails from "./comp/admin/SellDetails";
 import FindDetails from "./comp/Find a Home/FindDetails";
 import NewLaunchesForm from "./comp/admin/newLaunchesform/NewLaunchesForm";
-import NewLaunchespage from "./comp/New Launches/NewLaunchespage";
 import FindCompDetails from "./comp/Find a Home/FindCompDetails";
-import NewLaunchDetails from "./comp/New Launches/NewLaunchDetails";
-import SahelMapPage from "./comp/home content/sahel map/SahelMapPage";
 import MavLoading from "./comp/Loading/MavLoading";
 import EditDeveloper from "./comp/admin/Edit/Developer/EditDeveloper";
 import EditDealdetails from "./comp/admin/Edit/Deals/EditDealdetails";
@@ -35,18 +22,15 @@ import Editdevdetails from "./comp/admin/Edit/Developer/Editdevdetails";
 import EditDeals from "./comp/admin/Edit/Deals/EditDeals";
 import Editluanches from "./comp/admin/Edit/Luanches/Editluanches";
 import Editluanchesdetails from "./comp/admin/Edit/Luanches/Editluanchesdetails";
-import ContactPage from "./comp/ContactPage/ContactPage";
-import FavoriteList from "./comp/FavList/FavoriteList";
 import Err from "./comp/Err/Err";
 import Cityscape from "./comp/admin/cityscape/Cityscape";
-import CityscapeProjects from "./comp/home content/cityscape/CityscapeProjects";
 import EditCity from "./comp/admin/Edit/City/EditCity";
 import Inventory from "./comp/admin/inventory/Inventory";
 import InventoryDetails from "./comp/inventory/InventoryDetails";
 import DeveloperForm from "./comp/admin/developerForm/DeveloperForm";
 import { useTranslation } from "react-i18next";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import CompoundsForm from "./comp/admin/Compound/CompoundsForm";
 import EditCompound from "./comp/admin/Edit/Compound/EditCompound";
 import EditCompoundDetails from "./comp/admin/Edit/Compound/EditCompoundDetails";
@@ -60,6 +44,20 @@ import SahelForm from "./comp/admin/sahelForm/SahelForm";
 import { useGlobal } from "./context/GlobalContext";
 import EditSahel from "./comp/admin/Edit/sahel/EditSahel";
 import EditSahelDetails from "./comp/admin/Edit/sahel/EditSahelDetails";
+import Home from "./pages/homeSections/home/Home";
+import SahelMapPage from "./pages/sahel Page/SahelMapPage";
+import CityscapeProjects from "./pages/cityscape Page/CityscapeProjects";
+import NewLaunches from "./pages/New Launches Page/NewLaunches";
+import NewLaunchDetails from "./pages/New Launches Page/NewLaunchDetails";
+import Developers from "./pages/developers Page/Developers";
+import DeveloperDetails from "./pages/developers Page/DeveloperDetails";
+import ProjectDe from "./pages/developers Page/ProjectDe";
+import MaverickDeals from "./pages/deals Page/MaverickDeals";
+import DealDetails from "./pages/deals Page/DealDetails";
+import AboutUs from "./pages/about page/AboutUs";
+import ContactUs from "./pages/Contact Page/ContactUs";
+import Sell from "./pages/sell-rent Page/Sell";
+import FavoriteList from "./pages/FavList page/FavoriteList";
 function App() {
   const { i18n } = useTranslation();
   const { country, setCountry } = useGlobal();
@@ -184,14 +182,13 @@ function App() {
                   element={<FindCompDetails />}
                 />
               </Route>
-
-              <Route path="newlaunches" element={<NewLaunchespage />} />
+              <Route path="newlaunches" element={<NewLaunches />} />
               <Route
                 path="newlaunches/:launchId"
                 element={<NewLaunchDetails />}
               />
               <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
+              <Route path="/about" element={<AboutUs />} />
               <Route path="/favoriteList" element={<FavoriteList />} />
               <Route path="/sahelmap" element={<SahelMapPage />} />
               <Route
@@ -204,8 +201,7 @@ function App() {
               <Route path="/sell" element={<Sell />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/register" element={<RegisterForm />} />
-              <Route path="/contact" element={<ContactPage />} />
-
+              <Route path="/contact" element={<ContactUs />} />
               <Route path="/developers" element={<Developers />} />
               <Route path="/developers/:devId" element={<DeveloperDetails />} />
               <Route

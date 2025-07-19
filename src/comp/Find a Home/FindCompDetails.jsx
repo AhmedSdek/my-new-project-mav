@@ -23,7 +23,7 @@ import "swiper/css/pagination";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 // import './styles.css';
-import "../deals/styles.css";
+import "./styles.css";
 import {
   Autoplay,
   EffectCoverflow,
