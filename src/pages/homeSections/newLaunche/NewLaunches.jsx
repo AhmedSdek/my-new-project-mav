@@ -16,8 +16,11 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { collection } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import MavLoading from "../../../comp/Loading/MavLoading";
+import { useTranslation } from "react-i18next";
 function NewLaunches() {
   const [value, loading, error] = useCollection(collection(db, "newlaunch"));
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   return (
     <section style={{ margin: "25px 0" }}>
       <Container>
@@ -28,9 +31,13 @@ function NewLaunches() {
             alignItems: "center",
           }}
         >
-          <Typography sx={{ fontWeight: "bold" }}>Launches Now</Typography>
+          <Typography sx={{ fontWeight: "bold" }}>
+            {lang === "ar" ? "ينطلق الآن" : "Launches Now"}
+          </Typography>
           <Link to="/newlaunches">
-            <Typography sx={{ fontWeight: "bold" }}>Explore All</Typography>
+            <Typography sx={{ fontWeight: "bold" }}>
+              {lang === "ar" ? "استكشف الكل" : "Explore All"}
+            </Typography>
           </Link>
         </Stack>
         {value && (

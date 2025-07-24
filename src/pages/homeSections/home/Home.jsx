@@ -10,7 +10,10 @@ import Developers from "../developers/Developers";
 import Deals from "../deals/Deals";
 import Form from "../form/Form";
 import Search from "../search/Search";
+import { useTranslation } from "react-i18next";
 function Home() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   return (
     <div>
       <Box
@@ -38,7 +41,7 @@ function Home() {
                 color: "#1e4164",
               }}
             >
-              Let us
+              {lang === "ar" ? "دعنا" : "Let us"}
             </mark>
           </h1>
           <h2
@@ -50,7 +53,7 @@ function Home() {
               fontSize: "40px",
             }}
           >
-            Help You To Make
+            {lang === "ar" ? "نساعدك في" : "Help You To Make"}
           </h2>
           <h2
             className="hed3"
@@ -62,7 +65,7 @@ function Home() {
               fontSize: "40px",
             }}
           >
-            The Move
+            {lang === "ar" ? "الحركه" : "The Move"}
           </h2>
           <Search />
         </div>

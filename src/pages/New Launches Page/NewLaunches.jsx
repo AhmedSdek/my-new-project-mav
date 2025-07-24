@@ -17,7 +17,6 @@ function NewLaunches() {
     const fetchDevelopers = async () => {
       try {
         const snapshot = await getDocs(collection(db, "northcoast"));
-
         const filteredDevs = snapshot.docs
           .map((doc) => ({
             id: doc.id,

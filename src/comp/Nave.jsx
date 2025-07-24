@@ -14,7 +14,7 @@ function Navs() {
   const { i18n } = useTranslation();
   const lang = i18n.language; // هيطلع "ar" أو "en"
   const { country, setCountry } = useGlobal();
-  console.log(country);
+  // console.log(country);
   // console.log(lang)
   const [value, loading, error] = useCollection(collection(db, "admin"));
   var arr = [];

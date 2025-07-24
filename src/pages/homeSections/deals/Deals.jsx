@@ -7,8 +7,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { collection, doc, updateDoc } from "firebase/firestore";
-import React from "react";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "../../../firebase/config";
 import { Link } from "react-router-dom";
@@ -17,55 +17,100 @@ import ContactUsIcon from "../../../comp/Contact Us/ContactUsIcon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Pagination, Autoplay } from "swiper/modules";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { useGlobal } from "../../../context/GlobalContext";
+import ReactLoading from "react-loading";
 
 function Deals() {
-  const [value, loading, error] = useCollection(collection(db, "Resell"));
-  if (value) {
-    return (
-      <section style={{ margin: "25px 0" }}>
-        <Container>
-          <Stack sx={{ gap: 2 }}>
-            <Stack
-              sx={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+  const [deals, setDeals] = useState([]);
+  console.log(deals);
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { country } = useGlobal();
+  useEffect(() => {
+    const fetchdeals = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "deals"));
+        // console.log(snapshot.docs);
+        const filteredDeals = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter(
+            (dev) =>
+              dev?.developer.country?.en?.toLowerCase() === country.en ||
+              dev?.developer.country?.ar === country.ar
+          );
+        setDeals(filteredDeals);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchdeals();
+  }, [country]);
+  return (
+    <section style={{ margin: "25px 0" }}>
+      <Container>
+        <Stack sx={{ gap: 2 }}>
+          <Stack
+            sx={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography sx={{ fontWeight: "bold" }}>
+              {lang === "ar" ? "صفقات مافريك" : "Maverick deals"}
+            </Typography>
+            <Link to="/maverickdeals">
               <Typography sx={{ fontWeight: "bold" }}>
-                Maverick deals
+                {lang === "ar" ? "استكشف الكل" : "Explore All"}
               </Typography>
-              <Link to="/maverickdeals">
-                <Typography sx={{ fontWeight: "bold" }}>Explore All</Typography>
-              </Link>
-            </Stack>
-            <Swiper
-              autoplay={{
-                delay: 2500,
-                disableOnInteraction: false,
-              }}
-              spaceBetween={10}
-              breakpoints={{
-                640: {
-                  slidesPerView: 1,
-                  spaceBetween: 10,
-                },
-                768: {
-                  slidesPerView: 2,
-                  spaceBetween: 10,
-                },
-                1024: {
-                  slidesPerView: 3,
-                  spaceBetween: 10,
-                },
-              }}
-              freeMode={true}
-              loop={true}
-              style={{ height: "100%" }}
-              modules={[FreeMode, Pagination, Autoplay]}
-              className="mydealSwiper"
-            >
-              {value.docs.map((col, index) => {
+            </Link>
+          </Stack>
+          <Swiper
+            autoplay={{
+              delay: 2500,
+              disableOnInteraction: false,
+            }}
+            spaceBetween={10}
+            breakpoints={{
+              640: {
+                slidesPerView: 1,
+                spaceBetween: 10,
+              },
+              768: {
+                slidesPerView: 2,
+                spaceBetween: 10,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 10,
+              },
+            }}
+            freeMode={true}
+            loop={true}
+            style={{ height: "100%" }}
+            modules={[FreeMode, Pagination, Autoplay]}
+            className="mydealSwiper"
+          >
+            {loading ? (
+              <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
+                <ReactLoading
+                  color="black"
+                  type={"spin"}
+                  height={"50px"}
+                  width={"50px"}
+                />
+              </Stack>
+            ) : deals && deals.length > 0 ? (
+              deals.map((col, index) => {
                 return (
                   <SwiperSlide
                     key={index}
@@ -87,7 +132,7 @@ function Deals() {
                             }}
                           >
                             <Link
-                              to={`/maverickdeals/${col.data().id}`}
+                              to={`/maverickdeals/${col.id}`}
                               style={{ textDecoration: "none" }}
                             >
                               <Stack>
@@ -98,8 +143,8 @@ function Deals() {
                                       width: "100%",
                                       objectFit: "cover",
                                     }}
-                                    src={col.data().img[0]}
-                                    alt=""
+                                    src={col.img[0]}
+                                    alt={`${col.Sale[lang]} ${col.Type[lang]} in ${col.compoundName[lang]}`}
                                   />
                                 </Box>
                                 <CardContent
@@ -117,18 +162,20 @@ function Deals() {
                                       }}
                                       variant="h6"
                                     >
-                                      {`${col.data().imgtext}`}
+                                      {`${col.Sale[lang]} ${col.Type[lang]} ${
+                                        lang === "ar" ? "في" : "in"
+                                      } ${col.compoundName[lang]}`}
                                     </Typography>
-                                    <Typography
-                                      component="h2"
-                                      sx={{
-                                        lineHeight: "1.3",
-                                        fontWeight: "bold",
-                                      }}
-                                      variant="h6"
-                                    >
-                                      {col.data().compoundName}
-                                    </Typography>
+                                    {/* <Typography
+                                        component="h2"
+                                        sx={{
+                                          lineHeight: "1.3",
+                                          fontWeight: "bold",
+                                        }}
+                                        variant="h6"
+                                      >
+                                        {col.compoundName[lang]}
+                                      </Typography> */}
                                     <Typography
                                       variant="caption"
                                       sx={{
@@ -137,7 +184,7 @@ function Deals() {
                                         padding: "0 0 0 5px",
                                       }}
                                     >
-                                      {col.data().Location}
+                                      {col.Location[lang]}
                                     </Typography>
                                   </Stack>
                                   <Stack
@@ -149,7 +196,7 @@ function Deals() {
                                   >
                                     <div className="svgicon">
                                       <p style={{ fontWeight: "bold" }}>
-                                        {col.data().Bed}
+                                        {col.Bed[lang]}
                                       </p>
                                       <svg
                                         width="23"
@@ -168,7 +215,7 @@ function Deals() {
                                     </div>
                                     <div className="svgicon">
                                       <p style={{ fontWeight: "bold" }}>
-                                        {col.data().Bath}
+                                        {col.Bath[lang]}
                                       </p>
 
                                       <svg
@@ -221,7 +268,7 @@ function Deals() {
                                           fontWeight: "bold",
                                         }}
                                       >
-                                        {col.data().Area}
+                                        {col.Area}
                                         &nbsp;m²
                                       </p>
                                     </div>
@@ -245,12 +292,13 @@ function Deals() {
                                       style={{
                                         fontWeight: "bold",
                                         color: "#1e4164",
+                                        fontSize: "13px",
                                       }}
                                     >
-                                      {`${col.data().Sale}`}
+                                      {`${col.Sale[lang]}`}
                                     </p>
                                   </Box>
-                                  {col.data().sold === "SOLD OUT" && (
+                                  {col.sold.en === "SOLD OUT" && (
                                     <Box
                                       sx={{
                                         position: "absolute",
@@ -276,19 +324,15 @@ function Deals() {
                                           textAlign: "center",
                                         }}
                                       >
-                                        {`${col.data().sold}`}
+                                        {`${col.sold[lang]}`}
                                       </p>
                                     </Box>
                                   )}
 
                                   <Typography sx={{ fontWeight: "bold" }}>
                                     {`${Intl.NumberFormat("en-US").format(
-                                      col.data().price
-                                    )} ${
-                                      col.data().monyType === "dollar"
-                                        ? "$"
-                                        : "EGP"
-                                    }`}
+                                      col.price
+                                    )} ${col.monyType[lang]}`}
                                   </Typography>
                                 </CardContent>
                               </Stack>
@@ -297,66 +341,57 @@ function Deals() {
                               sx={{
                                 padding: "0 10px 10px 0",
                                 flexDirection: "row",
-                                justifyContent: "space-between",
+                                // justifyContent: "space-between",
+                                justifyContent: "end",
                               }}
                             >
-                              <Stack
-                                sx={{
-                                  flexDirection: "row",
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Checkbox
-                                  checked={
-                                    localStorage.getItem(col.data().id) ===
-                                    "true"
-                                      ? true
-                                      : false
-                                  }
-                                  aria-label="like"
-                                  icon={<FavoriteBorder />}
-                                  checkedIcon={
-                                    <Favorite sx={{ color: "red" }} />
-                                  }
-                                  onChange={async (e) => {
-                                    if (e.target.checked) {
-                                      localStorage.setItem(col.data().id, true);
-                                      localStorage.setItem(
-                                        col.data().refNum,
-                                        col.data().id
-                                      );
-                                      try {
-                                        await updateDoc(
-                                          doc(db, "Resell", col.data().id),
-                                          {
-                                            like: col.data().like + 1,
-                                          }
-                                        );
-                                      } catch (er) {
-                                        console.log(er);
-                                      }
-                                    } else {
-                                      localStorage.removeItem(col.data().id);
-                                      localStorage.removeItem(
-                                        col.data().refNum
-                                      );
-                                      await updateDoc(
-                                        doc(db, "Resell", col.data().id),
-                                        {
-                                          like: col.data().like - 1,
-                                        }
-                                      );
-                                    }
+                              {/* <Stack
+                                  sx={{
+                                    flexDirection: "row",
+                                    justifyContent: "center",
+                                    alignItems: "center",
                                   }}
-                                />
-                                {/* <Typography>
-                                                                    {col.data().like}
-                                                                </Typography> */}
-                              </Stack>
+                                >
+                                  <Checkbox
+                                    checked={
+                                      localStorage.getItem(col.id) === "true"
+                                        ? true
+                                        : false
+                                    }
+                                    aria-label="like"
+                                    icon={<FavoriteBorder />}
+                                    checkedIcon={<Favorite sx={{ color: "red" }} />}
+                                    onChange={async (e) => {
+                                      if (e.target.checked) {
+                                        localStorage.setItem(col.id, true);
+                                        localStorage.setItem(col.refNum, col.id);
+                                        try {
+                                          await updateDoc(
+                                            doc(db, "deals", col.id),
+                                            {
+                                              like: col.like + 1,
+                                            }
+                                          );
+                                        } catch (er) {
+                                          console.log(er);
+                                        }
+                                      } else {
+                                        localStorage.removeItem(col.id);
+                                        localStorage.removeItem(col.refNum);
+                                        await updateDoc(doc(db, "deals", col.id), {
+                                          like: col.like - 1,
+                                        });
+                                      }
+                                    }}
+                                  />
+                                </Stack> */}
                               <ContactUsIcon
-                                sectionName="Maverick-Deals"
-                                sectionData={col.data()}
+                                sectionName={
+                                  lang === "ar"
+                                    ? "صفقات مافريك"
+                                    : "Maverick deals"
+                                }
+                                sectionData={col}
                               />
                             </Stack>
                           </Card>
@@ -365,13 +400,23 @@ function Deals() {
                     </Col>
                   </SwiperSlide>
                 );
-              })}
-            </Swiper>
-          </Stack>
-        </Container>
-      </section>
-    );
-  }
+              })
+            ) : (
+              <Stack
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minHeight: "150px",
+                }}
+              >
+                <Typography>No Data in {country[lang]}</Typography>
+              </Stack>
+            )}
+          </Swiper>
+        </Stack>
+      </Container>
+    </section>
+  );
 }
 
 export default Deals;
