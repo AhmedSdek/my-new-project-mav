@@ -7,9 +7,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "../../../firebase/config";
 import { Link } from "react-router-dom";
 import { Col } from "react-bootstrap";
@@ -23,37 +29,33 @@ import ReactLoading from "react-loading";
 
 function Deals() {
   const [deals, setDeals] = useState([]);
-  console.log(deals);
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { country } = useGlobal();
   useEffect(() => {
-    const fetchdeals = async () => {
+    const fetchDeals = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "deals"));
-        // console.log(snapshot.docs);
-        const filteredDeals = snapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-          .filter(
-            (dev) =>
-              dev?.developer.country?.en?.toLowerCase() === country.en ||
-              dev?.developer.country?.ar === country.ar
-          );
-        setDeals(filteredDeals);
+        const q = query(
+          collection(db, "deals"),
+          where("countryKey", "==", country.en)
+        );
+        const snapshot = await getDocs(q);
+        const dealsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDeals(dealsData);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchdeals();
+    fetchDeals();
   }, [country]);
+
   return (
     <section style={{ margin: "25px 0" }}>
       <Container>

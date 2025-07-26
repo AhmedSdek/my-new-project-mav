@@ -24,9 +24,12 @@ function Cityscape() {
   const [open, setOpen] = useState(false);
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     cityscapeName: {
       ar: "",
-      en: ""
+      en: "",
     },
     cityscapeImgs: [],
     monyType: { ar: "", en: "" },
@@ -35,14 +38,20 @@ function Cityscape() {
     cashDiscount: 0,
     Location: {
       ar: "",
-      en: ""
+      en: "",
     },
     price: 0,
     discription: { ar: "", en: "" },
-    offers: [{ pers: "", year: "", offer: "" }]
+    offers: [{ pers: "", year: "", offer: "" }],
   });
   const [offers, setOffers] = useState([{ pers: "", year: "", offer: "" }]);
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
@@ -67,6 +76,9 @@ function Cityscape() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

@@ -36,7 +36,7 @@ function Navs() {
   const handleToggleCountry = () => {
     const newCountry =
       country.en === "egypt"
-        ? { en: "UAE", ar: "الامارات" }
+        ? { en: "uae", ar: "الامارات" }
         : { en: "egypt", ar: "مصر" };
     setCountry(newCountry);
     localStorage.setItem("selectedCountry", JSON.stringify(newCountry));

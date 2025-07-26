@@ -45,7 +45,13 @@ function DeveloperForm() {
       en: ""
     }
   });
-  const CountryOptions = useMemo(() => [{ ar: "مصر", en: "Egypt" }, { ar: "الامارات", en: "UAE" }], []);
+  const CountryOptions = useMemo(
+    () => [
+      { ar: "مصر", en: "egypt" },
+      { ar: "الامارات", en: "uae" },
+    ],
+    []
+  );
   const handleFileChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(

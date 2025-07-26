@@ -24,6 +24,9 @@ function Editluanchesdetails() {
   const [value, loading] = useDocument(doc(db, "newlaunch", editluanchesdetailsId));
   const [oldData, setOldData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     Dis: { ar: "", en: "" },
     Location: { ar: "", en: "" },
     img: [],
@@ -33,11 +36,14 @@ function Editluanchesdetails() {
     video: [],
     price: 0,
   });
-  const [prog, setProg] = useState(0)
-  const [prog3, setProg3] = useState(0)
-  const [prog4, setProg4] = useState(0)
+  const [prog, setProg] = useState(0);
+  const [prog3, setProg3] = useState(0);
+  const [prog4, setProg4] = useState(0);
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     Dis: { ar: "", en: "" },
     Location: { ar: "", en: "" },
     img: [],
@@ -47,7 +53,13 @@ function Editluanchesdetails() {
     video: [],
     price: 0,
   });
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -55,6 +67,9 @@ function Editluanchesdetails() {
       const data = value.data();
       const fullData = {
         developer: {},
+        countryKey: "",
+        devId: "",
+        devIcon: "",
         Dis: { ar: "", en: "" },
         Location: { ar: "", en: "" },
         img: [],
@@ -63,7 +78,7 @@ function Editluanchesdetails() {
         monyType: { ar: "", en: "" },
         video: [],
         price: 0,
-        ...data
+        ...data,
       };
       setNewData(fullData);
       setOldData(fullData); // 💪
@@ -89,7 +104,7 @@ function Editluanchesdetails() {
   }, []);
   const handleUpdate = async (e) => {
     e.preventDefault();
-    setBtn(true)
+    setBtn(true);
     try {
       if (!oldData) {
         Swal.fire({
@@ -113,31 +128,34 @@ function Editluanchesdetails() {
       const docRef = doc(db, "newlaunch", editluanchesdetailsId);
       await updateDoc(docRef, changedFields);
       // console.log(changedFields)
-      setBtn(false)
+      setBtn(false);
       toast.success("The modification has been made.", { autoClose: 2000 }); // عرض إشعار أنيق
       nav("/dashboard/editluanches");
     } catch (err) {
       console.error(err);
-      setBtn(false)
+      setBtn(false);
       Swal.fire({
-        icon: 'error',
+        icon: "error",
         title: "error",
-        text: "Oops ! Can't Edit"
-      })
+        text: "Oops ! Can't Edit",
+      });
       // alert("❌ فشل في التعديل");
     } finally {
-      setBtn(false)
+      setBtn(false);
     }
   };
-  const onchange = useCallback((parentKey, lang) => (e) => {
-    setNewData((prev) => ({
-      ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [lang]: e.target.value
-      }
-    }));
-  }, []);
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setNewData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
   const handleDynamicSelectChange = useCallback(
     (dataArray, fieldName) => (e) => {
       const selectedLabel = e.target.value;
@@ -146,7 +164,7 @@ function Editluanchesdetails() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
     },
     [lang]
@@ -158,6 +176,9 @@ function Editluanchesdetails() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

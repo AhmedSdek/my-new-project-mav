@@ -37,6 +37,9 @@ function EditcityDetails() {
   const [value, loading] = useDocument(doc(db, "cityscape", editcityId));
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     cityscapeName: {
       ar: "",
       en: "",
@@ -56,6 +59,9 @@ function EditcityDetails() {
   });
   const [oldData, setOldData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     cityscapeName: {
       ar: "",
       en: "",
@@ -103,6 +109,9 @@ function EditcityDetails() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },
@@ -194,6 +203,9 @@ function EditcityDetails() {
       const data = value.data();
       const fullData = {
         developer: {},
+        countryKey: "",
+        devId: "",
+        devIcon: "",
         cityscapeName: {
           ar: "",
           en: "",

@@ -13,6 +13,8 @@ import isEqual from "lodash.isequal";
 import { toast } from 'react-toastify';
 import ReactLoading from "react-loading";
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { useDocument } from "react-firebase-hooks/firestore";
+import Swal from "sweetalert2";
 
 function EditCompoundProject() {
   const { editcompoundprojId, editcompoundId } = useParams();
@@ -27,88 +29,138 @@ function EditCompoundProject() {
   const [btn, setBtn] = useState(false);
   const [prog3, setProg3] = useState(0);
   const [prog, setProg] = useState(0);
+  const [value, loading] = useDocument(doc(db, "compound", editcompoundprojId));
+
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     compoundName: {
       ar: "",
-      en: ""
+      en: "",
     },
     compoundImgs: [],
     district: {
       ar: "",
-      en: ""
+      en: "",
     },
     price: 0,
     compoundDes: {
       ar: "",
-      en: ""
+      en: "",
     },
     masterplanImg: [],
     Location: {
       ar: "",
-      en: ""
+      en: "",
     },
     aminatis: [],
     type: [],
     monyType: { ar: "", en: "" },
-    offers: [{ pers: "", year: "", offer: "" }]
+    offers: [{ pers: "", year: "", offer: "" }],
   });
 
-  console.log(newData)
+  console.log(newData);
   const [oldData, setOldData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     compoundName: {
       ar: "",
-      en: ""
+      en: "",
     },
     compoundImgs: [],
     district: {
       ar: "",
-      en: ""
+      en: "",
     },
     price: 0,
     compoundDes: {
       ar: "",
-      en: ""
+      en: "",
     },
     masterplanImg: [],
     Location: {
       ar: "",
-      en: ""
+      en: "",
     },
     aminatis: [],
     type: [],
     monyType: { ar: "", en: "" },
-    offers: [{ pers: "", year: "", offer: "" }]
+    offers: [{ pers: "", year: "", offer: "" }],
   });
-  console.log(oldData)
+  console.log(oldData);
   useEffect(() => {
-    const fetchCompoundData = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "compound"));
-        let found = false;
-        snapshot.forEach(docSnap => {
-          const data = docSnap.data();
-          const compounds = data.compounds || [];
-          const targetCompound = compounds.find(comp => comp.id === editcompoundprojId);
-          console.log(targetCompound)
-          if (targetCompound) {
-            setNewData(targetCompound);
-            setOldData(targetCompound);
-            setOffers(targetCompound.offers || [{ pers: "", year: "", offer: "" }]);
-            found = true;
-          }
-        });
-        if (!found) {
-          console.warn("🚨 لم يتم العثور على الكمباوند المطلوب");
-        }
-      } catch (err) {
-        console.error("❌ خطأ أثناء تحميل بيانات الكمباوند:", err);
-      }
-    };
+    if (value) {
+      const data = value.data();
+      const fullData = {
+        developer: {},
+        countryKey: "",
+        devId: "",
+        devIcon: "",
+        compoundName: {
+          ar: "",
+          en: "",
+        },
+        compoundImgs: [],
+        district: {
+          ar: "",
+          en: "",
+        },
+        price: 0,
+        compoundDes: {
+          ar: "",
+          en: "",
+        },
+        masterplanImg: [],
+        Location: {
+          ar: "",
+          en: "",
+        },
+        aminatis: [],
+        type: [],
+        monyType: { ar: "", en: "" },
+        offers: [{ pers: "", year: "", offer: "" }],
+        ...data,
+      };
+      setNewData(fullData);
+      setOldData(fullData);
+      setOffers(fullData.offers || [{ pers: "", year: "", offer: "" }]);
+    }
+  }, [value]);
+  // useEffect(() => {
+  //   const fetchCompoundData = async () => {
+  //     try {
+  //       const snapshot = await getDocs(collection(db, "compound"));
+  //       let found = false;
+  //       snapshot.forEach((docSnap) => {
+  //         const data = docSnap.data();
+  //         const compounds = data.compounds || [];
+  //         const targetCompound = compounds.find(
+  //           (comp) => comp.id === editcompoundprojId
+  //         );
+  //         console.log(targetCompound);
+  //         if (targetCompound) {
+  //           setNewData(targetCompound);
+  //           setOldData(targetCompound);
+  //           setOffers(
+  //             targetCompound.offers || [{ pers: "", year: "", offer: "" }]
+  //           );
+  //           found = true;
+  //         }
+  //       });
+  //       if (!found) {
+  //         console.warn("🚨 لم يتم العثور على الكمباوند المطلوب");
+  //       }
+  //     } catch (err) {
+  //       console.error("❌ خطأ أثناء تحميل بيانات الكمباوند:", err);
+  //     }
+  //   };
 
-    fetchCompoundData();
-  }, [editcompoundprojId]);
+  //   fetchCompoundData();
+  // }, [editcompoundprojId]);
 
   useEffect(() => {
     const fetchDevelopers = async () => {
@@ -129,7 +181,13 @@ function EditCompoundProject() {
     fetchDevelopers();
   }, []);
   const [offers, setOffers] = useState([{ pers: "", year: "", offer: "" }]);
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
 
   const handleDevChange = useCallback(
     (e) => {
@@ -138,6 +196,9 @@ function EditCompoundProject() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },
@@ -150,15 +211,18 @@ function EditCompoundProject() {
       [e.target.name]: e.target.value,
     }));
   }, []);
-  const onchange = useCallback((parentKey, lang) => (e) => {
-    setNewData((prev) => ({
-      ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [lang]: e.target.value
-      }
-    }));
-  }, []);
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setNewData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
   const handleFileChange = useCallback(async (event) => {
     if (event.target.files.length > 0) {
       // افرغ الصور القديمة
@@ -170,12 +234,16 @@ function EditCompoundProject() {
 
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(storage, "compound/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg(progress);
           setBtn(true);
         },
@@ -193,8 +261,6 @@ function EditCompoundProject() {
     }
   }, []);
 
-
-
   const handleMasterplanImgChange = useCallback(async (event) => {
     if (event.target.files.length > 0) {
       // افرغ الصور القديمة
@@ -206,12 +272,16 @@ function EditCompoundProject() {
 
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(storage, "compound/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg3(progress);
           setBtn(true);
         },
@@ -238,9 +308,9 @@ function EditCompoundProject() {
         ...prev,
         aminatis: exists
           ? prev.aminatis.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.aminatis, selectedItem],
       };
     });
@@ -255,9 +325,9 @@ function EditCompoundProject() {
         ...prev,
         type: exists
           ? prev.type.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.type, selectedItem],
       };
     });
@@ -283,7 +353,7 @@ function EditCompoundProject() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
     },
     [lang]
@@ -318,80 +388,143 @@ function EditCompoundProject() {
     ],
     []
   );
-  const checkBoxOptions2 = useMemo(() => [
-    { en: "Villa", ar: "فيلا" },
-    { en: "Retail", ar: "محل تجاري" },
-    { en: "Office", ar: "مكتب" },
-    { en: "Cabin", ar: "كوخ / كابينة" },
-    { en: "Clinic", ar: "عيادة" },
-    { en: "Townhouse", ar: "تاون هاوس" },
-    { en: "Chalet", ar: "شاليه" },
-    { en: "One storey Villa", ar: "فيلا دور واحد" },
-    { en: "Twin house", ar: "توين هاوس" },
-    { en: "Standalone", ar: "مستقل" },
-    { en: "Family house", ar: "بيت عائلي" },
-    { en: "Penthouse", ar: "بنتهاوس" },
-    { en: "Studio", ar: "استوديو" },
-    { en: "Duplex", ar: "دوبلكس" },
-    { en: "Apartment", ar: "شقة" }
-  ], []);
-  const onsubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
+  const checkBoxOptions2 = useMemo(
+    () => [
+      { en: "Villa", ar: "فيلا" },
+      { en: "Retail", ar: "محل تجاري" },
+      { en: "Office", ar: "مكتب" },
+      { en: "Cabin", ar: "كوخ / كابينة" },
+      { en: "Clinic", ar: "عيادة" },
+      { en: "Townhouse", ar: "تاون هاوس" },
+      { en: "Chalet", ar: "شاليه" },
+      { en: "One storey Villa", ar: "فيلا دور واحد" },
+      { en: "Twin house", ar: "توين هاوس" },
+      { en: "Standalone", ar: "مستقل" },
+      { en: "Family house", ar: "بيت عائلي" },
+      { en: "Penthouse", ar: "بنتهاوس" },
+      { en: "Studio", ar: "استوديو" },
+      { en: "Duplex", ar: "دوبلكس" },
+      { en: "Apartment", ar: "شقة" },
+    ],
+    []
+  );
+  // const onsubmit = useCallback(
+  //   async (e) => {
+  //     e.preventDefault();
 
-      // ✅ لو مفيش اي تغيير في الداتا مش نعمل حاجة
-      if (isEqual(newData, oldData)) {
-        toast.info("No changes detected", { autoClose: 2000 });
+  //     // ✅ لو مفيش اي تغيير في الداتا مش نعمل حاجة
+  //     if (isEqual(newData, oldData)) {
+  //       toast.info("No changes detected", { autoClose: 2000 });
+  //       return;
+  //     }
+
+  //     try {
+  //       setBtn(true);
+  //       const projectObject = {
+  //         ...newData,
+  //         offers,
+  //         id: newData.id,
+  //       };
+
+  //       // احنا محتاجين نجيب الـ developer document
+  //       const docRef = doc(db, "compound", newData.developer.id);
+  //       const docSnap = await getDoc(docRef);
+
+  //       if (docSnap.exists()) {
+  //         const data = docSnap.data();
+  //         const compounds = data.compounds || [];
+  //         // نعمل map ونستبدل الكمباوند بالـ id ده بالـ data الجديدة
+  //         const updatedCompounds = compounds.map((comp) =>
+  //           comp.id === newData.id ? projectObject : comp
+  //         );
+  //         await updateDoc(docRef, {
+  //           compounds: updatedCompounds,
+  //         });
+  //         toast.success("Data updated successfully!", { autoClose: 2000 });
+  //         nav(`/dashboard/editcompound/${editcompoundId}`);
+  //       } else {
+  //         console.error("⚠️ هذا المطور غير موجود");
+  //       }
+  //       setBtn(false);
+  //     } catch (err) {
+  //       console.error("❌ خطأ:", err);
+  //       setBtn(false);
+  //     }
+  //   },
+  //   [newData, oldData, offers, nav]
+  // );
+  const getChangedFields = (newObj, oldObj) => {
+    let changedFields = {};
+    for (let key in newObj) {
+      if (
+        typeof newObj[key] === "object" &&
+        newObj[key] !== null &&
+        !Array.isArray(newObj[key])
+      ) {
+        if (JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])) {
+          // في حالة object (زي dealName) ارسل كامل الـ object
+          changedFields[key] = newObj[key];
+        }
+      } else if (
+        JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])
+      ) {
+        changedFields[key] = newObj[key];
+      }
+    }
+    return changedFields;
+  };
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setBtn(true);
+    try {
+      if (!oldData) {
+        Swal.fire({
+          icon: "info",
+          title: "No Data",
+          text: "⚠️ البيانات الأصلية لم تحمل بعد",
+        });
+        // alert();
         return;
       }
-
-      try {
-        setBtn(true);
-
-        const projectObject = {
-          ...newData,
-          offers,
-          id: newData.id, // نحتفظ بنفس id مش نغيره
-        };
-
-        // احنا محتاجين نجيب الـ developer document
-        const docRef = doc(db, "compound", newData.developer.id);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const compounds = data.compounds || [];
-
-          // نعمل map ونستبدل الكمباوند بالـ id ده بالـ data الجديدة
-          const updatedCompounds = compounds.map(comp =>
-            comp.id === newData.id ? projectObject : comp
-          );
-
-          await updateDoc(docRef, {
-            compounds: updatedCompounds,
-          });
-
-          toast.success("Data updated successfully!", { autoClose: 2000 });
-          nav(`/dashboard/editcompound/${editcompoundId}`);
-        } else {
-          console.error("⚠️ هذا المطور غير موجود");
-        }
-
-        setBtn(false);
-      } catch (err) {
-        console.error("❌ خطأ:", err);
-        setBtn(false);
+      const changedFields = getChangedFields(newData, oldData);
+      if (Object.keys(changedFields).length === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "No changes",
+          text: "No changes were made to the data.",
+        });
+        // alert("⚠️ لا يوجد أي تعديل");
+        return;
       }
-    },
-    [newData, oldData, offers, nav]
-  );
-
-
+      const docRef = doc(db, "compound", editcompoundprojId);
+      await updateDoc(docRef, changedFields);
+      // console.log(changedFields)
+      setBtn(false);
+      toast.success("The modification has been made.", { autoClose: 2000 }); // عرض إشعار أنيق
+      nav("/dashboard/editcompound");
+    } catch (err) {
+      console.error(err);
+      setBtn(false);
+      Swal.fire({
+        icon: "error",
+        title: "error",
+        text: "Oops ! Can't Edit",
+      });
+      // alert("❌ فشل في التعديل");
+    } finally {
+      setBtn(false);
+    }
+  };
+  if (loading) {
+    return (
+      <>
+        <h2>loading</h2>
+      </>
+    );
+  }
   return (
-    <Box sx={{ minHeight: 'calc(100vh - 100px)', padding: '70px 0' }}>
-      <h2>
-        {lang === "ar" ? "تعديل الكومباوند" : "Edit Compound page"}
-      </h2>
+    <Box sx={{ minHeight: "calc(100vh - 100px)", padding: "70px 0" }}>
+      <h2>{lang === "ar" ? "تعديل الكومباوند" : "Edit Compound page"}</h2>
       <Container>
         <Card
           sx={{
@@ -405,7 +538,7 @@ function EditCompoundProject() {
         >
           <Box
             component="form"
-            onSubmit={onsubmit}
+            onSubmit={handleUpdate}
             style={{
               display: "flex",
               justifyContent: "center",
@@ -419,7 +552,7 @@ function EditCompoundProject() {
             <FormGro
               inputLabel={lang === "ar" ? "اختر المطور" : "Select Developer"}
               name="dev"
-              disabled
+              // disabled
               data={developers}
               value={newData.developer?.id || ""}
               fun={handleDevChange}
@@ -428,7 +561,9 @@ function EditCompoundProject() {
             <Input
               onChange={onchange("compoundName", "en")}
               id="Compound Name en"
-              label={lang === "ar" ? "اسم الكومباوند انجليزي" : "Compound Name en"}
+              label={
+                lang === "ar" ? "اسم الكومباوند انجليزي" : "Compound Name en"
+              }
               type="text"
               value={newData.compoundName.en}
             />
@@ -489,7 +624,12 @@ function EditCompoundProject() {
             {offers.map((offer, index) => (
               <Stack
                 key={index}
-                sx={{ gap: "10px", alignItems: "center", flexDirection: 'row', width: '100%' }}
+                sx={{
+                  gap: "10px",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  width: "100%",
+                }}
               >
                 <Input
                   onChange={handleOfferChange(index, "pers")}
@@ -536,7 +676,9 @@ function EditCompoundProject() {
             </IconButton>
             <Dialog open={open} onClose={() => setOpen(false)}>
               <DialogContent>
-                <Typography style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+                <Typography
+                  style={{ whiteSpace: "pre-wrap", fontSize: "0.9rem" }}
+                >
                   {`📝 إزاي تستخدم Markdown:
  # عنوان رئيسي
  ## عنوان فرعي
@@ -558,7 +700,11 @@ function EditCompoundProject() {
             <Input
               onChange={onchange("compoundDes", "en")}
               id="projectDes"
-              label={lang === "ar" ? "تفاصيل الكومباوند انجليزي" : "Compound Description en"}
+              label={
+                lang === "ar"
+                  ? "تفاصيل الكومباوند انجليزي"
+                  : "Compound Description en"
+              }
               type="text"
               value={newData.compoundDes.en}
               multiline
@@ -567,7 +713,11 @@ function EditCompoundProject() {
             <Input
               onChange={onchange("compoundDes", "ar")}
               id="projectDesar"
-              label={lang === "ar" ? "تفاصيل الكومباوند عربي" : "Compound Description ar"}
+              label={
+                lang === "ar"
+                  ? "تفاصيل الكومباوند عربي"
+                  : "Compound Description ar"
+              }
               type="text"
               value={newData.compoundDes.ar}
               multiline
@@ -576,7 +726,9 @@ function EditCompoundProject() {
             <FileUpload
               handleFileChange={handleMasterplanImgChange}
               prog={prog3}
-              title={lang === "ar" ? " صوره الماستر بلان" : "Master plan Images ..."}
+              title={
+                lang === "ar" ? " صوره الماستر بلان" : "Master plan Images ..."
+              }
             />
             <Input
               onChange={onchange("Location", "en")}
@@ -600,15 +752,17 @@ function EditCompoundProject() {
             >
               {btn ? (
                 <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+              ) : lang === "ar" ? (
+                "ارسال"
               ) : (
-                lang === "ar" ? "ارسال" : "Send"
+                "Send"
               )}
             </Button>
           </Box>
         </Card>
       </Container>
     </Box>
-  )
+  );
 }
 
 export default EditCompoundProject

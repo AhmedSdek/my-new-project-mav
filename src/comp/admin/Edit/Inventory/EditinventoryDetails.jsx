@@ -26,6 +26,9 @@ function EditinventoryDetails() {
   const [btn, setBtn] = useState(false);
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
     img: [],
@@ -57,6 +60,9 @@ function EditinventoryDetails() {
   });
   const [oldData, setOldData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
     img: [],
@@ -94,9 +100,21 @@ function EditinventoryDetails() {
   const [devLoading, setDevLoading] = useState(true);
   const [compoundNames, setCompoundNames] = useState([]);
   const [value, loadingData] = useDocument(doc(db, "inventory", inventoryId));
-  const nav = useNavigate()
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
-  const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
+  const nav = useNavigate();
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
+  const soldOutOptions = useMemo(
+    () => [
+      { en: "SOLD OUT", ar: "تم البيع" },
+      { en: "Not", ar: "متاح" },
+    ],
+    []
+  );
   const deliveryOptions = useMemo(
     () => [
       { en: "Delivered", ar: "تم التسليم" },
@@ -113,7 +131,13 @@ function EditinventoryDetails() {
     ],
     []
   );
-  const floorOptions = useMemo(() => [{ en: "Typical", ar: "متكرر " }, { en: "Ground", ar: "أرضي" }], []);
+  const floorOptions = useMemo(
+    () => [
+      { en: "Typical", ar: "متكرر " },
+      { en: "Ground", ar: "أرضي" },
+    ],
+    []
+  );
   const typeOptions = useMemo(
     () => [
       { en: "Apartment", ar: "شقة" },
@@ -148,13 +172,16 @@ function EditinventoryDetails() {
     ],
     []
   );
-  const bathroomOptions = useMemo(() => [
-    { en: "1", ar: "١" },
-    { en: "2", ar: "٢" },
-    { en: "3", ar: "٣" },
-    { en: "4", ar: "٤" },
-    { en: "5", ar: "٥" }
-  ], []);
+  const bathroomOptions = useMemo(
+    () => [
+      { en: "1", ar: "١" },
+      { en: "2", ar: "٢" },
+      { en: "3", ar: "٣" },
+      { en: "4", ar: "٤" },
+      { en: "5", ar: "٥" },
+    ],
+    []
+  );
   const finshOptions = useMemo(
     () => [
       { en: "Finished", ar: "تشطيب كامل" },
@@ -164,11 +191,14 @@ function EditinventoryDetails() {
     ],
     []
   );
-  const statusOptions = useMemo(() => [
-    { en: "Resale", ar: "إعادة بيع" },
-    { en: "Rent", ar: "إيجار" },
-    { en: "Primary", ar: "بيع أولي" },
-  ], []);
+  const statusOptions = useMemo(
+    () => [
+      { en: "Resale", ar: "إعادة بيع" },
+      { en: "Rent", ar: "إيجار" },
+      { en: "Primary", ar: "بيع أولي" },
+    ],
+    []
+  );
   const checkBoxOptions1 = useMemo(
     () => [
       { en: "Clubhouse", ar: "النادي الاجتماعي" },
@@ -199,6 +229,9 @@ function EditinventoryDetails() {
       // console.log(data)
       const fullData = {
         developer: {},
+        countryKey: "",
+        devId: "",
+        devIcon: "",
         Dis: { ar: "", en: "" },
         compoundName: { ar: "", en: "" },
         img: [],
@@ -227,7 +260,7 @@ function EditinventoryDetails() {
         delivery: { ar: "", en: "" },
         floor: { ar: "", en: "" },
         Type: { ar: "", en: "" },
-        ...data
+        ...data,
       };
       setNewData(fullData);
       setOldData(fullData); // 💪
@@ -241,11 +274,11 @@ function EditinventoryDetails() {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
         const allCompoundNames = [];
-        querySnapshot.forEach(doc => {
+        querySnapshot.forEach((doc) => {
           const data = doc.data();
           // console.log(data)
           if (Array.isArray(data.compounds)) {
-            data.compounds.forEach(item => {
+            data.compounds.forEach((item) => {
               if (item.compoundName) {
                 allCompoundNames.push(item.compoundName);
               }
@@ -277,15 +310,18 @@ function EditinventoryDetails() {
     };
     fetchDevelopers();
   }, []);
-  const onchange = useCallback((parentKey, lang) => (e) => {
-    setNewData((prev) => ({
-      ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [lang]: e.target.value
-      }
-    }));
-  }, []);
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setNewData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
   const handleCheckboxChange = useCallback((selectedItem) => {
     setNewData((prev) => {
       const exists = prev.aminatis.some(
@@ -295,9 +331,9 @@ function EditinventoryDetails() {
         ...prev,
         aminatis: exists
           ? prev.aminatis.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.aminatis, selectedItem],
       };
     });
@@ -329,13 +365,20 @@ function EditinventoryDetails() {
     }
 
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(storage, "inventory/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const storageRef = ref(
+        storage,
+        "inventory/" + event.target.files[i].name
+      );
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg(progress);
           setBtn(true);
         },
@@ -362,13 +405,20 @@ function EditinventoryDetails() {
     }
 
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(storage, "inventory/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const storageRef = ref(
+        storage,
+        "inventory/" + event.target.files[i].name
+      );
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg3(progress);
           setBtn(true);
         },
@@ -396,13 +446,20 @@ function EditinventoryDetails() {
       }
 
       for (let i = 0; i < event.target.files.length; i++) {
-        const storageRef = ref(storage, "inventory/" + event.target.files[i].name);
-        const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+        const storageRef = ref(
+          storage,
+          "inventory/" + event.target.files[i].name
+        );
+        const uploadTask = uploadBytesResumable(
+          storageRef,
+          event.target.files[i]
+        );
 
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProg2(progress);
             setBtn(true);
           },
@@ -428,6 +485,9 @@ function EditinventoryDetails() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

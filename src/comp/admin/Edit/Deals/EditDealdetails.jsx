@@ -39,6 +39,9 @@ function EditDealdetails() {
   const nav = useNavigate();
   const [oldData, setOldData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     dealName: { ar: "", en: "" },
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
@@ -71,6 +74,9 @@ function EditDealdetails() {
   // console.log(oldData)
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     dealName: { ar: "", en: "" },
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
@@ -106,6 +112,9 @@ function EditDealdetails() {
       const data = value.data();
       const fullData = {
         developer: {},
+        countryKey: "",
+        devId: "",
+        devIcon: "",
         dealName: { ar: "", en: "" },
         Dis: { ar: "", en: "" },
         compoundName: { ar: "", en: "" },
@@ -134,7 +143,7 @@ function EditDealdetails() {
         delivery: { ar: "", en: "" },
         floor: { ar: "", en: "" },
         Type: { ar: "", en: "" },
-        ...data
+        ...data,
       };
       setNewData(fullData);
       setOldData(fullData); // 💪
@@ -146,10 +155,10 @@ function EditDealdetails() {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
         const allCompoundNames = [];
-        querySnapshot.forEach(doc => {
+        querySnapshot.forEach((doc) => {
           const data = doc.data();
           if (Array.isArray(data.compounds)) {
-            data.compounds.forEach(item => {
+            data.compounds.forEach((item) => {
               if (item.compoundName) {
                 allCompoundNames.push(item.compoundName);
               }
@@ -181,7 +190,7 @@ function EditDealdetails() {
   }, []);
   const handleUpdate = async (e) => {
     e.preventDefault();
-    setBtn(true)
+    setBtn(true);
     try {
       if (!oldData) {
         Swal.fire({
@@ -205,31 +214,34 @@ function EditDealdetails() {
       const docRef = doc(db, "deals", editeDealdetailsId);
       await updateDoc(docRef, changedFields);
       // console.log(changedFields)
-      setBtn(false)
+      setBtn(false);
       toast.success("The modification has been made.", { autoClose: 2000 }); // عرض إشعار أنيق
       nav("/dashboard/editDeals");
     } catch (err) {
       console.error(err);
-      setBtn(false)
+      setBtn(false);
       Swal.fire({
-        icon: 'error',
+        icon: "error",
         title: "error",
-        text: "Oops ! Can't Edit"
-      })
+        text: "Oops ! Can't Edit",
+      });
       // alert("❌ فشل في التعديل");
     } finally {
-      setBtn(false)
+      setBtn(false);
     }
   };
-  const onchange = useCallback((parentKey, lang) => (e) => {
-    setNewData((prev) => ({
-      ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [lang]: e.target.value
-      }
-    }));
-  }, []);
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setNewData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
   const handleDynamicSelectChange = useCallback(
     (dataArray, fieldName) => (e) => {
       const selectedLabel = e.target.value;
@@ -238,7 +250,7 @@ function EditDealdetails() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
     },
     [lang]
@@ -252,9 +264,9 @@ function EditDealdetails() {
         ...prev,
         aminatis: exists
           ? prev.aminatis.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.aminatis, selectedItem],
       };
     });
@@ -269,6 +281,9 @@ function EditDealdetails() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

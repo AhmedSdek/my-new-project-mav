@@ -5,7 +5,7 @@ const GlobalContext = createContext();
 
 // 2. Provider
 export const GlobalProvider = ({ children }) => {
-  const [country, setCountry] = useState({ en: "UAE", ar: "الامارات" });
+  const [country, setCountry] = useState({ en: "egypt", ar: "مصر" });
 
   return (
     <GlobalContext.Provider value={{ country, setCountry }}>

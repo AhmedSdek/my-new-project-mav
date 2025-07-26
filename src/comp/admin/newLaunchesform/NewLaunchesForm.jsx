@@ -51,13 +51,22 @@ function NewLaunchesForm() {
       en: "",
     },
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     price: 0,
     monyType: { ar: "", en: "" },
   });
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
   const [devError, setDevError] = useState("");
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
   const handleDynamicSelectChange = useCallback(
     (dataArray, fieldName) => (e) => {
       const selectedLabel = e.target.value;
@@ -66,7 +75,7 @@ function NewLaunchesForm() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
     },
     [lang]
@@ -92,11 +101,14 @@ function NewLaunchesForm() {
   const handleDevChange = useCallback(
     (e) => {
       const selectedDev = developers.find((dev) => dev.id === e.target.value);
-      console.log(selectedDev)
+      console.log(selectedDev);
       if (selectedDev) {
         setNewData((prev) => ({
           ...prev,
-          developer: selectedDev
+          developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

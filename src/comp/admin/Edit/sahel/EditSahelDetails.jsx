@@ -32,6 +32,9 @@ function EditSahelDetails() {
   const nav = useNavigate();
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     compoundName: { ar: "", en: "" },
     img: [],
     Location: { ar: "", en: "" },
@@ -52,6 +55,9 @@ function EditSahelDetails() {
   });
   const [oldData, setOldData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     compoundName: { ar: "", en: "" },
     img: [],
     Location: { ar: "", en: "" },
@@ -257,6 +263,9 @@ function EditSahelDetails() {
       const data = value.data();
       const fullData = {
         developer: {},
+        countryKey: "",
+        devId: "",
+        devIcon: "",
         compoundName: { ar: "", en: "" },
         img: [],
         Location: { ar: "", en: "" },
@@ -336,6 +345,9 @@ function EditSahelDetails() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

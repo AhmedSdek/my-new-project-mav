@@ -28,6 +28,9 @@ function SahelForm() {
   const lang = i18n.language;
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     compoundName: { ar: "", en: "" },
     img: [],
     Location: { ar: "", en: "" },
@@ -286,6 +289,9 @@ function SahelForm() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

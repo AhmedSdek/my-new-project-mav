@@ -66,40 +66,53 @@ function CompoundsForm() {
 
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     compoundName: {
       ar: "",
-      en: ""
+      en: "",
     },
     compoundImgs: [],
     district: {
       ar: "",
-      en: ""
+      en: "",
     },
     price: 0,
     compoundDes: {
       ar: "",
-      en: ""
+      en: "",
     },
     masterplanImg: [],
     Location: {
       ar: "",
-      en: ""
+      en: "",
     },
     aminatis: [],
     type: [],
     monyType: { ar: "", en: "" },
-
   });
+  console.log(newData);
   const [offers, setOffers] = useState([{ pers: "", year: "", offer: "" }]);
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
 
   const handleDevChange = useCallback(
     (e) => {
       const selectedDev = developers.find((dev) => dev.id === e.target.value);
+      // console.log(selectedDev);
       if (selectedDev) {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },
@@ -113,15 +126,18 @@ function CompoundsForm() {
       [name]: type === "number" ? Number(value) : value,
     }));
   }, []);
-  const onchange = useCallback((parentKey, lang) => (e) => {
-    setNewData((prev) => ({
-      ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [lang]: e.target.value
-      }
-    }));
-  }, []);
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setNewData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
   const handleFileChange = useCallback(async (event) => {
     // أول ما تختار صور جديدة امسح الصور القديمة
     setNewData((prev) => ({
@@ -130,10 +146,7 @@ function CompoundsForm() {
     }));
 
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(
-        storage,
-        "compound/" + event.target.files[i].name
-      );
+      const storageRef = ref(storage, "compound/" + event.target.files[i].name);
       const uploadTask = uploadBytesResumable(
         storageRef,
         event.target.files[i]
@@ -159,7 +172,6 @@ function CompoundsForm() {
       );
     }
   }, []);
-
 
   const handleMasterplanImgChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
@@ -199,9 +211,9 @@ function CompoundsForm() {
         ...prev,
         aminatis: exists
           ? prev.aminatis.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.aminatis, selectedItem],
       };
     });
@@ -216,9 +228,9 @@ function CompoundsForm() {
         ...prev,
         type: exists
           ? prev.type.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.type, selectedItem],
       };
     });
@@ -244,7 +256,7 @@ function CompoundsForm() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
     },
     [lang]
@@ -279,23 +291,62 @@ function CompoundsForm() {
     ],
     []
   );
-  const checkBoxOptions2 = useMemo(() => [
-    { en: "Villa", ar: "فيلا" },
-    { en: "Retail", ar: "محل تجاري" },
-    { en: "Office", ar: "مكتب" },
-    { en: "Cabin", ar: "كوخ / كابينة" },
-    { en: "Clinic", ar: "عيادة" },
-    { en: "Townhouse", ar: "تاون هاوس" },
-    { en: "Chalet", ar: "شاليه" },
-    { en: "One storey Villa", ar: "فيلا دور واحد" },
-    { en: "Twin house", ar: "توين هاوس" },
-    { en: "Standalone", ar: "مستقل" },
-    { en: "Family house", ar: "بيت عائلي" },
-    { en: "Penthouse", ar: "بنتهاوس" },
-    { en: "Studio", ar: "استوديو" },
-    { en: "Duplex", ar: "دوبلكس" },
-    { en: "Apartment", ar: "شقة" }
-  ], []);
+  const checkBoxOptions2 = useMemo(
+    () => [
+      { en: "Villa", ar: "فيلا" },
+      { en: "Retail", ar: "محل تجاري" },
+      { en: "Office", ar: "مكتب" },
+      { en: "Cabin", ar: "كوخ / كابينة" },
+      { en: "Clinic", ar: "عيادة" },
+      { en: "Townhouse", ar: "تاون هاوس" },
+      { en: "Chalet", ar: "شاليه" },
+      { en: "One storey Villa", ar: "فيلا دور واحد" },
+      { en: "Twin house", ar: "توين هاوس" },
+      { en: "Standalone", ar: "مستقل" },
+      { en: "Family house", ar: "بيت عائلي" },
+      { en: "Penthouse", ar: "بنتهاوس" },
+      { en: "Studio", ar: "استوديو" },
+      { en: "Duplex", ar: "دوبلكس" },
+      { en: "Apartment", ar: "شقة" },
+    ],
+    []
+  );
+  // const onsubmit = useCallback(
+  //   async (e) => {
+  //     e.preventDefault();
+  //     const id = new Date().getTime();
+  //     const projectObject = {
+  //       ...newData,
+  //       offers,
+  //       id: id.toString(),
+  //     };
+  //     try {
+  //       setBtn(true);
+  //       const docRef = doc(db, "compound", newData.developer.id);
+  //       const docSnap = await getDoc(docRef);
+  //       if (!docSnap.exists()) {
+  //         await setDoc(docRef, {
+  //           ...newData.developer,
+  //           compounds: [projectObject],
+  //         });
+  //       } else {
+  //         await updateDoc(docRef, {
+  //           compounds: arrayUnion(projectObject), // ✅ nested update
+  //         });
+  //       }
+  //       toast.success("The data has been sent..", { autoClose: 2000 });
+  //       nav("/dashboard");
+  //       setBtn(false);
+  //     } catch (err) {
+  //       console.error("❌ خطأ:", err);
+  //       setBtn(false);
+  //     } finally {
+  //       setBtn(false);
+  //     }
+  //   },
+  //   [newData, offers, nav]
+  // );
+
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -307,18 +358,10 @@ function CompoundsForm() {
       };
       try {
         setBtn(true);
-        const docRef = doc(db, "compound", newData.developer.id);
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) {
-          await setDoc(docRef, {
-            ...newData.developer,
-            compounds: [projectObject],
-          });
-        } else {
-          await updateDoc(docRef, {
-            compounds: arrayUnion(projectObject), // ✅ nested update
-          });
-        }
+        const docRef = doc(db, "compound", newData.devId);
+        await setDoc(docRef, {
+          ...newData,
+        });
         toast.success("The data has been sent..", { autoClose: 2000 });
         nav("/dashboard");
         setBtn(false);
@@ -331,8 +374,6 @@ function CompoundsForm() {
     },
     [newData, offers, nav]
   );
-
-
   if (devLoading) {
     return (
       <div

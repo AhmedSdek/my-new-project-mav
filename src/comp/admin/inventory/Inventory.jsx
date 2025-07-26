@@ -68,6 +68,9 @@ function Inventory() {
 
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
     img: [],
@@ -97,15 +100,18 @@ function Inventory() {
     floor: { ar: "", en: "" },
     Type: { ar: "", en: "" },
   });
-  const onchange = useCallback((parentKey, lang) => (e) => {
-    setNewData((prev) => ({
-      ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [lang]: e.target.value
-      }
-    }));
-  }, []);
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setNewData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
   const handleCheckboxChange = useCallback((selectedItem) => {
     setNewData((prev) => {
       const exists = prev.aminatis.some(
@@ -115,9 +121,9 @@ function Inventory() {
         ...prev,
         aminatis: exists
           ? prev.aminatis.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.aminatis, selectedItem],
       };
     });
@@ -149,13 +155,20 @@ function Inventory() {
     }
 
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(storage, "inventory/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const storageRef = ref(
+        storage,
+        "inventory/" + event.target.files[i].name
+      );
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg(progress);
           setBtn(true);
         },
@@ -182,13 +195,20 @@ function Inventory() {
     }
 
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(storage, "inventory/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const storageRef = ref(
+        storage,
+        "inventory/" + event.target.files[i].name
+      );
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg3(progress);
           setBtn(true);
         },
@@ -216,13 +236,20 @@ function Inventory() {
       }
 
       for (let i = 0; i < event.target.files.length; i++) {
-        const storageRef = ref(storage, "inventory/" + event.target.files[i].name);
-        const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+        const storageRef = ref(
+          storage,
+          "inventory/" + event.target.files[i].name
+        );
+        const uploadTask = uploadBytesResumable(
+          storageRef,
+          event.target.files[i]
+        );
 
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProg2(progress);
             setBtn(true);
           },
@@ -274,8 +301,20 @@ function Inventory() {
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
 
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
-  const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
+  const soldOutOptions = useMemo(
+    () => [
+      { en: "SOLD OUT", ar: "تم البيع" },
+      { en: "Not", ar: "متاح" },
+    ],
+    []
+  );
   const deliveryOptions = useMemo(
     () => [
       { en: "Delivered", ar: "تم التسليم" },
@@ -292,7 +331,13 @@ function Inventory() {
     ],
     []
   );
-  const floorOptions = useMemo(() => [{ en: "Typical", ar: "متكرر " }, { en: "Ground", ar: "أرضي" }], []);
+  const floorOptions = useMemo(
+    () => [
+      { en: "Typical", ar: "متكرر " },
+      { en: "Ground", ar: "أرضي" },
+    ],
+    []
+  );
   const typeOptions = useMemo(
     () => [
       { en: "Apartment", ar: "شقة" },
@@ -327,13 +372,16 @@ function Inventory() {
     ],
     []
   );
-  const bathroomOptions = useMemo(() => [
-    { en: "1", ar: "١" },
-    { en: "2", ar: "٢" },
-    { en: "3", ar: "٣" },
-    { en: "4", ar: "٤" },
-    { en: "5", ar: "٥" }
-  ], []);
+  const bathroomOptions = useMemo(
+    () => [
+      { en: "1", ar: "١" },
+      { en: "2", ar: "٢" },
+      { en: "3", ar: "٣" },
+      { en: "4", ar: "٤" },
+      { en: "5", ar: "٥" },
+    ],
+    []
+  );
   const finshOptions = useMemo(
     () => [
       { en: "Finished", ar: "تشطيب كامل" },
@@ -343,11 +391,14 @@ function Inventory() {
     ],
     []
   );
-  const statusOptions = useMemo(() => [
-    { en: "Resale", ar: "إعادة بيع" },
-    { en: "Rent", ar: "إيجار" },
-    { en: "Primary", ar: "بيع أولي" },
-  ], []);
+  const statusOptions = useMemo(
+    () => [
+      { en: "Resale", ar: "إعادة بيع" },
+      { en: "Rent", ar: "إيجار" },
+      { en: "Primary", ar: "بيع أولي" },
+    ],
+    []
+  );
   const checkBoxOptions1 = useMemo(
     () => [
       { en: "Clubhouse", ar: "النادي الاجتماعي" },
@@ -379,6 +430,9 @@ function Inventory() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },

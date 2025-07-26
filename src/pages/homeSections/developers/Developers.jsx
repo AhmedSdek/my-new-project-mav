@@ -10,7 +10,7 @@ import "./slider.css";
 // import required modules
 import { useCollection } from "react-firebase-hooks/firestore";
 import { Link } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import { Container, Stack, Typography } from "@mui/material";
 import { useGlobal } from "../../../context/GlobalContext";
@@ -28,28 +28,49 @@ export default function Developers() {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "developer"));
-        // console.log(snapshot.docs);
-        const filteredDevs = snapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-          .filter(
-            (dev) =>
-              dev?.country?.en?.toLowerCase() === country.en ||
-              dev?.country?.ar === country.ar
-          );
-        setDevelopers(filteredDevs);
+        const q = query(
+          collection(db, "developer"),
+          where("country.en", "==", country.en)
+        );
+        const snapshot = await getDocs(q);
+        const developersData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDevelopers(developersData);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchDevelopers();
   }, [country]);
+  // useEffect(() => {
+  //   const fetchDevelopers = async () => {
+  //     try {
+  //       const snapshot = await getDocs(collection(db, "developer"));
+  //       // console.log(snapshot.docs);
+  //       const filteredDevs = snapshot.docs
+  //         .map((doc) => ({
+  //           id: doc.id,
+  //           ...doc.data(),
+  //         }))
+  //         .filter(
+  //           (dev) =>
+  //             dev?.country?.en?.toLowerCase() === country.en ||
+  //             dev?.country?.ar === country.ar
+  //         );
+  //       setDevelopers(filteredDevs);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchDevelopers();
+  // }, [country]);
   if (error) return <p>حدث خطأ: {error}</p>;
   return (
     <section className="slider-section">

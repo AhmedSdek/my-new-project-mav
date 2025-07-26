@@ -131,13 +131,13 @@ function App() {
                 <Route path="compound" element={<CompoundsForm />} />
                 <Route path="editcompound" element={<EditCompound />} />
                 <Route
-                  path="editcompound/:editcompoundId"
-                  element={<EditCompoundDetails />}
-                />
-                <Route
-                  path="editcompound/:editcompoundId/:editcompoundprojId"
+                  path="editcompound/:editcompoundprojId"
                   element={<EditCompoundProject />}
                 />
+                {/* <Route
+                  path="editcompound/:editcompoundId/:editcompoundprojId"
+                  element={<EditCompoundProject />}
+                /> */}
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="editinventory" element={<EditInventory />} />
                 <Route

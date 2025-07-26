@@ -72,7 +72,7 @@ function EditCompound() {
   }
   return (
     <Box sx={{ minHeight: "calc(100vh - 100px)", padding: "70px 0" }}>
-      <h2>{lang === "ar" ? "كل الدفيلوبر" : "All Developer page"}</h2>
+      <h2>{lang === "ar" ? "كل الكومبوننت" : "All Comp page"}</h2>
       <Container>
         {compound.length > 0 ? (
           <Stack
@@ -98,12 +98,15 @@ function EditCompound() {
                   }}
                 >
                   <CardMedia>
-                    <img src={product.img} alt={product.devName[lang]} />
+                    <img
+                      src={product.img}
+                      alt={product.developer.devName[lang]}
+                    />
                   </CardMedia>
                   <Stack sx={{ p: "10px" }}>
-                    <Typography>{`${product.devName[lang]}`}</Typography>
+                    <Typography>{`${product.developer.devName[lang]}`}</Typography>
                     <Typography variant="caption">
-                      {`${product.country[lang]}`}
+                      {`${product.developer.country[lang]}`}
                     </Typography>
                   </Stack>
                   <Stack

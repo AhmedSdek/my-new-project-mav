@@ -42,8 +42,8 @@ function Editdevdetails() {
   const nav = useNavigate();
   const CountryOptions = useMemo(
     () => [
-      { ar: "مصر", en: "Egypt" },
-      { ar: "الامارات", en: "UAE" },
+      { ar: "مصر", en: "egypt" },
+      { ar: "الامارات", en: "uae" },
     ],
     []
   );

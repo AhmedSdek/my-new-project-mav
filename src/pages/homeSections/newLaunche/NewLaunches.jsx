@@ -1,5 +1,5 @@
 import { Container, Stack, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -9,6 +9,7 @@ import "swiper/css/free-mode";
 import "swiper/css/pagination";
 
 import "./styles.css";
+import ReactLoading from "react-loading";
 
 // import required modules
 import { FreeMode, Pagination, Autoplay } from "swiper/modules";
@@ -17,10 +18,36 @@ import { collection } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import MavLoading from "../../../comp/Loading/MavLoading";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { useGlobal } from "../../../context/GlobalContext";
 function NewLaunches() {
-  const [value, loading, error] = useCollection(collection(db, "newlaunch"));
   const { i18n } = useTranslation();
   const lang = i18n.language;
+  const [newlaunch, setNewlaunch] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { country } = useGlobal();
+  useEffect(() => {
+    const fetchNewlaunch = async () => {
+      try {
+        const q = query(
+          collection(db, "newlaunch"),
+          where("country.en", "==", country.en)
+        );
+        const snapshot = await getDocs(q);
+        const newlaunchData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setNewlaunch(newlaunchData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNewlaunch();
+  }, [country]);
   return (
     <section style={{ margin: "25px 0" }}>
       <Container>
@@ -40,7 +67,16 @@ function NewLaunches() {
             </Typography>
           </Link>
         </Stack>
-        {value && (
+        {loading ? (
+          <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
+            <ReactLoading
+              color="black"
+              type={"spin"}
+              height={"50px"}
+              width={"50px"}
+            />
+          </Stack>
+        ) : newlaunch && newlaunch.length > 0 ? (
           <Stack>
             <Swiper
               spaceBetween={10}
@@ -67,16 +103,16 @@ function NewLaunches() {
               modules={[FreeMode, Pagination, Autoplay]}
               className="myLaunchSwiper"
             >
-              {value.docs.map((item) => {
+              {newlaunch.map((item) => {
                 return (
                   <div key={item}>
-                    {item.data().img.map((img) => {
+                    {newlaunch.img.map((img) => {
                       return (
                         <SwiperSlide key={img} style={{ height: "100%" }}>
                           <Link
-                            aria-label={item.data().launchName}
+                            aria-label={newlaunch.launchName}
                             style={{ width: "393px", height: "225px" }}
-                            to={`/newlaunches/${item.data().id}`}
+                            to={`/newlaunches/${newlaunch.id}`}
                           >
                             <picture>
                               <img
@@ -95,10 +131,15 @@ function NewLaunches() {
               })}
             </Swiper>
           </Stack>
-        )}
-        {loading && (
-          <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
-            <MavLoading />
+        ) : (
+          <Stack
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "150px",
+            }}
+          >
+            <Typography>No Data in {country[lang]}</Typography>
           </Stack>
         )}
       </Container>

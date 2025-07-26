@@ -31,6 +31,9 @@ function ReSale() {
   // const [messege, setMessege] = React.useState(false);
   const [newData, setNewData] = useState({
     developer: {},
+    countryKey: "",
+    devId: "",
+    devIcon: "",
     dealName: { ar: "", en: "" },
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
@@ -72,10 +75,7 @@ function ReSale() {
   const [prog3, setProg3] = useState(0);
   const handleFileChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(
-        storage,
-        "deals/" + event.target.files[i].name
-      );
+      const storageRef = ref(storage, "deals/" + event.target.files[i].name);
       const uploadTask = uploadBytesResumable(
         storageRef,
         event.target.files[i]
@@ -136,10 +136,7 @@ function ReSale() {
   }, []);
   const handleMasterplanImgChange = useCallback(async (event) => {
     for (let i = 0; i < event.target.files.length; i++) {
-      const storageRef = ref(
-        storage,
-        "deals/" + event.target.files[i].name
-      );
+      const storageRef = ref(storage, "deals/" + event.target.files[i].name);
       const uploadTask = uploadBytesResumable(
         storageRef,
         event.target.files[i]
@@ -201,10 +198,7 @@ function ReSale() {
   const handleFiletowChange = useCallback(
     async (event) => {
       for (let i = 0; i < event.target.files.length; i++) {
-        const storageRef = ref(
-          storage,
-          "deals/" + event.target.files[i].name
-        );
+        const storageRef = ref(storage, "deals/" + event.target.files[i].name);
         const uploadTask = uploadBytesResumable(
           storageRef,
           event.target.files[i]
@@ -248,10 +242,10 @@ function ReSale() {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
         const allCompoundNames = [];
-        querySnapshot.forEach(doc => {
+        querySnapshot.forEach((doc) => {
           const data = doc.data();
           if (Array.isArray(data.compounds)) {
-            data.compounds.forEach(item => {
+            data.compounds.forEach((item) => {
               if (item.compoundName) {
                 allCompoundNames.push(item.compoundName);
               }
@@ -292,6 +286,9 @@ function ReSale() {
         setNewData((prev) => ({
           ...prev,
           developer: selectedDev,
+          countryKey: selectedDev.country.en,
+          devId: selectedDev.id,
+          devIcon: selectedDev.img,
         }));
       }
     },
