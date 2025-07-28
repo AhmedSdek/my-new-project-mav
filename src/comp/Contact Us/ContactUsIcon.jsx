@@ -4,7 +4,7 @@ import React from 'react'
 import { useTranslation } from "react-i18next";
 
 function ContactUsIcon({ sectionName = "", sectionData = "" }) {
-  console.log(sectionData);
+  // console.log(sectionData);
   const { i18n } = useTranslation();
   const lang = i18n.language;
   return (

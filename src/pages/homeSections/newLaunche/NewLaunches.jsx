@@ -10,11 +10,9 @@ import "swiper/css/pagination";
 
 import "./styles.css";
 import ReactLoading from "react-loading";
-
 // import required modules
 import { FreeMode, Pagination, Autoplay } from "swiper/modules";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { collection } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import MavLoading from "../../../comp/Loading/MavLoading";
 import { useTranslation } from "react-i18next";
@@ -24,6 +22,7 @@ function NewLaunches() {
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const [newlaunch, setNewlaunch] = useState([]);
+  // console.log(newlaunch);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { country } = useGlobal();
@@ -32,7 +31,7 @@ function NewLaunches() {
       try {
         const q = query(
           collection(db, "newlaunch"),
-          where("country.en", "==", country.en)
+          where("countryKey", "==", country.en)
         );
         const snapshot = await getDocs(q);
         const newlaunchData = snapshot.docs.map((doc) => ({
@@ -103,29 +102,26 @@ function NewLaunches() {
               modules={[FreeMode, Pagination, Autoplay]}
               className="myLaunchSwiper"
             >
-              {newlaunch.map((item) => {
+              {newlaunch.map((item, index) => {
+                console.log(item);
                 return (
                   <div key={item}>
-                    {newlaunch.img.map((img) => {
-                      return (
-                        <SwiperSlide key={img} style={{ height: "100%" }}>
-                          <Link
-                            aria-label={newlaunch.launchName}
-                            style={{ width: "393px", height: "225px" }}
-                            to={`/newlaunches/${newlaunch.id}`}
-                          >
-                            <picture>
-                              <img
-                                style={{ borderRadius: "8px" }}
-                                src={img}
-                                sizes="(min-width: 600px) 50vw, 100vw"
-                                alt="Flowers"
-                              />
-                            </picture>
-                          </Link>
-                        </SwiperSlide>
-                      );
-                    })}
+                    <SwiperSlide key={index} style={{ height: "100%" }}>
+                      <Link
+                        aria-label={item.launchName[lang]}
+                        style={{ width: "393px", height: "225px" }}
+                        to={`/newlaunches/${item.id}`}
+                      >
+                        <picture>
+                          <img
+                            style={{ borderRadius: "8px" }}
+                            src={item.img[0]}
+                            sizes="(min-width: 600px) 50vw, 100vw"
+                            alt={item.launchName[lang]}
+                          />
+                        </picture>
+                      </Link>
+                    </SwiperSlide>
                   </div>
                 );
               })}

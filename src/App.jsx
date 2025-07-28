@@ -58,6 +58,7 @@ import AboutUs from "./pages/about page/AboutUs";
 import ContactUs from "./pages/Contact Page/ContactUs";
 import Sell from "./pages/sell-rent Page/Sell";
 import FavoriteList from "./pages/FavList page/FavoriteList";
+import ScrollToTop from "./comp/ScrollToTop";
 function App() {
   const { i18n } = useTranslation();
   const { country, setCountry } = useGlobal();
@@ -123,6 +124,7 @@ function App() {
           <>
             <Navs />
             <ToastContainer />
+            <ScrollToTop />
             <Routes>
               <Route path="dashboard" element={<Dashboard />}>
                 <Route index element={<SaleData />} />

@@ -8,7 +8,6 @@ import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import "./slider.css";
 // import required modules
-import { useCollection } from "react-firebase-hooks/firestore";
 import { Link } from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase/config";
@@ -46,31 +45,6 @@ export default function Developers() {
     };
     fetchDevelopers();
   }, [country]);
-  // useEffect(() => {
-  //   const fetchDevelopers = async () => {
-  //     try {
-  //       const snapshot = await getDocs(collection(db, "developer"));
-  //       // console.log(snapshot.docs);
-  //       const filteredDevs = snapshot.docs
-  //         .map((doc) => ({
-  //           id: doc.id,
-  //           ...doc.data(),
-  //         }))
-  //         .filter(
-  //           (dev) =>
-  //             dev?.country?.en?.toLowerCase() === country.en ||
-  //             dev?.country?.ar === country.ar
-  //         );
-  //       setDevelopers(filteredDevs);
-  //     } catch (err) {
-  //       setError(err.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchDevelopers();
-  // }, [country]);
   if (error) return <p>حدث خطأ: {error}</p>;
   return (
     <section className="slider-section">
