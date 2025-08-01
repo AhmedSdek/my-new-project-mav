@@ -103,7 +103,27 @@ function ProjectDe() {
     };
     fetchCompound();
   }, [projId]);
-
+  useEffect(() => {
+    const fetchRelatedProjects = async () => {
+      try {
+        const q = query(
+          collection(db, "inventory"),
+          where("countryKey", "==", country.en)
+        );
+        const snapshot = await getDocs(q);
+        const RelatedProjectsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        fetchRelatedProjects(RelatedProjectsData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRelatedProjects();
+  }, [country]);
   if (loading) {
     return (
       <div

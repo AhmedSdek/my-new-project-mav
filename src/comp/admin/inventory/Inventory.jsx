@@ -37,25 +37,26 @@ function Inventory() {
   const [developers, setDevelopers] = useState([]);
   const [devLoading, setDevLoading] = useState(true);
   const [compoundNames, setCompoundNames] = useState([]);
+  console.log(compoundNames);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchCompounds = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
-        const allCompoundNames = [];
-        querySnapshot.forEach(doc => {
+        const allCompounds = [];
+
+        querySnapshot.forEach((doc) => {
           const data = doc.data();
-          // console.log(data)
-          if (Array.isArray(data.compounds)) {
-            data.compounds.forEach(item => {
-              if (item.compoundName) {
-                allCompoundNames.push(item.compoundName);
-              }
+          if (data?.compoundName?.en || data?.compoundName?.ar) {
+            allCompounds.push({
+              id: doc.id,
+              en: data.compoundName.en,
+              ar: data.compoundName.ar,
             });
           }
         });
-        setCompoundNames(allCompoundNames);
+
+        setCompoundNames(allCompounds);
       } catch (error) {
         console.error("Error fetching compounds:", error);
       } finally {
@@ -73,6 +74,7 @@ function Inventory() {
     devIcon: "",
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
+    compoundId: "",
     img: [],
     Masterimg: [],
     Layoutimg: [],
@@ -295,8 +297,8 @@ function Inventory() {
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      // console.log(newData);
-      await sendData(newData);
+      console.log(newData);
+      // await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
@@ -446,8 +448,28 @@ function Inventory() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
+    },
+    [lang]
+  );
+  const handleDynamicSelectcompond = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => item[lang] === selectedLabel
+      );
+
+      if (selectedObject) {
+        setNewData((prev) => ({
+          ...prev,
+          compoundId: selectedObject.id,
+          [fieldName]: {
+            en: selectedObject.en,
+            ar: selectedObject.ar,
+          },
+        }));
+      }
     },
     [lang]
   );
@@ -456,12 +478,14 @@ function Inventory() {
   return (
     <Box className="w-full flex flex-col justify-center align-items-center pt-16">
       <Stack className="align-items-center mb-2.5">
-        <Typography variant="h5">{lang === "ar" ? "الوحدات المتاحة" : "inventory"}</Typography>
+        <Typography variant="h5">
+          {lang === "ar" ? "الوحدات المتاحة" : "inventory"}
+        </Typography>
       </Stack>
       <Card
         onSubmit={onsubmit}
         component="form"
-        sx={{ gap: '10px' }}
+        sx={{ gap: "10px" }}
         className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
       >
         <FormGro
@@ -522,10 +546,15 @@ function Inventory() {
           name="compoundName"
           data={compoundNames}
           value={newData.compoundName[lang] || ""}
-          fun={handleDynamicSelectChange(compoundNames, "compoundName")}
+          fun={handleDynamicSelectcompond(compoundNames, "compoundName")}
           lang={lang}
         />
-        <FileUpload multiple handleFileChange={handleFileChange} prog={prog} title='imges' />
+        <FileUpload
+          multiple
+          handleFileChange={handleFileChange}
+          prog={prog}
+          title="imges"
+        />
         <Input
           onChange={onchange("imgtext", "en")}
           type="text"
@@ -538,9 +567,13 @@ function Inventory() {
           type="text"
           id="imgtextar"
           label={lang === "ar" ? "تفاصيل الصوره عربي" : "img text ar"}
-          value={newData.imgtext.ar} 
+          value={newData.imgtext.ar}
         />
-        <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title='Master img' />
+        <FileUpload
+          handleFileChange={handleMasterplanImgChange}
+          prog={prog3}
+          title="Master img"
+        />
         <FormGro
           inputLabel={lang === "ar" ? "نوع العمله" : "Money Type"}
           name="monyType"
@@ -552,7 +585,7 @@ function Inventory() {
         <Input
           onChange={onchangesimple}
           id="Price"
-          name='price'
+          name="price"
           label={lang === "ar" ? "السعر" : "Price"}
           type="number"
           value={newData.price} // نخزن ونعرض الـ id
@@ -710,7 +743,11 @@ function Inventory() {
           fun={handleDynamicSelectChange(finshOptions, "Finsh")}
           inputLabel={lang === "ar" ? "الحاله" : "status"}
         />
-        <FileUpload handleFileChange={handleFiletowChange} prog={prog2} title="Layout img" />
+        <FileUpload
+          handleFileChange={handleFiletowChange}
+          prog={prog2}
+          title="Layout img"
+        />
         <FormGro
           name="Sale"
           lang={lang}
@@ -735,8 +772,10 @@ function Inventory() {
         >
           {btn ? (
             <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+          ) : lang === "ar" ? (
+            "ارسال"
           ) : (
-              lang === "ar" ? "ارسال" : "Send" 
+            "Send"
           )}
         </Button>
       </Card>
