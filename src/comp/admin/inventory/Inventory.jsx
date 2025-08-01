@@ -297,8 +297,8 @@ function Inventory() {
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      console.log(newData);
-      // await sendData(newData);
+      // console.log(newData);
+      await sendData(newData);
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
