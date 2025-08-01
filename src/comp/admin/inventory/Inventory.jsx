@@ -294,6 +294,7 @@ function Inventory() {
       [name]: type === "number" ? Number(value) : value,
     }));
   }, []);
+
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();

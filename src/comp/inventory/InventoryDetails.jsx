@@ -45,48 +45,35 @@ import {
   faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
+import { useGlobal } from "../../context/GlobalContext";
 
 function InventoryDetails() {
   const [open, setOpen] = useState(false);
   const [openlay, setOpenLay] = useState(false);
-  const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  console.log(project);
+  const [error, setError] = useState(null);
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const { country } = useGlobal();
+  const [inventory, setInventory] = useState({});
+  console.log(inventory);
   let { compId } = useParams();
   console.log(compId);
-  const getProjectById = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      // المحاولة الأولى: من inventory
-      let docRef = doc(db, "inventory", compId);
-      let docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        setProject({ id: docSnap.id, ...docSnap.data(), source: "inventory" });
-      } else {
-        // المحاولة الثانية: من Resell
-        docRef = doc(db, "Resell", compId);
-        docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setProject({ id: docSnap.id, ...docSnap.data(), source: "Resell" });
-        } else {
-          setError("⚠️ لا يوجد مشروع بهذا الرقم التعريفي.");
-        }
-      }
-    } catch (err) {
-      console.error("حدث خطأ أثناء جلب المشروع:", err);
-      setError("❌ فشل تحميل بيانات المشروع.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    getProjectById();
+    const fetchInventory = async () => {
+      try {
+        const docRef = doc(db, "inventory", compId);
+        const docSnap = await getDoc(docRef);
+        // console.log(docSnap);
+        setInventory({ id: docSnap.id, ...docSnap.data() });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInventory();
   }, [compId]);
   const [imgsrc, setImgsrc] = useState("");
   const [imgopen, setImgopen] = useState(false);
@@ -159,7 +146,14 @@ function InventoryDetails() {
     );
   }
   return (
-    <Box sx={{ marginTop: "40px", padding: "15px 0", position: "relative" }}>
+    <Box
+      sx={{
+        marginTop: "40px",
+        padding: "15px 0",
+        position: "relative",
+        minHeight: "calc(100vh - 100px)",
+      }}
+    >
       <Container>
         <Stack sx={{ flexDirection: "row", gap: "10px" }}>
           <Swiper
@@ -204,7 +198,7 @@ function InventoryDetails() {
             modules={[FreeMode, Pagination, Navigation, Autoplay]}
             className="mySwiper2"
           >
-            {project.img.map((el, index) => {
+            {inventory.img.map((el, index) => {
               return (
                 <SwiperSlide key={index}>
                   <img
@@ -214,7 +208,7 @@ function InventoryDetails() {
                     }}
                     style={{ cursor: "pointer" }}
                     src={el}
-                    alt=""
+                    alt={inventory.compoundName[lang]}
                   />
                 </SwiperSlide>
               );
@@ -243,7 +237,7 @@ function InventoryDetails() {
                     boxShadow: "0 -1px 15px -3px rgba(0, 0, 0, 0.2)",
                     borderRadius: "50%",
                   }}
-                  src={project.icon}
+                  src={inventory.icon}
                   alt=""
                 />
               </Stack>
@@ -277,21 +271,8 @@ function InventoryDetails() {
                         textAlign: "center",
                       }}
                     >
-                      {`${project.Type} ${project.compoundName}`}
+                      {`${inventory.Type[lang]} in ${inventory.compoundName[lang]}`}
                     </Typography>
-                    {/* <Typography
-                      variant="caption"
-                      sx={{
-                        lineHeight: "1",
-                        textAlign: {
-                          xs: "center",
-                          sm: "center",
-                          md: "initial",
-                        },
-                      }}
-                    >
-                      {` ${project.Location}`}
-                    </Typography> */}
                   </Stack>
                   <Box
                     sx={{
@@ -304,7 +285,7 @@ function InventoryDetails() {
                     }}
                   >
                     <p style={{ fontWeight: "bold", padding: "8px" }}>
-                      {`${project.Sale}`}
+                      {`${inventory.Sale[lang]}`}
                     </p>
                   </Box>
                 </Stack>
@@ -323,11 +304,17 @@ function InventoryDetails() {
                       color: "black",
                     }}
                   >
-                    {`${Intl.NumberFormat("en-US").format(project.price)} ${
-                      project.monyType === "dollar" ? "$" : "EGP"
+                    {`${Intl.NumberFormat("en-US").format(inventory.price)} ${
+                      inventory.monyType.en === "dollar"
+                        ? lang === "ar"
+                          ? "دولار"
+                          : "$"
+                        : lang === "ar"
+                        ? "جم"
+                        : "EGP"
                     }`}
 
-                    {project.status === "Rent" && (
+                    {inventory.status === "Rent" && (
                       <Typography
                         variant="caption"
                         sx={{ lineHeight: "1", color: "#1E4164" }}
@@ -338,7 +325,7 @@ function InventoryDetails() {
                   </Typography>
                   <ContactUsBtn
                     sectionName="Maverick-Deals"
-                    sectionData={project}
+                    sectionData={inventory}
                   />
                 </Stack>
               </Stack>
@@ -368,7 +355,7 @@ function InventoryDetails() {
                         Reference N0.
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.refNum}
+                        {inventory.refNum}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -377,7 +364,7 @@ function InventoryDetails() {
                         Compound
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.compoundName}
+                        {inventory.compoundName[lang]}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -386,69 +373,47 @@ function InventoryDetails() {
                         Developer
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        <Link to={`/developers/${project.devname}`}>
-                          {project.devname}
+                        <Link to={`/developers/${inventory.devId}`}>
+                          {inventory.developer.devName[lang]}
                           <ArrowCircleRight sx={{ fontSize: "18px" }} />
                         </Link>
                       </StyledTableCell>
                     </StyledTableRow>
 
-                    {project.floor && (
+                    {inventory.floor && (
                       <StyledTableRow>
                         <StyledTableCell component="th" scope="row">
                           Floor
                         </StyledTableCell>
                         <StyledTableCell align="left">
-                          {project.floor}
+                          {inventory.floor[lang]}
                         </StyledTableCell>
                       </StyledTableRow>
                     )}
-
-                    {project.landArea && (
-                      <StyledTableRow>
-                        <StyledTableCell component="th" scope="row">
-                          Land Area
-                        </StyledTableCell>
-                        <StyledTableCell align="left">
-                          {project.landArea} m²
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    )}
+                    {inventory.landArea != null &&
+                      inventory.landArea !== "" && (
+                        <StyledTableRow>
+                          <StyledTableCell component="th" scope="row">
+                            Land Area
+                          </StyledTableCell>
+                          <StyledTableCell align="left">
+                            {inventory.landArea} m²
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      )}
 
                     <StyledTableRow>
                       <StyledTableCell component="th" scope="row">
                         Area
                       </StyledTableCell>
-                      <StyledTableCell align="left">{`${project.Area} m²`}</StyledTableCell>
+                      <StyledTableCell align="left">{`${inventory.Area} m²`}</StyledTableCell>
                     </StyledTableRow>
-
-                    {/* {project.gardenArea && (
-                      <StyledTableRow>
-                        <StyledTableCell component="th" scope="row">
-                          Garden Area
-                        </StyledTableCell>
-                        <StyledTableCell align="left">
-                          {project.gardenArea} m²
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    )} */}
-                    {/* {project.RoofArea && (
-                      <StyledTableRow>
-                        <StyledTableCell component="th" scope="row">
-                          Roof Area
-                        </StyledTableCell>
-                        <StyledTableCell align="left">
-                          {project.RoofArea} m²
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    )} */}
-
                     <StyledTableRow>
                       <StyledTableCell component="th" scope="row">
                         Bedrooms
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.Bed}
+                        {inventory.Bed[lang]}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -457,7 +422,7 @@ function InventoryDetails() {
                         Bathrooms
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.Bath}
+                        {inventory.Bath[lang]}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -466,7 +431,7 @@ function InventoryDetails() {
                         Delivery in
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.delivery}
+                        {inventory.delivery[lang]}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -475,7 +440,7 @@ function InventoryDetails() {
                         Sale type
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.Sale}
+                        {inventory.Sale[lang]}
                       </StyledTableCell>
                     </StyledTableRow>
 
@@ -484,38 +449,42 @@ function InventoryDetails() {
                         Finishing
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        {project.Finsh}
+                        {inventory.Finsh[lang]}
                       </StyledTableCell>
                     </StyledTableRow>
 
-                    {project.downPayment && (
-                      <StyledTableRow>
-                        <StyledTableCell component="th" scope="row">
-                          Down Payment
-                        </StyledTableCell>
-                        <StyledTableCell align="left">
-                          {project.downPayment}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    )}
+                    {inventory.downPayment != null &&
+                      inventory.downPayment !== "" && (
+                        <StyledTableRow>
+                          <StyledTableCell component="th" scope="row">
+                            Down Payment
+                          </StyledTableCell>
+                          <StyledTableCell align="left">
+                            {inventory.downPayment}
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      )}
 
-                    {project.remaining && (
-                      <StyledTableRow>
-                        <StyledTableCell component="th" scope="row">
-                          Remaining
-                        </StyledTableCell>
-                        <StyledTableCell align="left">
-                          {project.remaining}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    )}
+                    {inventory.remaining != null &&
+                      inventory.remaining !== "" && (
+                        <StyledTableRow>
+                          <StyledTableCell component="th" scope="row">
+                            Remaining
+                          </StyledTableCell>
+                          <StyledTableCell align="left">
+                            {inventory.remaining}
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      )}
 
-                    {project.rental && (
+                    {inventory.rental != null && inventory.rental !== "" && (
                       <StyledTableRow>
                         <StyledTableCell component="th" scope="row">
                           Minimum rental period
                         </StyledTableCell>
-                        <StyledTableCell align="left">{`${project.rental} Month`}</StyledTableCell>
+                        <StyledTableCell align="left">
+                          {inventory.rental}
+                        </StyledTableCell>
                       </StyledTableRow>
                     )}
                   </TableBody>
@@ -523,7 +492,7 @@ function InventoryDetails() {
               </TableContainer>
             </Stack>
 
-            {project.Sale === "Resale" && (
+            {inventory.Sale.en === "Resale" && (
               <Stack
                 sx={{
                   justifyContent: "center",
@@ -545,9 +514,8 @@ function InventoryDetails() {
                     border: "1px solid black",
                   }}
                 >
-                  {/* < */}
                   <Stack>
-                    {!project.downPayment && (
+                    {!inventory.downPayment && (
                       <Stack
                         sx={{
                           flexDirection: "row",
@@ -561,9 +529,15 @@ function InventoryDetails() {
                         />
                         <Typography>
                           {`${Intl.NumberFormat("en-US").format(
-                            project.price
+                            inventory.price
                           )} ${
-                            project.monyType === "dollar" ? "$" : "EGP"
+                            inventory.monyType.en === "dollar"
+                              ? lang === "ar"
+                                ? "دولار"
+                                : "$"
+                              : lang === "ar"
+                              ? "جم"
+                              : "EGP"
                           } Total Cash`}
                         </Typography>
                       </Stack>
@@ -571,7 +545,7 @@ function InventoryDetails() {
                   </Stack>
 
                   <Stack sx={{ width: "100%" }}>
-                    {project.downPayment && (
+                    {inventory.downPayment !== 0 && (
                       <Stack
                         sx={{
                           flexDirection: "row",
@@ -600,7 +574,15 @@ function InventoryDetails() {
                               DownPayment
                             </Typography>
                             <Typography>
-                              {`${project.downPayment} EGP  `}
+                              {`${inventory.downPayment} ${
+                                inventory.monyType.en === "dollar"
+                                  ? lang === "ar"
+                                    ? "دولار"
+                                    : "$"
+                                  : lang === "ar"
+                                  ? "جم"
+                                  : "EGP"
+                              }  `}
                             </Typography>
                           </Stack>
                         </Stack>
@@ -623,12 +605,26 @@ function InventoryDetails() {
                             <Typography sx={{ fontWeight: "bold" }}>
                               Remaining
                             </Typography>
-                            <Typography>{project.remaining} EGP</Typography>
+                            <Typography>
+                              {`
+                            ${inventory.remaining}
+                              ${
+                                inventory.monyType.en === "dollar"
+                                  ? lang === "ar"
+                                    ? "دولار"
+                                    : "$"
+                                  : lang === "ar"
+                                  ? "جم"
+                                  : "EGP"
+                              }
+                              
+                              `}
+                            </Typography>
                             <Typography
                               variant="caption"
                               sx={{ marginLeft: "10px" }}
                             >
-                              Over {project.month} Month
+                              Over {inventory.month} Month
                             </Typography>
                           </Stack>
                         </Stack>
@@ -734,15 +730,13 @@ function InventoryDetails() {
                     variant="outlined"
                   >
                     <div className="sc-6c7c04b6-0 hehFCg">
-                      {/* <img width="42" height="38" src={layimg} alt="" /> */}
                       <span className="text-2">Layout</span>
                     </div>
                   </Button>
                 </Stack>
               </Stack>
             </Stack>
-            {
-              project.Dis &&
+            {inventory.Dis && (
               <>
                 <Typography
                   variant="h6"
@@ -750,9 +744,9 @@ function InventoryDetails() {
                 >
                   Description
                 </Typography>
-                <ReactMarkdown>{project.Dis}</ReactMarkdown>
+                <ReactMarkdown>{inventory.Dis[lang]}</ReactMarkdown>
               </>
-            }
+            )}
           </Col>
           <Divider />
         </Row>
@@ -770,7 +764,7 @@ function InventoryDetails() {
         >
           <img
             style={{ width: "100%", maxHeight: "100%" }}
-            src={project.Masterimg[0]}
+            src={inventory.Masterimg[0]}
             alt=""
           />
           <IconButton
@@ -796,7 +790,7 @@ function InventoryDetails() {
         >
           <img
             style={{ width: "100%", maxHeight: "100%" }}
-            src={project.Layoutimg[0]}
+            src={inventory.Layoutimg[0]}
             alt=""
           />
           <IconButton

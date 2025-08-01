@@ -36,7 +36,7 @@ export default function DeveloperDetails() {
   // console.log(devId);
   const [developer, setDeveloper] = useState({});
   const [compounds, setCompounds] = useState([]);
-  // console.log(compounds);
+  console.log(developer);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingcompound, setLoadingcompound] = useState(true);
@@ -46,7 +46,7 @@ export default function DeveloperDetails() {
       try {
         const docRef = doc(db, "developer", devId);
         const docSnap = await getDoc(docRef);
-        // console.log(docSnap);
+        console.log(docSnap);
         setDeveloper({ id: docSnap.id, ...docSnap.data() });
       } catch (err) {
         setError(err.message);

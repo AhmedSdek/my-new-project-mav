@@ -129,7 +129,7 @@ export default function Developers() {
                   <Link
                     style={{ width: "126px", height: "126px " }}
                     aria-label={developers.devName}
-                    to={`/developers/${item.devName.en}`}
+                    to={`/developers/${item.id}`}
                   >
                     <img
                       className="slidImg sm-shadow w-shadow mx-auto img-fluid bg-white rounded-circle p-md-2 p-1 img-fluid  "

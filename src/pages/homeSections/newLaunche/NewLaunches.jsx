@@ -58,7 +58,7 @@ function NewLaunches() {
           }}
         >
           <Typography sx={{ fontWeight: "bold" }}>
-            {lang === "ar" ? "ينطلق الآن" : "Launches Now"}
+            {lang === "ar" ? "يطرح الآن" : "Launches Now"}
           </Typography>
           <Link to="/newlaunches">
             <Typography sx={{ fontWeight: "bold" }}>

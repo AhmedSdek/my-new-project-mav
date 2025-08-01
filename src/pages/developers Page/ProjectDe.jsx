@@ -77,16 +77,18 @@ function ProjectDe() {
   const { devId, projId } = useParams();
   // console.log({ devId, projId });
   const { i18n } = useTranslation();
-  const [compound, setCompound] = useState({});
-  console.log(compound);
   const lang = i18n.language;
   const { country } = useGlobal();
+  const [compound, setCompound] = useState({});
+  console.log(compound);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loadingInventory, setLoadingInventory] = useState(true);
+  const [errorInventory, setErrorInventory] = useState(null);
   const [open, setOpen] = useState(false);
   const [imgsrc, setImgsrc] = useState("");
   const [relatedProjects, setRelatedProjects] = useState([]); // تخزين المشاريع ذات الصلة
-  // console.log(relatedProjects.length)
+  console.log(relatedProjects);
   const [imgopen, setImgopen] = useState(false);
   useEffect(() => {
     const fetchCompound = async () => {
@@ -108,22 +110,22 @@ function ProjectDe() {
       try {
         const q = query(
           collection(db, "inventory"),
-          where("countryKey", "==", country.en)
+          where("compoundId", "==", projId)
         );
         const snapshot = await getDocs(q);
         const RelatedProjectsData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        fetchRelatedProjects(RelatedProjectsData);
+        setRelatedProjects(RelatedProjectsData);
       } catch (err) {
-        setError(err.message);
+        setErrorInventory(err.message);
       } finally {
-        setLoading(false);
+        setLoadingInventory(false);
       }
     };
     fetchRelatedProjects();
-  }, [country]);
+  }, [projId]);
   if (loading) {
     return (
       <div
@@ -524,14 +526,16 @@ function ProjectDe() {
               {compound.compoundDes[lang]}
             </Typography>
           </Stack>
-          {/* <Stack>
+
+          <Stack>
             {relatedProjects.length > 0 && (
               <>
                 <Typography sx={{ fontWeight: "bold", padding: "6px 0" }}>
-                  Explore Properties In {fil.proj}
+                  Explore Properties In {compound.compoundName[lang]}
                 </Typography>
                 <Row>
                   {relatedProjects.map((item) => {
+                    // console.log(item.sold.en === true);
                     return (
                       <Col
                         className=" col-sm-6 col-12 col-lg-4 col-md-6"
@@ -582,7 +586,14 @@ function ProjectDe() {
                                     }}
                                     variant="h6"
                                   >
-                                    {`${item.Type} - ${projId}`}
+                                    {`${item.Type[lang]}`}
+                                  </Typography>
+                                  <Typography variant="caption">
+                                    {`${
+                                      lang === "ar"
+                                        ? "التسليم في"
+                                        : "Delivery Date"
+                                    } ${item.delivery[lang]}`}
                                   </Typography>
                                 </Stack>
                                 <Stack
@@ -594,7 +605,7 @@ function ProjectDe() {
                                 >
                                   <div className="svgicon">
                                     <p style={{ fontWeight: "bold" }}>
-                                      {item.Bed}
+                                      {item.Bed[lang]}
                                     </p>
                                     <svg
                                       width="23"
@@ -613,7 +624,7 @@ function ProjectDe() {
                                   </div>
                                   <div className="svgicon">
                                     <p style={{ fontWeight: "bold" }}>
-                                      {item.Bath}
+                                      {item.Bath[lang]}
                                     </p>
 
                                     <svg
@@ -672,7 +683,6 @@ function ProjectDe() {
                                   </div>
                                 </Stack>
 
-                              
                                 <Box
                                   sx={{
                                     position: "absolute",
@@ -696,10 +706,10 @@ function ProjectDe() {
                                       textAlign: "center",
                                     }}
                                   >
-                                    {`${item.Sale}`}
+                                    {`${item.Sale[lang]}`}
                                   </p>
                                 </Box>
-                                {item.sold === "SOLD OUT" && (
+                                {item.sold.en === "SOLD OUT" && (
                                   <Box
                                     sx={{
                                       position: "absolute",
@@ -725,7 +735,7 @@ function ProjectDe() {
                                         textAlign: "center",
                                       }}
                                     >
-                                      {`${item.sold}`}
+                                      {`${item.sold[lang]}`}
                                     </p>
                                   </Box>
                                 )}
@@ -734,7 +744,13 @@ function ProjectDe() {
                                   {`${Intl.NumberFormat("en-US").format(
                                     item.price
                                   )} ${
-                                    item.moneyType === "dollar" ? "$" : "EGP"
+                                    item.monyType.en === "dollar"
+                                      ? lang === "ar"
+                                        ? "دولار"
+                                        : "$"
+                                      : lang === "ar"
+                                      ? "جم"
+                                      : "EGP"
                                   }`}
                                 </Typography>
                               </CardContent>
@@ -753,9 +769,9 @@ function ProjectDe() {
                 </Row>
               </>
             )}
-          </Stack> */}
+          </Stack>
         </Container>
-        <Card
+        {/* <Card
           sx={{
             position: "fixed",
             height: "100vh",
@@ -816,7 +832,7 @@ function ProjectDe() {
           >
             <Close sx={{ color: "red" }} />
           </IconButton>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

@@ -31,6 +31,7 @@ function EditinventoryDetails() {
     devIcon: "",
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
+    compoundId: "",
     img: [],
     Masterimg: [],
     Layoutimg: [],
@@ -65,6 +66,7 @@ function EditinventoryDetails() {
     devIcon: "",
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
+    compoundId: "",
     img: [],
     Masterimg: [],
     Layoutimg: [],
@@ -234,6 +236,7 @@ function EditinventoryDetails() {
         devIcon: "",
         Dis: { ar: "", en: "" },
         compoundName: { ar: "", en: "" },
+        compoundId: "",
         img: [],
         Masterimg: [],
         Layoutimg: [],
@@ -273,19 +276,20 @@ function EditinventoryDetails() {
     const fetchCompounds = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
-        const allCompoundNames = [];
+        const allCompounds = [];
+
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          // console.log(data)
-          if (Array.isArray(data.compounds)) {
-            data.compounds.forEach((item) => {
-              if (item.compoundName) {
-                allCompoundNames.push(item.compoundName);
-              }
+          if (data?.compoundName?.en || data?.compoundName?.ar) {
+            allCompounds.push({
+              id: doc.id,
+              en: data.compoundName.en,
+              ar: data.compoundName.ar,
             });
           }
         });
-        setCompoundNames(allCompoundNames);
+
+        setCompoundNames(allCompounds);
       } catch (error) {
         console.error("Error fetching compounds:", error);
       } finally {
@@ -501,14 +505,14 @@ function EditinventoryDetails() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
     },
     [lang]
   );
   const handleUpdate = async (e) => {
     e.preventDefault();
-    setBtn(true)
+    setBtn(true);
     try {
       if (!oldData) {
         Swal.fire({
@@ -532,52 +536,83 @@ function EditinventoryDetails() {
       const docRef = doc(db, "inventory", inventoryId);
       await updateDoc(docRef, changedFields);
       // console.log(changedFields)
-      setBtn(false)
+      setBtn(false);
       toast.success("The modification has been made.", { autoClose: 2000 }); // عرض إشعار أنيق
       nav("/dashboard/editinventory");
     } catch (err) {
       console.error(err);
-      setBtn(false)
+      setBtn(false);
       Swal.fire({
-        icon: 'error',
+        icon: "error",
         title: "error",
-        text: "Oops ! Can't Edit"
-      })
+        text: "Oops ! Can't Edit",
+      });
       // alert("❌ فشل في التعديل");
     } finally {
-      setBtn(false)
+      setBtn(false);
     }
   };
   const getChangedFields = (newObj, oldObj) => {
     let changedFields = {};
     for (let key in newObj) {
-      if (typeof newObj[key] === "object" && newObj[key] !== null && !Array.isArray(newObj[key])) {
+      if (
+        typeof newObj[key] === "object" &&
+        newObj[key] !== null &&
+        !Array.isArray(newObj[key])
+      ) {
         if (JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])) {
           // في حالة object (زي dealName) ارسل كامل الـ object
           changedFields[key] = newObj[key];
         }
-      } else if (JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])) {
+      } else if (
+        JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])
+      ) {
         changedFields[key] = newObj[key];
       }
     }
     return changedFields;
   };
+  const handleDynamicSelectcompond = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => item[lang] === selectedLabel
+      );
+
+      if (selectedObject) {
+        setNewData((prev) => ({
+          ...prev,
+          compoundId: selectedObject.id,
+          [fieldName]: {
+            en: selectedObject.en,
+            ar: selectedObject.ar,
+          },
+        }));
+      }
+    },
+    [lang]
+  );
   return (
-    <Stack sx={{
-      minHeight: "calc(100vh - 100px)", padding: "70px 0 0",
-      width: "100%",
-      flexDirection: "column",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    }}>
+    <Stack
+      sx={{
+        minHeight: "calc(100vh - 100px)",
+        padding: "70px 0 0",
+        width: "100%",
+        flexDirection: "column",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-        <Typography variant="h5">{lang === "ar" ? "تعديل اينفينتوري" : "ُEdit Inventory"}</Typography>
+        <Typography variant="h5">
+          {lang === "ar" ? "تعديل اينفينتوري" : "ُEdit Inventory"}
+        </Typography>
       </Stack>
       <Card
         onSubmit={handleUpdate}
         component="form"
-        sx={{ gap: '10px', width: '100%' }}
+        sx={{ gap: "10px", width: "100%" }}
         className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
       >
         <FormGro
@@ -638,10 +673,15 @@ function EditinventoryDetails() {
           name="compoundName"
           data={compoundNames}
           value={newData.compoundName[lang] || ""}
-          fun={handleDynamicSelectChange(compoundNames, "compoundName")}
+          fun={handleDynamicSelectcompond(compoundNames, "compoundName")}
           lang={lang}
         />
-        <FileUpload multiple handleFileChange={handleFileChange} prog={prog} title='imges' />
+        <FileUpload
+          multiple
+          handleFileChange={handleFileChange}
+          prog={prog}
+          title="imges"
+        />
         <Input
           onChange={onchange("imgtext", "en")}
           type="text"
@@ -656,7 +696,11 @@ function EditinventoryDetails() {
           label={lang === "ar" ? "تفاصيل الصوره عربي" : "img text ar"}
           value={newData.imgtext.ar}
         />
-        <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title='Master img' />
+        <FileUpload
+          handleFileChange={handleMasterplanImgChange}
+          prog={prog3}
+          title="Master img"
+        />
         <FormGro
           inputLabel={lang === "ar" ? "نوع العمله" : "Money Type"}
           name="monyType"
@@ -668,7 +712,7 @@ function EditinventoryDetails() {
         <Input
           onChange={onchangesimple}
           id="Price"
-          name='price'
+          name="price"
           label={lang === "ar" ? "السعر" : "Price"}
           type="number"
           value={newData.price} // نخزن ونعرض الـ id
@@ -759,7 +803,11 @@ function EditinventoryDetails() {
           name="gardenArea"
           value={newData.gardenArea} // نخزن ونعرض الـ id
         />
-        <FileUpload handleFileChange={handleFiletowChange} prog={prog2} title="Layout img" />
+        <FileUpload
+          handleFileChange={handleFiletowChange}
+          prog={prog2}
+          title="Layout img"
+        />
 
         <FormGro
           name="sold"
@@ -843,13 +891,15 @@ function EditinventoryDetails() {
         >
           {btn ? (
             <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+          ) : lang === "ar" ? (
+            "تعديل"
           ) : (
-            lang === "ar" ? "تعديل" : "Update"
+            "Update"
           )}
         </Button>
       </Card>
     </Stack>
-  )
+  );
 }
 
 export default EditinventoryDetails
