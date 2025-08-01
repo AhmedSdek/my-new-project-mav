@@ -33,7 +33,7 @@ function NewLaunchDetails() {
       }
     };
     fetchNewlaunch();
-  }, [country]);
+  }, []);
   if (error) return <p>حدث خطأ: {error}</p>;
 
   return (

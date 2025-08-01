@@ -1,44 +1,57 @@
 import "./developers.css";
 import { Link } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import MavLoading from "../../comp/Loading/MavLoading";
 import { Box, Container, Stack, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useGlobal } from "../../context/GlobalContext";
 function Developers() {
-  const [data, setData] = useState([]); // تخزين البيانات القادمة من Firebase
-  const [searchTerm, setSearchTerm] = useState(""); // تتبع نص البحث
-  const [filteredData, setFilteredData] = useState([]); // تخزين البيانات المصنفة
-  const [loading, setLoading] = useState(true); // حالة التحميل
-  // جلب البيانات من Firestore
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const { country } = useGlobal();
+  const [developers, setDevelopers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDevelopers = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "admin")); // اسم مجموعة البيانات
-        const devData = querySnapshot.docs.map((doc) => ({
+        const q = query(
+          collection(db, "developer"),
+          where("country.en", "==", country.en)
+        );
+        const snapshot = await getDocs(q);
+        const developersData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setData(devData); // تخزين البيانات الأصلية
-        setFilteredData(devData); // تخزين نسخة مبدئية
-        setLoading(false); // إيقاف حالة التحميل
-      } catch (error) {
-        console.error("Error fetching data from Firestore:", error);
-        setLoading(false); // إيقاف حالة التحميل في حالة الخطأ
+        setDevelopers(developersData);
+        setFilteredData(developersData); // تخزين نسخة مبدئية
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchData();
-  }, []);
+    fetchDevelopers();
+  }, [country]);
   // تصفية البيانات عند تحديث نص البحث
   useEffect(() => {
-    const results = data.filter((item) =>
-      item.devName.toLowerCase().includes(searchTerm.toLowerCase())
+    const results = developers.filter((item) =>
+      item.devName[lang].toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredData(results);
-  }, [searchTerm, data]);
+  }, [searchTerm, developers]);
+  if (error) return <p>حدث خطأ: {error}</p>;
+
   return (
     <Box sx={{ minHeight: "calc(100vh - 100px)", padding: "70px 0" }}>
-      <h1 className="developers-title">DEVELOPERS FULL LIST</h1>
+      <h1 className="developers-title">
+        {lang === "ar" ? "قائمة المطورين" : "DEVELOPERS FULL LIST"}
+      </h1>
       <Container>
         <Stack
           component="form"
@@ -109,13 +122,13 @@ function Developers() {
                         borderRadius: "50%",
                       }}
                       className="logo hoveredLogo d-flex align-items-center flex-column  inner"
-                      to={`/developers/${item.devName}`}
+                      to={`/developers/${item.id}`}
                     >
                       <img
                         style={{ height: "100%", width: "100%" }}
                         className="img-fluid img shadow-filter rounded-circle"
-                        src={item.devIcon}
-                        alt={item.devName}
+                        src={item.img}
+                        alt={item.devName[lang]}
                       ></img>
                     </Link>
                   </Stack>

@@ -358,7 +358,8 @@ function CompoundsForm() {
       };
       try {
         setBtn(true);
-        const docRef = doc(db, "compound", newData.devId);
+        const id = new Date().getTime();
+        const docRef = doc(db, "compound", `${id}`);
         await setDoc(docRef, {
           ...newData,
         });

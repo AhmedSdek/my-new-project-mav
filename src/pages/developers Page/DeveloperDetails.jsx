@@ -1,4 +1,11 @@
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../firebase/config";
@@ -15,141 +22,177 @@ import {
 import { Col, Row } from "react-bootstrap";
 import ContactUsIcon from "../../comp/Contact Us/ContactUsIcon";
 import MavLoading from "../../comp/Loading/MavLoading";
+import { useTranslation } from "react-i18next";
+import { useGlobal } from "../../context/GlobalContext";
+import ReactMarkdown from "react-markdown";
+import ReactLoading from "react-loading";
 
 export default function DeveloperDetails() {
   const { devId } = useParams();
-  console.log(devId);
-  const [docData, setDocData] = useState(null);
-  const [docLoading, setDocLoading] = useState(true);
-  const [docError, setDocError] = useState("");
-
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const { country } = useGlobal();
+  console.log(country);
+  // console.log(devId);
+  const [developer, setDeveloper] = useState({});
+  const [compounds, setCompounds] = useState([]);
+  console.log(compounds);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [loadingcompound, setLoadingcompound] = useState(true);
+  const [errorcompound, setErrorcompound] = useState(null);
   useEffect(() => {
-    const fetchDocument = async () => {
-      if (!devId) return; // تأكد إن devId موجود
-
+    const fetchDeveloper = async () => {
       try {
-        const docRef = doc(db, "admin", devId);
+        const docRef = doc(db, "developer", devId);
         const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setDocData({ id: docSnap.id, ...docSnap.data() });
-        } else {
-          setDocError("⚠️ لا يوجد مستند بهذا المعرف.");
-        }
+        // console.log(docSnap);
+        setDeveloper({ id: docSnap.id, ...docSnap.data() });
       } catch (err) {
-        console.error("❌ خطأ أثناء جلب المستند:", err);
-        setDocError("فشل تحميل البيانات.");
+        setError(err.message);
       } finally {
-        setDocLoading(false);
+        setLoading(false);
       }
     };
-
-    fetchDocument();
-  }, [devId]);
-  let disfiter = [];
-  let list = [];
-  console.log(docData);
-  if (docData) {
-    const disdata = docData.devDis.split("$");
-    for (let i = 0; i < disdata.length; i++) {
-      disfiter = [...disfiter, disdata[i]];
-    }
-
-    if (docData.devDis6) {
-      const ul = docData?.devDis6?.split("-");
-      for (let i = 1; i < ul.length; i++) {
-        list = [...list, ul[i]];
+    fetchDeveloper();
+  }, []);
+  useEffect(() => {
+    const fetchcompounds = async () => {
+      try {
+        const q = query(
+          collection(db, "compound"),
+          where("countryKey", "==", country.en),
+          where("devId", "==", devId)
+        );
+        const snapshot = await getDocs(q);
+        // console.log(snapshot);
+        const compoundsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setCompounds(compoundsData);
+      } catch (err) {
+        setErrorcompound(err.message);
+      } finally {
+        setLoadingcompound(false);
       }
-    }
+    };
+    fetchcompounds();
+  }, [devId, country]);
+  if (error) return <p>حدث خطأ: {error}</p>;
+  if (loading) {
     return (
-      <Box sx={{ padding: "80px 0 0 0", minHeight: "calc(100vh - 100px)" }}>
-        {docData ? (
-          <Container>
-            <Stack
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "calc(100vh - 100px)",
+        }}
+      >
+        <MavLoading />
+      </div>
+    );
+  }
+  return (
+    <Box sx={{ padding: "80px 0 0 0", minHeight: "calc(100vh - 100px)" }}>
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "calc(100vh - 100px)",
+          }}
+        >
+          <MavLoading />
+        </div>
+      ) : developer ? (
+        <Container>
+          <Stack
+            sx={{
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "10px",
+              gap: 3,
+            }}
+          >
+            <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+              <img
+                style={{
+                  width: "70px",
+                  boxShadow: "0 -1px 15px -3px rgba(0, 0, 0, 0.2)",
+                  borderRadius: "50%",
+                  height: "70px",
+                }}
+                src={developer.img}
+                alt={developer.devName[lang]}
+              />
+              <Typography
+                sx={{ fontWeight: "bold", color: "#1e4164 " }}
+                variant="h5"
+                component="h2"
+              >
+                {developer.devName[lang]}
+              </Typography>
+            </Stack>
+            <span className="text-2" data-test="entity-type">
+              {lang === "ar" ? "مطور" : "Developer"}
+            </span>
+          </Stack>
+          <Divider sx={{ borderWidth: "1px" }} />
+          <Box sx={{ padding: "20px 0 0 0" }}>
+            <Typography
               sx={{
-                flexDirection: { xs: "column", sm: "row" },
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "10px",
-                gap: 3,
+                fontWeight: "bold",
+                color: "#1e4164 ",
+                padding: "10px 0",
               }}
             >
-              <Stack
-                sx={{ flexDirection: "row", alignItems: "center", gap: 3 }}
-              >
-                <img
-                  style={{
-                    width: "70px",
-                    boxShadow: "0 -1px 15px -3px rgba(0, 0, 0, 0.2)",
-                    borderRadius: "50%",
-                    height: "70px",
-                  }}
-                  src={docData.devIcon}
-                  alt=""
-                />
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#1e4164 " }}
-                  variant="h5"
-                  component="h2"
-                >
-                  {docData.devName}
-                </Typography>
-              </Stack>
-              <span className="text-2" data-test="entity-type">
-                Developer
-              </span>
-            </Stack>
-            <Divider />
-            <Box sx={{ padding: "50px 0 0 0" }}>
+              {`${lang === "ar" ? "عن" : "About"} ${developer.devName[lang]}`}
+            </Typography>
+            <ReactMarkdown
+              children={developer.devDis[lang]}
+              components={{
+                p: ({ node, ...props }) => (
+                  <p style={{ whiteSpace: "pre-line" }} {...props} />
+                ),
+                h6: ({ node, ...props }) => (
+                  <h6 style={{ margin: "10px 0" }} {...props} />
+                ),
+              }}
+            />
+            <Stack>
               <Typography
                 sx={{
+                  padding: "10px 0",
                   fontWeight: "bold",
                   color: "#1e4164 ",
-                  padding: "10px 0",
                 }}
               >
-                {`About ${docData.devName}`}
+                {`${
+                  lang === "ar" ? "استكشاف المشاريع في" : "Explore projects In"
+                } ${developer.devName[lang]}`}
               </Typography>
-              {/* {disfiter.map((p, index) => {
-                                return (
-                                    <Typography key={index}>
-                                        {p}
-                                    </Typography>
-                                )
-                            })} */}
-              {
-                <Typography style={{ whiteSpace: "pre-wrap" }}>
-                  {docData.devDis}
-                </Typography>
-              }
-              <Typography
-                sx={{
-                  fontWeight: "bold",
-                  color: "#1e4164 ",
-                  padding: "10px 0",
-                }}
-              >
-                {docData.devDis2}
-              </Typography>
-              {docData.devDis6 && (
-                <ul>
-                  {list.map((li) => {
-                    return <li key={li}>{li}</li>;
-                  })}
-                </ul>
-              )}
-              <Stack>
-                <Typography
+              {loadingcompound ? (
+                <Stack
                   sx={{
-                    padding: "10px 0",
-                    fontWeight: "bold",
-                    color: "#1e4164 ",
+                    height: "100px",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
-                  {`Explore projects In ${docData.devName}`}
-                </Typography>
+                  <ReactLoading
+                    color="black"
+                    type={"spin"}
+                    height={"50px"}
+                    width={"50px"}
+                  />
+                </Stack>
+              ) : compounds && compounds.length > 0 ? (
                 <Row>
-                  {docData.dev.map((project, index) => {
+                  {compounds.map((project, index) => {
                     return (
                       <Col
                         key={index}
@@ -166,7 +209,7 @@ export default function DeveloperDetails() {
                           }}
                         >
                           <Link
-                            to={`/developers/${devId}/${project.proj}`}
+                            to={`/developers/${devId}/${project.id}`}
                             style={{ textDecoration: "none" }}
                           >
                             <Box sx={{ height: "216px" }}>
@@ -176,8 +219,8 @@ export default function DeveloperDetails() {
                                   width: "100%",
                                   objectFit: "cover",
                                 }}
-                                src={project.projImgs[0]}
-                                alt=""
+                                src={project.compoundImgs[0]}
+                                alt={project.compoundName[lang]}
                               />
                             </Box>
                             <CardContent
@@ -192,7 +235,7 @@ export default function DeveloperDetails() {
                                   }}
                                   variant="body1"
                                 >
-                                  {project.proj}
+                                  {project.compoundName[lang]}
                                 </Typography>
                                 <Typography
                                   variant="caption"
@@ -202,18 +245,15 @@ export default function DeveloperDetails() {
                                     padding: "0 0 0 5px",
                                   }}
                                 >
-                                  {project.Location}
+                                  {project.Location[lang]}
                                 </Typography>
                               </Stack>
-                              {/* <Typography sx={{ fontWeight: 'bold' }}>
-                                                            {`${project.price} EGP`}
-                                                        </Typography> */}
                             </CardContent>
                           </Link>
                           <Stack sx={{ padding: "0 10px 10px 0" }}>
                             <ContactUsIcon
                               sectionName="Developer"
-                              sectionData={docData}
+                              sectionData={project}
                             />
                           </Stack>
                         </Card>
@@ -221,36 +261,30 @@ export default function DeveloperDetails() {
                     );
                   })}
                 </Row>
-              </Stack>
-            </Box>
-          </Container>
-        ) : (
-          <Stack
-            sx={{ height: "calc(100vh - 100px)", justifyContent: "center" }}
+              ) : (
+                <Stack
+                  sx={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "150px",
+                  }}
+                >
+                  <Typography>No Data in {country[lang]}</Typography>
+                </Stack>
+              )}
+            </Stack>
+          </Box>
+        </Container>
+      ) : (
+        <Stack sx={{ height: "calc(100vh - 100px)", justifyContent: "center" }}>
+          <Typography
+            variant="h4"
+            sx={{ textAlign: "center", fontWeight: "bold" }}
           >
-            <Typography
-              variant="h4"
-              sx={{ textAlign: "center", fontWeight: "bold" }}
-            >
-              Oops, Data not Found
-            </Typography>
-          </Stack>
-        )}
-      </Box>
-    );
-  }
-  if (docLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "calc(100vh - 100px)",
-        }}
-      >
-        <MavLoading />
-      </div>
-    );
-  }
+            Oops, Data not Found
+          </Typography>
+        </Stack>
+      )}
+    </Box>
+  );
 }
