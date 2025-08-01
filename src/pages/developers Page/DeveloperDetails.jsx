@@ -32,11 +32,11 @@ export default function DeveloperDetails() {
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const { country } = useGlobal();
-  console.log(country);
+  // console.log(country);
   // console.log(devId);
   const [developer, setDeveloper] = useState({});
   const [compounds, setCompounds] = useState([]);
-  console.log(compounds);
+  // console.log(compounds);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingcompound, setLoadingcompound] = useState(true);

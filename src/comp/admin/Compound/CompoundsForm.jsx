@@ -311,57 +311,18 @@ function CompoundsForm() {
     ],
     []
   );
-  // const onsubmit = useCallback(
-  //   async (e) => {
-  //     e.preventDefault();
-  //     const id = new Date().getTime();
-  //     const projectObject = {
-  //       ...newData,
-  //       offers,
-  //       id: id.toString(),
-  //     };
-  //     try {
-  //       setBtn(true);
-  //       const docRef = doc(db, "compound", newData.developer.id);
-  //       const docSnap = await getDoc(docRef);
-  //       if (!docSnap.exists()) {
-  //         await setDoc(docRef, {
-  //           ...newData.developer,
-  //           compounds: [projectObject],
-  //         });
-  //       } else {
-  //         await updateDoc(docRef, {
-  //           compounds: arrayUnion(projectObject), // ✅ nested update
-  //         });
-  //       }
-  //       toast.success("The data has been sent..", { autoClose: 2000 });
-  //       nav("/dashboard");
-  //       setBtn(false);
-  //     } catch (err) {
-  //       console.error("❌ خطأ:", err);
-  //       setBtn(false);
-  //     } finally {
-  //       setBtn(false);
-  //     }
-  //   },
-  //   [newData, offers, nav]
-  // );
 
   const onsubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      const id = new Date().getTime();
-      const projectObject = {
-        ...newData,
-        offers,
-        id: id.toString(),
-      };
+      console.log(newData);
       try {
         setBtn(true);
         const id = new Date().getTime();
         const docRef = doc(db, "compound", `${id}`);
         await setDoc(docRef, {
           ...newData,
+          offers,
         });
         toast.success("The data has been sent..", { autoClose: 2000 });
         nav("/dashboard");
