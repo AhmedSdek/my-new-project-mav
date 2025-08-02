@@ -157,7 +157,18 @@ function NewLaunchDetails() {
             >
               Launch Details
             </Typography>
-            <ReactMarkdown>{newlaunch.Dis[lang]}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node, ...props }) => (
+                  <p style={{ whiteSpace: "pre-line" }} {...props} />
+                ),
+                h6: ({ node, ...props }) => (
+                  <h6 style={{ margin: "10px 0" }} {...props} />
+                ),
+              }}
+            >
+              {newlaunch.Dis[lang]}
+            </ReactMarkdown>
           </Stack>
         </Container>
       ) : (
