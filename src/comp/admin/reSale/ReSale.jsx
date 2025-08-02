@@ -37,6 +37,7 @@ function ReSale() {
     dealName: { ar: "", en: "" },
     Dis: { ar: "", en: "" },
     compoundName: { ar: "", en: "" },
+    compoundId: "",
     img: [],
     Layoutimg: [],
     Masterimg: [],
@@ -241,18 +242,20 @@ function ReSale() {
     const fetchCompounds = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
-        const allCompoundNames = [];
+        const allCompounds = [];
+
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          if (Array.isArray(data.compounds)) {
-            data.compounds.forEach((item) => {
-              if (item.compoundName) {
-                allCompoundNames.push(item.compoundName);
-              }
+          if (data?.compoundName?.en || data?.compoundName?.ar) {
+            allCompounds.push({
+              id: doc.id,
+              en: data.compoundName.en,
+              ar: data.compoundName.ar,
             });
           }
         });
-        setCompoundNames(allCompoundNames);
+
+        setCompoundNames(allCompounds);
       } catch (error) {
         console.error("Error fetching compounds:", error);
       } finally {
@@ -294,15 +297,18 @@ function ReSale() {
     },
     [developers]
   );
-  const onchange = useCallback((parentKey, lang) => (e) => {
-    setNewData((prev) => ({
-      ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [lang]: e.target.value
-      }
-    }));
-  }, []);
+  const onchange = useCallback(
+    (parentKey, lang) => (e) => {
+      setNewData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [lang]: e.target.value,
+        },
+      }));
+    },
+    []
+  );
   const handleDynamicSelectChange = useCallback(
     (dataArray, fieldName) => (e) => {
       const selectedLabel = e.target.value;
@@ -311,7 +317,7 @@ function ReSale() {
       );
       setNewData((prev) => ({
         ...prev,
-        [fieldName]: selectedObject || prev[fieldName]
+        [fieldName]: selectedObject || prev[fieldName],
       }));
     },
     [lang]
@@ -325,9 +331,9 @@ function ReSale() {
         ...prev,
         aminatis: exists
           ? prev.aminatis.filter(
-            (item) =>
-              item.en !== selectedItem.en || item.ar !== selectedItem.ar
-          )
+              (item) =>
+                item.en !== selectedItem.en || item.ar !== selectedItem.ar
+            )
           : [...prev.aminatis, selectedItem],
       };
     });
@@ -340,15 +346,46 @@ function ReSale() {
     }));
   }, []);
   const handleRadioChange = (fieldName) => (selectedOption) => {
-    console.log(selectedOption[lang])
+    console.log(selectedOption[lang]);
     setNewData((prev) => ({
       ...prev,
-      [fieldName]: selectedOption
+      [fieldName]: selectedOption,
     }));
   };
+  const handleDynamicSelectcompond = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => item[lang] === selectedLabel
+      );
 
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
-  const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
+      if (selectedObject) {
+        setNewData((prev) => ({
+          ...prev,
+          compoundId: selectedObject.id,
+          [fieldName]: {
+            en: selectedObject.en,
+            ar: selectedObject.ar,
+          },
+        }));
+      }
+    },
+    [lang]
+  );
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
+  const soldOutOptions = useMemo(
+    () => [
+      { en: "SOLD OUT", ar: "تم البيع" },
+      { en: "Not", ar: "متاح" },
+    ],
+    []
+  );
   const deliveryOptions = useMemo(
     () => [
       { en: "Delivered", ar: "تم التسليم" },
@@ -365,7 +402,13 @@ function ReSale() {
     ],
     []
   );
-  const floorOptions = useMemo(() => [{ en: "Typical", ar: "متكرر " }, { en: "Ground", ar: "أرضي" }], []);
+  const floorOptions = useMemo(
+    () => [
+      { en: "Typical", ar: "متكرر " },
+      { en: "Ground", ar: "أرضي" },
+    ],
+    []
+  );
   const typeOptions = useMemo(
     () => [
       { en: "Apartment", ar: "شقة" },
@@ -400,13 +443,16 @@ function ReSale() {
     ],
     []
   );
-  const bathroomOptions = useMemo(() => [
-    { en: "1", ar: "١" },
-    { en: "2", ar: "٢" },
-    { en: "3", ar: "٣" },
-    { en: "4", ar: "٤" },
-    { en: "5", ar: "٥" }
-  ], []);
+  const bathroomOptions = useMemo(
+    () => [
+      { en: "1", ar: "١" },
+      { en: "2", ar: "٢" },
+      { en: "3", ar: "٣" },
+      { en: "4", ar: "٤" },
+      { en: "5", ar: "٥" },
+    ],
+    []
+  );
   const finshOptions = useMemo(
     () => [
       { en: "Finished", ar: "تشطيب كامل" },
@@ -416,11 +462,14 @@ function ReSale() {
     ],
     []
   );
-  const statusOptions = useMemo(() => [
-    { en: "Resale", ar: "إعادة بيع" },
-    { en: "Rent", ar: "إيجار" },
-    { en: "Primary", ar: "بيع أولي" },
-  ], []);
+  const statusOptions = useMemo(
+    () => [
+      { en: "Resale", ar: "إعادة بيع" },
+      { en: "Rent", ar: "إيجار" },
+      { en: "Primary", ar: "بيع أولي" },
+    ],
+    []
+  );
   const checkBoxOptions1 = useMemo(
     () => [
       { en: "Clubhouse", ar: "النادي الاجتماعي" },
@@ -510,7 +559,7 @@ function ReSale() {
             name="compoundName"
             data={compoundNames}
             value={newData.compoundName[lang] || ""}
-            fun={handleDynamicSelectChange(compoundNames, "compoundName")}
+            fun={handleDynamicSelectcompond(compoundNames, "compoundName")}
             lang={lang}
           />
           <Input

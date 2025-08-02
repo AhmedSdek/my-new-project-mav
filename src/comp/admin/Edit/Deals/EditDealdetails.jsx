@@ -154,20 +154,24 @@ function EditDealdetails() {
     const fetchCompounds = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
-        const allCompoundNames = [];
+        const allCompounds = [];
+
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          if (Array.isArray(data.compounds)) {
-            data.compounds.forEach((item) => {
-              if (item.compoundName) {
-                allCompoundNames.push(item.compoundName);
-              }
+          if (data?.compoundName?.en || data?.compoundName?.ar) {
+            allCompounds.push({
+              id: doc.id,
+              en: data.compoundName.en,
+              ar: data.compoundName.ar,
             });
           }
         });
-        setCompoundNames(allCompoundNames);
+
+        setCompoundNames(allCompounds);
       } catch (error) {
         console.error("Error fetching compounds:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -300,11 +304,15 @@ function EditDealdetails() {
 
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(storage, "deals/" + event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg(progress);
           setBtn(true);
         },
@@ -332,19 +340,23 @@ function EditDealdetails() {
 
     for (let i = 0; i < event.target.files.length; i++) {
       const storageRef = ref(storage, event.target.files[i].name);
-      const uploadTask = uploadBytesResumable(storageRef, event.target.files[i]);
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        event.target.files[i]
+      );
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProg3(progress);
           setBtn(true);
         },
         (error) => console.error(error),
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          // خليه يحط الصورة الجديدة مكان القديم (واحدة بس)
+            // خليه يحط الصورة الجديدة مكان القديم (واحدة بس)
             setNewData((prev) => ({
               ...prev,
               Masterimg: [downloadURL],
@@ -403,9 +415,40 @@ function EditDealdetails() {
     },
     [storage]
   );
+  const handleDynamicSelectcompond = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => item[lang] === selectedLabel
+      );
 
-  const monyType = useMemo(() => [{ en: "dollar", ar: "دولار" }, { en: "pound", ar: "جنيه مصري" }], []);
-  const soldOutOptions = useMemo(() => [{ en: "SOLD OUT", ar: "تم البيع" }, { en: "Not", ar: 'متاح' }], []);
+      if (selectedObject) {
+        setNewData((prev) => ({
+          ...prev,
+          compoundId: selectedObject.id,
+          [fieldName]: {
+            en: selectedObject.en,
+            ar: selectedObject.ar,
+          },
+        }));
+      }
+    },
+    [lang]
+  );
+  const monyType = useMemo(
+    () => [
+      { en: "dollar", ar: "دولار" },
+      { en: "pound", ar: "جنيه مصري" },
+    ],
+    []
+  );
+  const soldOutOptions = useMemo(
+    () => [
+      { en: "SOLD OUT", ar: "تم البيع" },
+      { en: "Not", ar: "متاح" },
+    ],
+    []
+  );
   const deliveryOptions = useMemo(
     () => [
       { en: "Delivered", ar: "تم التسليم" },
@@ -422,7 +465,13 @@ function EditDealdetails() {
     ],
     []
   );
-  const floorOptions = useMemo(() => [{ en: "Typical", ar: "متكرر " }, { en: "Ground", ar: "أرضي" }], []);
+  const floorOptions = useMemo(
+    () => [
+      { en: "Typical", ar: "متكرر " },
+      { en: "Ground", ar: "أرضي" },
+    ],
+    []
+  );
   const typeOptions = useMemo(
     () => [
       { en: "Apartment", ar: "شقة" },
@@ -457,13 +506,16 @@ function EditDealdetails() {
     ],
     []
   );
-  const bathroomOptions = useMemo(() => [
-    { en: "1", ar: "١" },
-    { en: "2", ar: "٢" },
-    { en: "3", ar: "٣" },
-    { en: "4", ar: "٤" },
-    { en: "5", ar: "٥" }
-  ], []);
+  const bathroomOptions = useMemo(
+    () => [
+      { en: "1", ar: "١" },
+      { en: "2", ar: "٢" },
+      { en: "3", ar: "٣" },
+      { en: "4", ar: "٤" },
+      { en: "5", ar: "٥" },
+    ],
+    []
+  );
   const finshOptions = useMemo(
     () => [
       { en: "Finished", ar: "تشطيب كامل" },
@@ -473,11 +525,14 @@ function EditDealdetails() {
     ],
     []
   );
-  const statusOptions = useMemo(() => [
-    { en: "Resale", ar: "إعادة بيع" },
-    { en: "Rent", ar: "إيجار" },
-    { en: "Primary", ar: "بيع أولي" },
-  ], []);
+  const statusOptions = useMemo(
+    () => [
+      { en: "Resale", ar: "إعادة بيع" },
+      { en: "Rent", ar: "إيجار" },
+      { en: "Primary", ar: "بيع أولي" },
+    ],
+    []
+  );
   const checkBoxOptions1 = useMemo(
     () => [
       { en: "Clubhouse", ar: "النادي الاجتماعي" },
@@ -505,18 +560,23 @@ function EditDealdetails() {
   const getChangedFields = (newObj, oldObj) => {
     let changedFields = {};
     for (let key in newObj) {
-      if (typeof newObj[key] === "object" && newObj[key] !== null && !Array.isArray(newObj[key])) {
+      if (
+        typeof newObj[key] === "object" &&
+        newObj[key] !== null &&
+        !Array.isArray(newObj[key])
+      ) {
         if (JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])) {
           // في حالة object (زي dealName) ارسل كامل الـ object
           changedFields[key] = newObj[key];
         }
-      } else if (JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])) {
+      } else if (
+        JSON.stringify(newObj[key]) !== JSON.stringify(oldObj?.[key])
+      ) {
         changedFields[key] = newObj[key];
       }
     }
     return changedFields;
   };
-
 
   if (loading) {
     return (
@@ -534,21 +594,26 @@ function EditDealdetails() {
   }
   return (
     <>
-      <Stack sx={{
-        minHeight: "calc(100vh - 100px)", padding: "70px 0 0",
-        width: "100%",
-        flexDirection: "column",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
+      <Stack
+        sx={{
+          minHeight: "calc(100vh - 100px)",
+          padding: "70px 0 0",
+          width: "100%",
+          flexDirection: "column",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Stack sx={{ alignItems: "center", marginBottom: "10px" }}>
-          <Typography variant="h5">{lang === "ar" ? "تعديل العرض" : "ُEdit Deal"}</Typography>
+          <Typography variant="h5">
+            {lang === "ar" ? "تعديل العرض" : "ُEdit Deal"}
+          </Typography>
         </Stack>
         <Card
           onSubmit={handleUpdate}
           component="form"
-          sx={{ gap: '10px' }}
+          sx={{ gap: "10px" }}
           className="sm:w-11/12 md:w-4/5 flex align-items-center flex-col p-5 mt-2.5 mb-2.5"
         >
           <Input
@@ -568,7 +633,7 @@ function EditDealdetails() {
             name="compoundName"
             data={compoundNames}
             value={newData.compoundName[lang] || ""}
-            fun={handleDynamicSelectChange(compoundNames, "compoundName")}
+            fun={handleDynamicSelectcompond(compoundNames, "compoundName")}
             lang={lang}
           />
           <Input
@@ -607,11 +672,16 @@ function EditDealdetails() {
             fun={handleDynamicSelectChange(monyType, "monyType")}
             lang={lang}
           />
-          <FileUpload handleFileChange={handleFileChange} prog={prog} multiple={true} title='Upload Your Images ...' />
+          <FileUpload
+            handleFileChange={handleFileChange}
+            prog={prog}
+            multiple={true}
+            title="Upload Your Images ..."
+          />
           <Input
             onChange={onchangesimple}
             id="Price"
-            name='price'
+            name="price"
             label={lang === "ar" ? "السعر" : "Price"}
             type="number"
             value={newData.price} // نخزن ونعرض الـ id
@@ -720,7 +790,11 @@ function EditDealdetails() {
             fun={handleDynamicSelectChange(typeOptions, "Type")}
             inputLabel={lang === "ar" ? "النوع " : "Type"}
           />
-          <FileUpload handleFileChange={handleFiletowChange} prog={prog2} title="Layout img" />
+          <FileUpload
+            handleFileChange={handleFiletowChange}
+            prog={prog2}
+            title="Layout img"
+          />
 
           <Input
             onChange={onchangesimple}
@@ -731,7 +805,11 @@ function EditDealdetails() {
             name="Area"
             value={newData.Area} // نخزن ونعرض الـ id
           />
-          <FileUpload handleFileChange={handleMasterplanImgChange} prog={prog3} title='Master img' />
+          <FileUpload
+            handleFileChange={handleMasterplanImgChange}
+            prog={prog3}
+            title="Master img"
+          />
           <FormGro
             name="Bed"
             data={bedroomOptions}
@@ -814,14 +892,16 @@ function EditDealdetails() {
           >
             {btn ? (
               <ReactLoading type={"spin"} height={"20px"} width={"20px"} />
+            ) : lang === "ar" ? (
+              "ارسال"
             ) : (
-              lang === "ar" ? "ارسال" : "Send"
+              "Send"
             )}
           </Button>
         </Card>
       </Stack>
     </>
-  )
+  );
 }
 
 export default EditDealdetails;
