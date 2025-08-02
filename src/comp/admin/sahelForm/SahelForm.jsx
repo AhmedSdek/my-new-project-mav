@@ -31,6 +31,7 @@ function SahelForm() {
     countryKey: "",
     devId: "",
     devIcon: "",
+    compoundId: "",
     compoundName: { ar: "", en: "" },
     img: [],
     Location: { ar: "", en: "" },
@@ -236,18 +237,20 @@ function SahelForm() {
     const fetchCompounds = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "compound"));
-        const allCompoundNames = [];
+        const allCompounds = [];
+
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          if (Array.isArray(data.compounds)) {
-            data.compounds.forEach((item) => {
-              if (item.compoundName) {
-                allCompoundNames.push(item.compoundName);
-              }
+          if (data?.compoundName?.en || data?.compoundName?.ar) {
+            allCompounds.push({
+              id: doc.id,
+              en: data.compoundName.en,
+              ar: data.compoundName.ar,
             });
           }
         });
-        setCompoundNames(allCompoundNames);
+
+        setCompoundNames(allCompounds);
       } catch (error) {
         console.error("Error fetching compounds:", error);
       } finally {
@@ -406,6 +409,26 @@ function SahelForm() {
     },
     [newData] // لازم تضيف newData هنا عشان يشوف النسخة المحدثة
   );
+  const handleDynamicSelectcompond = useCallback(
+    (dataArray, fieldName) => (e) => {
+      const selectedLabel = e.target.value;
+      const selectedObject = dataArray.find(
+        (item) => item[lang] === selectedLabel
+      );
+
+      if (selectedObject) {
+        setNewData((prev) => ({
+          ...prev,
+          compoundId: selectedObject.id,
+          [fieldName]: {
+            en: selectedObject.en,
+            ar: selectedObject.ar,
+          },
+        }));
+      }
+    },
+    [lang]
+  );
   return (
     <>
       <Box
@@ -442,7 +465,7 @@ function SahelForm() {
             name="compoundName"
             data={compoundNames}
             value={newData.compoundName[lang] || ""}
-            fun={handleDynamicSelectChange(compoundNames, "compoundName")}
+            fun={handleDynamicSelectcompond(compoundNames, "compoundName")}
             lang={lang}
           />
 
