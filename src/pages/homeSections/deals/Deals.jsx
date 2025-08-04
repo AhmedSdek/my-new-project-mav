@@ -146,7 +146,7 @@ function Deals() {
                                       objectFit: "cover",
                                     }}
                                     src={col.img[0]}
-                                    alt={`${col.Sale[lang]} ${col.Type[lang]} in ${col.compoundName[lang]}`}
+                                    alt={`${col.Type[lang]} in ${col.compoundName[lang]}`}
                                   />
                                 </Box>
                                 <CardContent
@@ -164,20 +164,10 @@ function Deals() {
                                       }}
                                       variant="h6"
                                     >
-                                      {`${col.Sale[lang]} ${col.Type[lang]} ${
+                                      {`${col.Type[lang]} ${
                                         lang === "ar" ? "في" : "in"
                                       } ${col.compoundName[lang]}`}
                                     </Typography>
-                                    {/* <Typography
-                                        component="h2"
-                                        sx={{
-                                          lineHeight: "1.3",
-                                          fontWeight: "bold",
-                                        }}
-                                        variant="h6"
-                                      >
-                                        {col.compoundName[lang]}
-                                      </Typography> */}
                                     <Typography
                                       variant="caption"
                                       sx={{

@@ -4,28 +4,50 @@ import logoPhoto from "./log.webp";
 import { Link } from "react-router-dom";
 import { db } from "../firebase/config";
 import { Button, Stack, ToggleButton, Tooltip } from "@mui/material";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { collection } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { FavoriteBorder, FormatBold } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGlobal } from "../context/GlobalContext";
 function Navs() {
   const { i18n } = useTranslation();
-  const lang = i18n.language; // هيطلع "ar" أو "en"
+  const lang = i18n.language;
   const { country, setCountry } = useGlobal();
-  // console.log(country);
-  // console.log(lang)
-  const [value, loading, error] = useCollection(collection(db, "admin"));
-  var arr = [];
-  value &&
-    value.docs.map((e) =>
-      e.data().dev.map((it) => {
-        if (!arr.includes(it.district) && it.district !== "") {
-          arr.push(it.district);
-        }
-      })
-    );
+  const [loadingcompound, setLoadingcompound] = useState(true);
+  const [errorcompound, setErrorcompound] = useState(null);
+  const [districts, setDistricts] = useState([]);
+  useEffect(() => {
+    const fetchcompounds = async () => {
+      try {
+        const q = query(
+          collection(db, "compound"),
+          where("countryKey", "==", country.en)
+        );
+        const snapshot = await getDocs(q);
+        const compoundsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const allDistricts = compoundsData.map((item) => item.district);
+
+        // إزالة التكرارات بناءً على القيمة `en` مثلاً
+        const uniqueDistricts = allDistricts.filter(
+          (district, index, self) =>
+            index ===
+            self.findIndex((d) => d.en === district.en && d.ar === district.ar)
+        );
+        setDistricts(uniqueDistricts);
+      } catch (err) {
+        setErrorcompound(err.message);
+      } finally {
+        setLoadingcompound(false);
+      }
+    };
+
+    fetchcompounds();
+  }, [country]);
+
   const [ope, setOpe] = useState(false);
   const handleToggleLanguage = () => {
     window.location.reload();
@@ -72,16 +94,17 @@ function Navs() {
                 title={lang === "ar" ? "المناطق" : "Districts"}
                 id="navbarScrollingDropdown"
               >
-                {arr.map((link, index) => {
+                {districts.map((link, index) => {
+                  console.log(link);
                   return (
                     <NavDropdown.Item
                       as={Link}
                       key={index}
                       className="dropdown-item"
-                      to={`findhome/${link}`}
+                      to={`/${link.en}`}
                       eventKey="0"
                     >
-                      {link}
+                      {link[lang]}
                     </NavDropdown.Item>
                   );
                 })}

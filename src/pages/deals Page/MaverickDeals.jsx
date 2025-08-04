@@ -84,20 +84,6 @@ function MaverickDeals() {
       }}
     >
       <Container>
-        {/* <Stack sx={{ marginBottom: "10px" }}>
-          <IconButton
-            sx={{ backgroundColor: "rgb(255 145 77)", width: "fit-content" }}
-            onClick={() => {
-              if (filterIcon) {
-                setFilterIcon(false);
-              } else {
-                setFilterIcon(true);
-              }
-            }}
-          >
-            <Tune sx={{ color: "#1e4164" }} />
-          </IconButton>
-        </Stack> */}
         <Row>
           {deals.length > 0 ? (
             deals.map((item, index) => {

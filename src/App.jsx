@@ -59,6 +59,7 @@ import ContactUs from "./pages/Contact Page/ContactUs";
 import Sell from "./pages/sell-rent Page/Sell";
 import FavoriteList from "./pages/FavList page/FavoriteList";
 import ScrollToTop from "./comp/ScrollToTop";
+import District from "./pages/district page/District";
 function App() {
   const { i18n } = useTranslation();
   const { country, setCountry } = useGlobal();
@@ -177,8 +178,8 @@ function App() {
                 />
               </Route>
 
+              <Route path="/:districtid" element={<District />} />
               <Route path="findhome" element={<FindHomeDetails />}>
-                <Route path=":districtid" element={<FindDetails />} />
                 <Route
                   path=":districtid/:findprojId"
                   element={<FindCompDetails />}

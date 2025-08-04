@@ -31,7 +31,7 @@ function CityscapeProjects() {
   const [devName, setDevName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  // const [country, setCountry] = React.useState("eg");
+  const [countryCode, setCountryCode] = React.useState("eg");
   const [phone, setPhone] = React.useState("");
   const [message, setMessage] = useState("");
   const [city, setCity] = useState([]);
@@ -361,11 +361,12 @@ function CityscapeProjects() {
             <TextField
               sx={{ margin: "10px", width: "100%" }}
               id="ProjectName"
-              label=" ProjectName"
+              label=" Project Name"
               variant="outlined"
               type="text"
               value={projectName[lang]}
               disabled
+              InputLabelProps={{ shrink: true }}
             />
 
             <TextField
@@ -375,6 +376,7 @@ function CityscapeProjects() {
               variant="outlined"
               type="text"
               value={devName[lang]}
+              InputLabelProps={{ shrink: true }}
               disabled
             />
 
@@ -394,7 +396,7 @@ function CityscapeProjects() {
             <Box sx={{ width: { xs: "100%", md: "100%" }, padding: "5px" }}>
               <PhoneInput
                 inputProps={{ required: true }}
-                country={country}
+                country={countryCode}
                 value={phone}
                 onChange={(value) => {
                   setPhone(value);
