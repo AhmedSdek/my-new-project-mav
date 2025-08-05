@@ -11,7 +11,6 @@ function Search() {
   const [serch, setSerch] = useState(null);
   const [menu, setMenu] = useState(false);
   const [adminData, setAdminData] = useState([]);
-  console.log(adminData);
   const [adminLoading, setAdminLoading] = useState(true);
   const [adminError, setAdminError] = useState("");
 
@@ -88,18 +87,24 @@ function Search() {
 
     adminData.forEach((item) => {
       switch (item._type) {
-        case "compound":
-          if (
+        case "compound": {
+          const compoundNameMatch =
             item.compoundName?.en?.toLowerCase().includes(searchTerm) ||
-            item.compoundName?.ar?.toLowerCase().includes(searchTerm)
-          ) {
+            item.compoundName?.ar?.toLowerCase().includes(searchTerm);
+          const districtMatch =
+            item.district?.en?.toLowerCase().includes(searchTerm) ||
+            item.district?.ar?.toLowerCase().includes(searchTerm);
+
+          if (compoundNameMatch || districtMatch) {
             firebasedata.push({
               label: item.compoundName[currentLang] || item.compoundName.en,
+              subLabel: item.district?.[currentLang] || item.district?.en,
               type: "Compound",
-              link: `developers/${item.devId}/${item.id}`,
+              link: `findhome/${item.id}`,
             });
           }
           break;
+        }
 
         case "deals":
           if (
@@ -109,20 +114,20 @@ function Search() {
             firebasedata.push({
               label: item.compoundName[currentLang] || item.compoundName.en,
               type: "Deal",
-              link: `maverickdeals/${item.id}`,
+              link: `deals/${item.id}`,
             });
           }
           break;
 
         case "newLaunch":
           if (
-            item.launchName?.en?.toLowerCase().includes(searchTerm) ||
-            item.launchName?.ar?.toLowerCase().includes(searchTerm)
+            item.llaunchName?.en?.toLowerCase().includes(searchTerm) ||
+            item.llaunchName?.ar?.toLowerCase().includes(searchTerm)
           ) {
             firebasedata.push({
-              label: item.launchName[currentLang] || item.launchName.en,
+              label: item.llaunchName[currentLang] || item.llaunchName.en,
               type: "New Launch",
-              link: `newlaunches/${item.id}`,
+              link: `newlaunch/${item.id}`,
             });
           }
           break;
@@ -135,7 +140,7 @@ function Search() {
             firebasedata.push({
               label: item.compoundName[currentLang] || item.compoundName.en,
               type: "Inventory",
-              link: `developers/${item.devId}/${item.compoundId}/${item.id}`,
+              link: `inventory/${item.id}`,
             });
           }
           break;
@@ -226,6 +231,11 @@ function Search() {
                     <Typography sx={{ fontWeight: "bold" }}>
                       {filter.label}
                     </Typography>
+                    {filter.subLabel && (
+                      <Typography variant="caption" color="text.secondary">
+                        {filter.subLabel}
+                      </Typography>
+                    )}
                   </Stack>
                   <Typography
                     variant="caption"
