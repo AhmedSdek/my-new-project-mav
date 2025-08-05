@@ -1,66 +1,165 @@
 import { Paper, Stack, TextField, Typography } from "@mui/material";
 import React, { memo, useEffect, useState } from "react";
-import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase/config";
+import { useTranslation } from "react-i18next";
 
 function Search() {
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
+
   const [serch, setSerch] = useState(null);
   const [menu, setMenu] = useState(false);
   const [adminData, setAdminData] = useState([]);
+  console.log(adminData);
   const [adminLoading, setAdminLoading] = useState(true);
   const [adminError, setAdminError] = useState("");
 
   useEffect(() => {
-    const fetchAdminData = async () => {
+    const fetchAllData = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "admin"));
-        const result = snapshot.docs.map((doc) => ({
+        const [
+          compoundSnap,
+          dealsSnap,
+          newLaunchSnap,
+          inventorySnap,
+          developerSnap,
+        ] = await Promise.all([
+          getDocs(collection(db, "compound")),
+          getDocs(collection(db, "deals")),
+          getDocs(collection(db, "newlaunch")),
+          getDocs(collection(db, "inventory")),
+          getDocs(collection(db, "developer")),
+        ]);
+
+        const compounds = compoundSnap.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
+          _type: "compound",
         }));
-        setAdminData(result);
+
+        const deals = dealsSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          _type: "deals",
+        }));
+
+        const newLaunches = newLaunchSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          _type: "newLaunch",
+        }));
+
+        const inventorys = inventorySnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          _type: "inventory",
+        }));
+
+        const developers = developerSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          _type: "developer",
+        }));
+
+        const allData = [
+          ...compounds,
+          ...deals,
+          ...newLaunches,
+          ...inventorys,
+          ...developers,
+        ];
+        setAdminData(allData);
       } catch (err) {
-        console.error("خطأ أثناء تحميل بيانات admin:", err);
+        console.error("خطأ أثناء تحميل البيانات:", err);
         setAdminError("فشل في تحميل البيانات.");
       } finally {
         setAdminLoading(false);
       }
     };
 
-    fetchAdminData();
+    fetchAllData();
   }, []);
+
   let firebasedata = [];
-  if (adminData) {
-    adminData.map((item) => {
-      // console.log(item)
-      //projects data
-      item.dev.map((proj) => {
-        if (proj.proj.toUpperCase().includes(serch)) {
-          firebasedata.push({
-            divIcon: item.devIcon,
-            devName: item.devName,
-            proj,
-          });
-        }
-      });
-      //developrt data
-      if (item.devName.toUpperCase().includes(serch)) {
-        firebasedata.push({ Name: item.devName, Icon: item.devIcon });
-      }
-      //distract data
-      item.dev.map((proj) => {
-        if (proj.district.toUpperCase().includes(serch)) {
+
+  if (serch && adminData.length) {
+    const searchTerm = serch.toLowerCase();
+
+    adminData.forEach((item) => {
+      switch (item._type) {
+        case "compound":
           if (
-            !firebasedata.includes(proj.district) &&
-            firebasedata.district !== ""
+            item.compoundName?.en?.toLowerCase().includes(searchTerm) ||
+            item.compoundName?.ar?.toLowerCase().includes(searchTerm)
           ) {
-            firebasedata.push(proj.district);
+            firebasedata.push({
+              label: item.compoundName[currentLang] || item.compoundName.en,
+              type: "Compound",
+              link: `developers/${item.devId}/${item.id}`,
+            });
           }
-        }
-      });
+          break;
+
+        case "deals":
+          if (
+            item.compoundName?.en?.toLowerCase().includes(searchTerm) ||
+            item.compoundName?.ar?.toLowerCase().includes(searchTerm)
+          ) {
+            firebasedata.push({
+              label: item.compoundName[currentLang] || item.compoundName.en,
+              type: "Deal",
+              link: `maverickdeals/${item.id}`,
+            });
+          }
+          break;
+
+        case "newLaunch":
+          if (
+            item.launchName?.en?.toLowerCase().includes(searchTerm) ||
+            item.launchName?.ar?.toLowerCase().includes(searchTerm)
+          ) {
+            firebasedata.push({
+              label: item.launchName[currentLang] || item.launchName.en,
+              type: "New Launch",
+              link: `newlaunches/${item.id}`,
+            });
+          }
+          break;
+
+        case "inventory":
+          if (
+            item.compoundName?.en?.toLowerCase().includes(searchTerm) ||
+            item.compoundName?.ar?.toLowerCase().includes(searchTerm)
+          ) {
+            firebasedata.push({
+              label: item.compoundName[currentLang] || item.compoundName.en,
+              type: "Inventory",
+              link: `developers/${item.devId}/${item.compoundId}/${item.id}`,
+            });
+          }
+          break;
+
+        case "developer":
+          if (
+            item.devName?.en?.toLowerCase().includes(searchTerm) ||
+            item.devName?.ar?.toLowerCase().includes(searchTerm)
+          ) {
+            firebasedata.push({
+              label: item.devName[currentLang] || item.devName.en,
+              icon: item.devIcon,
+              type: "Developer",
+              link: `developers/${item.id}`,
+            });
+          }
+          break;
+
+        default:
+          break;
+      }
     });
   }
+
   return (
     <Stack
       component="form"
@@ -71,140 +170,80 @@ function Search() {
         paddingTop: "10px",
         position: "relative",
       }}
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
+      onSubmit={(e) => e.preventDefault()}
     >
       <TextField
         color="warning"
         className="header-search"
         sx={{ backgroundColor: "white", width: "100%", borderRadius: "10px" }}
         id="outlined-search"
-        placeholder="Developers Or Area Or Compounds "
+        placeholder="Developers Or Area Or Compounds"
         type="search"
         onChange={(e) => {
-          // console.log(e.target)
-          if (e.target.value === "") {
+          const val = e.target.value;
+          if (val === "") {
             setSerch(null);
             setMenu(false);
           } else {
-            setSerch(e.target.value.toUpperCase());
+            setSerch(val.toLowerCase());
             setMenu(true);
           }
         }}
       />
       <Stack className="searchBox" sx={{ display: !menu && "none" }}>
         <Stack sx={{ width: "100%", gap: 1 }}>
-          {adminData ? (
-            firebasedata.length > 0 ? (
-              firebasedata.map((filter, index) => {
-                return (
-                  <a
-                    className="searchLink"
-                    key={index}
-                    onClick={() => setSerch(null)}
-                    href={
-                      filter.Name
-                        ? `developers/${filter.Name}`
-                        : filter.divIcon
-                        ? `developers/${filter.devName}/${filter.proj.proj}`
-                        : `findhome/${filter}`
-                    }
-                  >
-                    <Paper
-                      sx={{
-                        padding: "10px",
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
+          {adminLoading ? (
+            <Typography>Loading...</Typography>
+          ) : firebasedata.length > 0 ? (
+            firebasedata.map((filter, index) => (
+              <a
+                className="searchLink"
+                key={index}
+                onClick={() => setSerch(null)}
+                href={filter.link}
+              >
+                <Paper
+                  sx={{
+                    padding: "10px",
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                  elevation={3}
+                >
+                  {filter.icon && (
+                    <img
+                      src={filter.icon}
+                      alt=""
+                      style={{
+                        width: "50px",
+                        filter: "drop-shadow(0 0 10px rgba(0, 0, 0, .15))",
                       }}
-                      elevation={3}
-                    >
-                      {filter.Name ? (
-                        <Stack
-                          sx={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            width: "100%",
-                            gap: 1,
-                          }}
-                        >
-                          <img
-                            src={filter.Icon}
-                            alt=""
-                            style={{
-                              width: "50px",
-                              filter:
-                                "drop-shadow(0 0 10px rgba(0, 0, 0, .15))",
-                            }}
-                          />
-                          <Typography sx={{ fontWeight: "bold" }}>
-                            {filter.Name}
-                          </Typography>
-                        </Stack>
-                      ) : filter.divIcon ? (
-                        <Stack
-                          sx={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            width: "100%",
-                            gap: 1,
-                          }}
-                        >
-                          <img
-                            src={filter.divIcon}
-                            alt=""
-                            style={{
-                              width: "50px",
-                              filter:
-                                "drop-shadow(0 0 10px rgba(0, 0, 0, .15))",
-                            }}
-                          />
-                          <Stack>
-                            <Typography sx={{ fontWeight: "bold" }}>
-                              {filter.proj.proj}
-                            </Typography>
-                            <Typography variant="caption">
-                              {filter.proj.Location}
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      ) : (
-                        <Stack
-                          sx={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            width: "100%",
-                          }}
-                        >
-                          <Typography sx={{ fontWeight: "bold" }}>
-                            {filter}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              backgroundColor: "rgb(240, 240, 240)",
-                              padding: "1px 7px",
-                              borderRadius: "10px",
-                              color: "rgb(33, 36, 39)",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Area
-                          </Typography>
-                        </Stack>
-                      )}
-                    </Paper>
-                  </a>
-                );
-              })
-            ) : (
-              <Typography>Data Not Found !</Typography>
-            )
+                    />
+                  )}
+                  <Stack sx={{ flex: 1 }}>
+                    <Typography sx={{ fontWeight: "bold" }}>
+                      {filter.label}
+                    </Typography>
+                  </Stack>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      backgroundColor: "rgb(240, 240, 240)",
+                      padding: "1px 7px",
+                      borderRadius: "10px",
+                      color: "rgb(33, 36, 39)",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {filter.type}
+                  </Typography>
+                </Paper>
+              </a>
+            ))
           ) : (
-            <Typography>loading</Typography>
+            <Typography>Data Not Found!</Typography>
           )}
         </Stack>
       </Stack>
