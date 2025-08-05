@@ -100,7 +100,7 @@ function Search() {
               label: item.compoundName[currentLang] || item.compoundName.en,
               subLabel: item.district?.[currentLang] || item.district?.en,
               type: "Compound",
-              link: `findhome/${item.id}`,
+              link: `developers/${item.devId}/${item.id}`,
             });
           }
           break;
@@ -114,20 +114,20 @@ function Search() {
             firebasedata.push({
               label: item.compoundName[currentLang] || item.compoundName.en,
               type: "Deal",
-              link: `deals/${item.id}`,
+              link: `maverickdeals/${item.id}`,
             });
           }
           break;
 
         case "newLaunch":
           if (
-            item.llaunchName?.en?.toLowerCase().includes(searchTerm) ||
-            item.llaunchName?.ar?.toLowerCase().includes(searchTerm)
+            item.launchName?.en?.toLowerCase().includes(searchTerm) ||
+            item.launchName?.ar?.toLowerCase().includes(searchTerm)
           ) {
             firebasedata.push({
-              label: item.llaunchName[currentLang] || item.llaunchName.en,
+              label: item.launchName[currentLang] || item.launchName.en,
               type: "New Launch",
-              link: `newlaunch/${item.id}`,
+              link: ` newlaunches/${item.id}`,
             });
           }
           break;
@@ -140,7 +140,7 @@ function Search() {
             firebasedata.push({
               label: item.compoundName[currentLang] || item.compoundName.en,
               type: "Inventory",
-              link: `inventory/${item.id}`,
+              link: `developers/${item.devId}/${item.compoundId}/${item.id}`,
             });
           }
           break;
