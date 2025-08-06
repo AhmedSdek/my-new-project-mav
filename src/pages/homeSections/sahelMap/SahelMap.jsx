@@ -20,7 +20,7 @@ function SahelMap() {
           <Typography sx={{ fontWeight: "bold" }}>
             {lang === "ar"
               ? "استكشف كل المشاريع في الساحل الشمالي"
-              : "Explore all project in north cost"}
+              : "Explore all project in north coast"}
           </Typography>
         </Stack>
         <Link

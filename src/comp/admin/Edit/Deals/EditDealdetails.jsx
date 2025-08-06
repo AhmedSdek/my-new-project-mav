@@ -439,6 +439,7 @@ function EditDealdetails() {
     () => [
       { en: "dollar", ar: "دولار" },
       { en: "pound", ar: "جنيه مصري" },
+      { en: "AED", ar: "الدرهم الإماراتي" },
     ],
     []
   );

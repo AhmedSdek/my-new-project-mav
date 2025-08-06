@@ -135,7 +135,7 @@ function Navs() {
                 gap: "10px",
               }}
             >
-              <Nav.Link
+              {/* <Nav.Link
                 style={{ width: "100%" }}
                 as={Link}
                 to="/favoriteList"
@@ -144,7 +144,7 @@ function Navs() {
                 <Tooltip title="FavoriteList">
                   <FavoriteBorder />
                 </Tooltip>
-              </Nav.Link>
+              </Nav.Link> */}
               <Stack sx={{ flexDirection: "row" }}>
                 <ToggleButton
                   sx={{

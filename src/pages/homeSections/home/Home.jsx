@@ -11,6 +11,7 @@ import Deals from "../deals/Deals";
 import Form from "../form/Form";
 import Search from "../search/Search";
 import { useTranslation } from "react-i18next";
+import NorthCoastProjects from "../north Coast Projects/NorthCoastProjects";
 function Home() {
   const { i18n } = useTranslation();
   const lang = i18n.language;
@@ -72,6 +73,7 @@ function Home() {
       </Box>
       <SahelMap />
       <CityscapeHome />
+      <NorthCoastProjects />
       <NewLaunches />
       <Developers />
       <Deals />
