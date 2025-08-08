@@ -61,6 +61,7 @@ import FavoriteList from "./pages/FavList page/FavoriteList";
 import ScrollToTop from "./comp/ScrollToTop";
 import District from "./pages/district page/District";
 import NorthCoastProjects from "./pages/north Coast Projects page/NorthCoastProjects";
+import NorthCoastProjectsDetails from "./pages/north Coast Projects page/NorthCoastProjectsDetails";
 function App() {
   const { i18n } = useTranslation();
   const { country, setCountry } = useGlobal();
@@ -192,6 +193,10 @@ function App() {
                 element={<NewLaunchDetails />}
               />
               <Route path="northcoast" element={<NorthCoastProjects />} />
+              <Route
+                path="northcoast/:id"
+                element={<NorthCoastProjectsDetails />}
+              />
 
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<AboutUs />} />

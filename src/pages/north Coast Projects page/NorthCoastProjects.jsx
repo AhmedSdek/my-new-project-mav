@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Card,
@@ -16,6 +17,14 @@ import ReactLoading from "react-loading";
 import ContactUsBtn from "../../comp/Contact Us/ContactUsBtn";
 import { Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import {
+  BathroomOutlined,
+  BedroomParentOutlined,
+  BedroomParentTwoTone,
+  Groups,
+  Groups2Outlined,
+  GroupsOutlined,
+} from "@mui/icons-material";
 
 function NorthCoastProjects() {
   const { i18n } = useTranslation();
@@ -55,7 +64,7 @@ function NorthCoastProjects() {
           paddingTop: "60px",
         }}
       >
-        <Box sx={{ height: "100%" }}>
+        <Box sx={{ height: "100%", width: "100%" }}>
           {loading ? (
             <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
               <ReactLoading
@@ -87,7 +96,7 @@ function NorthCoastProjects() {
                         letterSpacing: "4.14px",
                       }}
                     >
-                      Explore New
+                      Explore
                       <span
                         style={{
                           color: "rgb(255 110 25)",
@@ -96,7 +105,7 @@ function NorthCoastProjects() {
                           letterSpacing: "0px",
                         }}
                       >
-                        Launches
+                        North Coast
                       </span>
                     </h1>
                     <h2
@@ -113,9 +122,9 @@ function NorthCoastProjects() {
                   <ContactUsBtn sectionName="New-Launch" />
                 </Stack>
                 <hr />
-                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                {/* <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                   Launching Soon
-                </Typography>
+                </Typography> */}
                 <Row>
                   {northCoast.map((itm, index) => {
                     return (
@@ -151,6 +160,35 @@ function NorthCoastProjects() {
                                 >
                                   {itm.compoundName[lang]}
                                 </Typography>
+                                <Stack
+                                  sx={{
+                                    margin: "10px 0",
+                                    flexDirection: "row",
+                                    gap: 2,
+                                  }}
+                                >
+                                  <Badge
+                                    badgeContent={itm.Bed[lang]}
+                                    sx={{ width: "fit-content" }}
+                                    color="primary"
+                                  >
+                                    <BedroomParentOutlined />
+                                  </Badge>
+                                  <Badge
+                                    badgeContent={itm.Bath[lang]}
+                                    sx={{ width: "fit-content" }}
+                                    color="primary"
+                                  >
+                                    <BathroomOutlined />
+                                  </Badge>
+                                  <Badge
+                                    badgeContent={itm.peopleNumber}
+                                    sx={{ width: "fit-content" }}
+                                    color="primary"
+                                  >
+                                    <GroupsOutlined />
+                                  </Badge>
+                                </Stack>
                                 <Typography
                                   variant="caption"
                                   sx={{
@@ -167,6 +205,46 @@ function NorthCoastProjects() {
                                   {`${itm.price} EGP`}
                                 </Typography>
                               )}
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "rgb(100, 100, 100)",
+                                  paddingTop: "4px",
+                                  fontSize: "14px",
+                                }}
+                              >
+                                {`
+                                ${lang === "ar" ? "متاح" : "Available"}
+                          ${
+                            lang === "ar"
+                              ? `من ${new Date(
+                                  itm.startDate
+                                ).toLocaleDateString("ar-EG", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })} إلى ${new Date(
+                                  itm.endDate
+                                ).toLocaleDateString("ar-EG", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}`
+                              : `From ${new Date(
+                                  itm.startDate
+                                ).toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })} to ${new Date(
+                                  itm.endDate
+                                ).toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}`
+                          }`}
+                              </Typography>
                             </CardContent>
                           </Card>
                         </Link>

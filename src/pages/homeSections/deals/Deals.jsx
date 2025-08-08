@@ -118,10 +118,7 @@ function Deals() {
                     key={index}
                     style={{ marginBottom: "15px", position: "relative" }}
                   >
-                    <Col
-                      key={index}
-                      style={{ position: "relative", height: "460px" }}
-                    >
+                    <Col key={index} style={{ position: "relative" }}>
                       {col && (
                         <>
                           <Card
@@ -337,46 +334,6 @@ function Deals() {
                                 justifyContent: "end",
                               }}
                             >
-                              {/* <Stack
-                                  sx={{
-                                    flexDirection: "row",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <Checkbox
-                                    checked={
-                                      localStorage.getItem(col.id) === "true"
-                                        ? true
-                                        : false
-                                    }
-                                    aria-label="like"
-                                    icon={<FavoriteBorder />}
-                                    checkedIcon={<Favorite sx={{ color: "red" }} />}
-                                    onChange={async (e) => {
-                                      if (e.target.checked) {
-                                        localStorage.setItem(col.id, true);
-                                        localStorage.setItem(col.refNum, col.id);
-                                        try {
-                                          await updateDoc(
-                                            doc(db, "deals", col.id),
-                                            {
-                                              like: col.like + 1,
-                                            }
-                                          );
-                                        } catch (er) {
-                                          console.log(er);
-                                        }
-                                      } else {
-                                        localStorage.removeItem(col.id);
-                                        localStorage.removeItem(col.refNum);
-                                        await updateDoc(doc(db, "deals", col.id), {
-                                          like: col.like - 1,
-                                        });
-                                      }
-                                    }}
-                                  />
-                                </Stack> */}
                               <ContactUsIcon
                                 sectionName={
                                   lang === "ar"
