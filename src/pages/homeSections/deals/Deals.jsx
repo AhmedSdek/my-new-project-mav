@@ -116,7 +116,10 @@ function Deals() {
                 return (
                   <SwiperSlide
                     key={index}
-                    style={{ marginBottom: "15px", position: "relative" }}
+                    style={{
+                      marginBottom: "15px",
+                      position: "relative",
+                    }}
                   >
                     <Col key={index} style={{ position: "relative" }}>
                       {col && (
@@ -132,7 +135,10 @@ function Deals() {
                           >
                             <Link
                               to={`/maverickdeals/${col.id}`}
-                              style={{ textDecoration: "none" }}
+                              style={{
+                                textDecoration: "none",
+                                minHeight: "380px",
+                              }}
                             >
                               <Stack>
                                 <Box sx={{ height: "215px" }}>

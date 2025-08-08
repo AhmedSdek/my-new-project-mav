@@ -4,7 +4,14 @@ import {
   Button,
   Card,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
   IconButton,
+  Slide,
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
@@ -14,7 +21,9 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
-
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 function Calc() {
   const [openCalc, setOpenCalc] = useState(false);
   const [total, setTotal] = useState("");
@@ -23,6 +32,8 @@ function Calc() {
   const [years, setYears] = useState("");
   const [maintenanceres, setMaintenanceres] = useState(0);
   const [amount, setAmount] = useState(0);
+  const [open, setOpen] = React.useState(false);
+  const [openDilo, setOpenDilo] = React.useState(false);
   const [month, setMonth] = useState(0);
   const actions = [
     { icon: <Calculate />, name: "Calculator" },
@@ -31,7 +42,10 @@ function Calc() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpenDilo(true);
+  };
+  const handleCloseDilo = () => setOpenDilo(false);
   return (
     <>
       <Box
@@ -57,262 +71,219 @@ function Calc() {
           <SpeedDialAction
             icon={<Calculate />}
             tooltipTitle="Calculator"
-            onClick={() => setOpenCalc(true)}
+            onClick={() => setOpenDilo(true)}
           />
-          {/* <SpeedDialAction
-                        icon={<Save />}
-                        tooltipTitle='Save'
-                        onClick={handleClose}
-                    /> */}
         </SpeedDial>
       </Box>
-      {openCalc && (
-        <Stack
-          sx={{
-            alignItems: "center",
-            justifyContent: "center",
-            position: "fixed",
-            height: "100%",
-            width: "100%",
-            backgroundColor: "#000000d1",
-            zIndex: "200",
-            top: "0",
-          }}
-        >
+      <Dialog
+        open={openDilo}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={handleCloseDilo}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>{"Budget Calculator"}</DialogTitle>
+        <DialogContent>
           <Stack
-            sx={{
-              width: { xs: "90%", md: "60%" },
-              backgroundColor: "white",
-              height: "fit-content",
-              position: "relative",
-              margin: "50px 0 0",
-              borderRadius: "12px",
-              gap: { xs: 0, sm: 0, md: 1, lg: 1 },
-              padding: "40px 0 0",
+            component="form"
+            sx={{ gap: 1, alignItems: "center", marginBottom: "10px" }}
+            onSubmit={async (e) => {
+              e.preventDefault();
             }}
           >
-            <h1
-              style={{
-                fontWeight: "bold",
-                textAlign: "center",
-                // letterSpacing: '0px',
-                fontFamily: "materialBold",
-                fontSize: "15px",
-                color: "rgb(30, 65, 100)",
-                textTransform: "uppercase",
-                letterSpacing: "4.14px",
-                marginBottom: "0",
+            <Stack
+              sx={{
+                flexDirection: { xs: "column", sm: "row" },
+                width: "100%",
+                gap: 1,
               }}
             >
-              Budget
-              <span
-                style={{
-                  color: "rgb(255 110 25)",
-                  fontSize: "30px",
-                  verticalAlign: "middle",
-                  letterSpacing: "0px",
-                }}
-              >
-                Calculator
-              </span>
-            </h1>
-
-            <Card sx={{ height: "fit-content", padding: "6px 10px" }}>
-              <Stack
-                component="form"
-                sx={{ gap: 1, alignItems: "center" }}
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  setAmount((total * downPayment) / 100);
-                  setMonth(
-                    (total - (total * downPayment) / 100) / (years * 12)
-                  );
-                  setMaintenanceres((total * maintenance) / 100);
-                }}
-              >
-                <Stack
-                  sx={{
-                    flexDirection: { xs: "column", sm: "row" },
-                    width: "100%",
-                    gap: 1,
-                  }}
-                >
-                  <TextField
-                    sx={{ width: "100%" }}
-                    required
-                    id="outlined-required"
-                    label="Total Budget"
-                    type="number"
-                    placeholder="EGP"
-                    value={total}
-                    className="inbutlapel
+              <TextField
+                sx={{ width: "100%" }}
+                required
+                id="outlined-required"
+                label="Total Budget"
+                type="number"
+                placeholder="EGP"
+                value={total}
+                className="inbutlapel
                                         "
-                    size="small"
-                    onChange={(e) => setTotal(e.target.value)}
-                  />
-                  <TextField
-                    sx={{ width: "100%" }}
-                    id="maintenance"
-                    label="Maintenance"
-                    type="number"
-                    placeholder="%"
-                    value={maintenance}
-                    className="inbutlapel
+                size="small"
+                onChange={(e) => setTotal(e.target.value)}
+              />
+              <TextField
+                sx={{ width: "100%" }}
+                id="maintenance"
+                label="Maintenance"
+                type="number"
+                placeholder="%"
+                value={maintenance}
+                className="inbutlapel
                                         "
-                    size="small"
-                    onChange={(e) => setMaintenance(e.target.value)}
-                  />
-                </Stack>
-                <Stack
-                  sx={{
-                    flexDirection: { xs: "column", sm: "row" },
-                    width: "100%",
-                    gap: 1,
-                  }}
-                >
-                  <TextField
-                    sx={{ width: "100%" }}
-                    required
-                    id="downPayment"
-                    placeholder="%"
-                    label="Down Payment"
-                    type="number"
-                    size="small"
-                    className="inbutlapel
+                size="small"
+                onChange={(e) => setMaintenance(e.target.value)}
+              />
+            </Stack>
+            <Stack
+              sx={{
+                flexDirection: { xs: "column", sm: "row" },
+                width: "100%",
+                gap: 1,
+              }}
+            >
+              <TextField
+                sx={{ width: "100%" }}
+                required
+                id="downPayment"
+                placeholder="%"
+                label="Down Payment"
+                type="number"
+                size="small"
+                className="inbutlapel
                                             "
-                    value={downPayment}
-                    onChange={(e) => setDownPayment(e.target.value)}
-                  />
-                  <TextField
-                    sx={{ width: "100%" }}
-                    required
-                    id="years"
-                    size="small"
-                    className="inbutlapel"
-                    label="years Of Installments"
-                    type="number"
-                    placeholder="0"
-                    value={years}
-                    onChange={(e) => setYears(e.target.value)}
-                  />
-                </Stack>
-                <Button
-                  className="calcbtn"
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    width: "150px",
-                    backgroundColor: "rgb(255 110 25)",
-                    color: "rgb(30, 65, 100)",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Calc
-                </Button>
-              </Stack>
-            </Card>
-            <Container>
-              <Row style={{ paddingBottom: "5px" }}>
-                <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Down Paymant Amount
-                    <Typography
-                      sx={{
-                        padding: "2px 10px",
-                        borderRadius: "10px",
-                        backgroundColor: "#0d4d8f2e",
-                        color: "rgb(255 110 25)",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {amount} EGP
-                    </Typography>
-                  </Typography>
-                </Col>
-                <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Monthly Paymant
-                    <Typography
-                      sx={{
-                        padding: "2px 10px",
-                        borderRadius: "10px",
-                        backgroundColor: "#0d4d8f2e",
-                        color: "rgb(255 110 25)",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {month} EGP
-                    </Typography>
-                  </Typography>
-                </Col>
-                <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Quarterly payment
-                    <Typography
-                      sx={{
-                        padding: "2px 10px",
-                        borderRadius: "10px",
-                        backgroundColor: "#0d4d8f2e",
-                        color: "rgb(255 110 25)",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {month * 3} EGP
-                    </Typography>
-                  </Typography>
-                </Col>
-                <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Annual payment
-                    <Typography
-                      sx={{
-                        padding: "2px 10px",
-                        borderRadius: "10px",
-                        backgroundColor: "#0d4d8f2e",
-                        color: "rgb(255 110 25)",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {month * 12} EGP
-                    </Typography>
-                  </Typography>
-                </Col>
-                <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Maintenance
-                    <Typography
-                      sx={{
-                        padding: "2px 10px",
-                        borderRadius: "10px",
-                        backgroundColor: "#0d4d8f2e",
-                        color: "rgb(255 110 25)",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {maintenanceres} EGP
-                    </Typography>
-                  </Typography>
-                </Col>
-              </Row>
-            </Container>
-            <IconButton
-              onClick={() => {
-                setOpenCalc(false);
-                setTotal("");
-                setDownPayment("");
-                setYears("");
-                setMaintenance("");
-                setAmount(0);
-                setMonth(0);
-                setMaintenanceres(0);
-              }}
-              sx={{ position: "absolute", top: "1px", right: "1px" }}
-            >
-              <Close fontSize="large" />
-            </IconButton>
+                value={downPayment}
+                onChange={(e) => setDownPayment(e.target.value)}
+              />
+              <TextField
+                sx={{ width: "100%" }}
+                required
+                id="years"
+                size="small"
+                className="inbutlapel"
+                label="years Of Installments"
+                type="number"
+                placeholder="0"
+                value={years}
+                onChange={(e) => setYears(e.target.value)}
+              />
+            </Stack>
           </Stack>
-        </Stack>
-      )}
+          <Divider />
+          <Container>
+            <Row style={{ padding: "5px" }}>
+              <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
+                <Typography sx={{ fontWeight: "bold" }}>
+                  Down Paymant Amount
+                  <Typography
+                    sx={{
+                      padding: "2px 10px",
+                      borderRadius: "10px",
+                      backgroundColor: "#0d4d8f2e",
+                      color: "rgb(255 110 25)",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {amount} EGP
+                  </Typography>
+                </Typography>
+              </Col>
+              <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
+                <Typography sx={{ fontWeight: "bold" }}>
+                  Monthly Paymant
+                  <Typography
+                    sx={{
+                      padding: "2px 10px",
+                      borderRadius: "10px",
+                      backgroundColor: "#0d4d8f2e",
+                      color: "rgb(255 110 25)",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {month} EGP
+                  </Typography>
+                </Typography>
+              </Col>
+              <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
+                <Typography sx={{ fontWeight: "bold" }}>
+                  Quarterly payment
+                  <Typography
+                    sx={{
+                      padding: "2px 10px",
+                      borderRadius: "10px",
+                      backgroundColor: "#0d4d8f2e",
+                      color: "rgb(255 110 25)",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {month * 3} EGP
+                  </Typography>
+                </Typography>
+              </Col>
+              <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
+                <Typography sx={{ fontWeight: "bold" }}>
+                  Annual payment
+                  <Typography
+                    sx={{
+                      padding: "2px 10px",
+                      borderRadius: "10px",
+                      backgroundColor: "#0d4d8f2e",
+                      color: "rgb(255 110 25)",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {month * 12} EGP
+                  </Typography>
+                </Typography>
+              </Col>
+              <Col className="col-lg-6 col-md-6 col-sm-6 col-12">
+                <Typography sx={{ fontWeight: "bold" }}>
+                  Maintenance
+                  <Typography
+                    sx={{
+                      padding: "2px 10px",
+                      borderRadius: "10px",
+                      backgroundColor: "#0d4d8f2e",
+                      color: "rgb(255 110 25)",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {maintenanceres} EGP
+                  </Typography>
+                </Typography>
+              </Col>
+            </Row>
+          </Container>
+        </DialogContent>
+        <DialogActions sx={{ gap: 2, justifyContent: "space-evenly" }}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => {
+              setOpenDilo(false);
+              setTotal("");
+              setDownPayment("");
+              setYears("");
+              setMaintenance("");
+              setAmount(0);
+              setMonth(0);
+              setMaintenanceres(0);
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            onClick={() => {
+              setAmount((total * downPayment) / 100);
+              setMonth((total - (total * downPayment) / 100) / (years * 12));
+              setMaintenanceres((total * maintenance) / 100);
+            }}
+            className="calcbtn"
+            type="submit"
+            variant="contained"
+            sx={{
+              width: "150px",
+              backgroundColor: "rgb(255 110 25)",
+              color: "rgb(30, 65, 100)",
+              fontWeight: "bold",
+            }}
+          >
+            Calc
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
