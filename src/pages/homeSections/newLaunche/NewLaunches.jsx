@@ -18,6 +18,7 @@ import MavLoading from "../../../comp/Loading/MavLoading";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useGlobal } from "../../../context/GlobalContext";
+import Skeltoon from "../../../comp/skeltoon/Skeltoon";
 function NewLaunches() {
   const { i18n } = useTranslation();
   const lang = i18n.language;
@@ -26,6 +27,7 @@ function NewLaunches() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { country } = useGlobal();
+
   useEffect(() => {
     const fetchNewlaunch = async () => {
       try {
@@ -67,14 +69,7 @@ function NewLaunches() {
           </Link>
         </Stack>
         {loading ? (
-          <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
-            <ReactLoading
-              color="black"
-              type={"spin"}
-              height={"50px"}
-              width={"50px"}
-            />
-          </Stack>
+          <Skeltoon Xs={1} Sm={2} Md={3} lg={3} height={225} width={393} />
         ) : newlaunch && newlaunch.length > 0 ? (
           <Stack>
             <Swiper
@@ -84,11 +79,11 @@ function NewLaunches() {
                 disableOnInteraction: false,
               }}
               breakpoints={{
-                640: {
+                600: {
                   slidesPerView: 2,
                   spaceBetween: 10,
                 },
-                768: {
+                900: {
                   slidesPerView: 3,
                   spaceBetween: 10,
                 },

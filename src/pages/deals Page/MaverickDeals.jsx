@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import {
   Box,
@@ -35,8 +35,10 @@ import ContactUsBtn from "../../comp/Contact Us/ContactUsBtn";
 import ContactUsIcon from "../../comp/Contact Us/ContactUsIcon";
 import MavLoading from "../../comp/Loading/MavLoading";
 import im from "./2238332.png";
+import Filter from "../../comp/filter/Filter";
 function MaverickDeals() {
   const [deals, setDeals] = useState([]);
+  console.log(deals);
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const [loading, setLoading] = useState(true);
@@ -47,13 +49,12 @@ function MaverickDeals() {
     type: "",
     bed: "",
     bath: "",
-    finish: "",
+    Finsh: "",
     sale: "",
     monyType: "",
     compoundName: "",
     search: "", // 🔍 هنا السيرش
   });
-  const [showFilters, setShowFilters] = useState(false);
   const [openFilterDrawer, setOpenFilterDrawer] = useState(false);
 
   useEffect(() => {
@@ -78,9 +79,9 @@ function MaverickDeals() {
     fetchDeals();
   }, [country]);
 
-  const handleSliderChange = (type) => (event, newValue) => {
-    setFilters((prev) => ({ ...prev, [type]: newValue }));
-  };
+  // const handleSliderChange = (type) => (event, newValue) => {
+  //   setFilters((prev) => ({ ...prev, [type]: newValue }));
+  // };
 
   const filteredDeals = deals.filter((deal) => {
     const price = Number(deal.price);
@@ -88,18 +89,18 @@ function MaverickDeals() {
     const type = deal.Type?.[lang]?.toLowerCase() || "";
     const bed = deal.Bed?.[lang];
     const bath = deal.Bath?.[lang];
-    const finish = deal.Finish?.[lang];
+    const Finsh = deal.Finsh?.[lang];
     const sale = deal.Sale?.[lang];
     const monyType = deal.monyType?.[lang];
     const compoundName = deal.compoundName?.[lang];
-    const dealName = deal.dealName?.[lang]?.toLowerCase() || "";
+    const devName = deal.developer.devName?.[lang]?.toLowerCase() || "";
     const Location = deal.Location?.[lang]?.toLowerCase() || "";
 
     const searchLower = filters.search.toLowerCase();
 
     const matchesSearch =
       !filters.search ||
-      dealName.includes(searchLower) ||
+      devName.includes(searchLower) ||
       compoundName?.toLowerCase().includes(searchLower) ||
       Location?.toLowerCase().includes(searchLower) ||
       type.includes(searchLower);
@@ -112,14 +113,19 @@ function MaverickDeals() {
       (filters.type === "" || type.includes(filters.type.toLowerCase())) &&
       (filters.bed === "" || filters.bed == bed) &&
       (filters.bath === "" || filters.bath == bath) &&
-      (filters.finish === "" || filters.finish == finish) &&
+      (filters.Finsh === "" || filters.Finsh == Finsh) &&
       (filters.sale === "" || filters.sale == sale) &&
       (filters.monyType === "" || filters.monyType == monyType) &&
       (filters.compoundName === "" || filters.compoundName == compoundName) &&
       matchesSearch // ✅ شرط السيرش
     );
   });
-
+  const label = useMemo(() => {
+    return {
+      ar: "البحث بالكمبوند، الموقع،المطور",
+      en: "Search by Compound, Location, Developer",
+    };
+  }, [lang]);
   if (loading) {
     return (
       <Box
@@ -188,7 +194,18 @@ function MaverickDeals() {
             </div>
             <ContactUsBtn sectionName="Maverick-Deals" />
           </Stack>
-          <Stack
+
+          <Filter
+            data={deals}
+            filters={filters}
+            lang={lang}
+            openFilterDrawer={openFilterDrawer}
+            setFilters={setFilters}
+            setOpenFilterDrawer={setOpenFilterDrawer}
+            label={label}
+          />
+
+          {/* <Stack
             sx={{
               flexDirection: "row",
               gap: 2,
@@ -200,8 +217,8 @@ function MaverickDeals() {
               fullWidth
               label={`${
                 lang === "ar"
-                  ? "البحث بالكمبوند، الموقع، اسم العرض"
-                  : "Search by compound, Location, deal Name"
+                  ? "البحث بالكمبوند، الموقع،المطور"
+                  : "Search by Compound, Location, Developer"
               }`}
               variant="outlined"
               value={filters.search}
@@ -212,7 +229,7 @@ function MaverickDeals() {
             <IconButton
               onClick={() => setOpenFilterDrawer(true)}
               sx={{
-                borderRadius: 1, // 0 للمربع التام، أو 1 (يعني 4px) لمربع بزوايا خفيفة
+                borderRadius: 1,
                 width: 40,
                 height: 40,
                 backgroundColor: "#f5f5f5", // اختياري
@@ -223,9 +240,9 @@ function MaverickDeals() {
             >
               <Tune />
             </IconButton>
-          </Stack>
+          </Stack> */}
           {/* ✅ الفلاتر */}
-          <SwipeableDrawer
+          {/* <SwipeableDrawer
             anchor="bottom"
             open={openFilterDrawer}
             onClose={() => setOpenFilterDrawer(false)}
@@ -276,7 +293,7 @@ function MaverickDeals() {
                     justifyContent: { xs: "center", md: "initial" },
                   }}
                 >
-                  {/* Type Filter */}
+
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth sx={{ minWidth: 200 }}>
                       <InputLabel>Type</InputLabel>
@@ -302,7 +319,7 @@ function MaverickDeals() {
                     </FormControl>
                   </Grid>
 
-                  {/* Bedrooms Filter */}
+                  
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth sx={{ minWidth: 200 }}>
                       <InputLabel>Bedrooms</InputLabel>
@@ -317,7 +334,7 @@ function MaverickDeals() {
                         }
                       >
                         <MenuItem value="">All</MenuItem>
-                        {[...new Set(deals.map((d) => d.Bed))].map(
+                        {[...new Set(deals.map((d) => d.Bed?.[lang]))].map(
                           (bed, index) => (
                             <MenuItem key={index} value={bed}>
                               {bed}
@@ -328,7 +345,6 @@ function MaverickDeals() {
                     </FormControl>
                   </Grid>
 
-                  {/* Bathrooms Filter */}
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth sx={{ minWidth: 200 }}>
                       <InputLabel>Bath</InputLabel>
@@ -343,7 +359,7 @@ function MaverickDeals() {
                         }
                       >
                         <MenuItem value="">All</MenuItem>
-                        {[...new Set(deals.map((d) => d.Bath))].map(
+                        {[...new Set(deals.map((d) => d.Bath?.[lang]))].map(
                           (bath, index) => (
                             <MenuItem key={index} value={bath}>
                               {bath}
@@ -354,33 +370,31 @@ function MaverickDeals() {
                     </FormControl>
                   </Grid>
 
-                  {/* Finishing Filter */}
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth sx={{ minWidth: 200 }}>
                       <InputLabel>Finishing</InputLabel>
                       <Select
                         label="Finishing"
-                        value={filters.finsh}
+                        value={filters.Finsh}
                         onChange={(e) =>
                           setFilters((prev) => ({
                             ...prev,
-                            finsh: e.target.value,
+                            Finsh: e.target.value,
                           }))
                         }
                       >
                         <MenuItem value="">All</MenuItem>
                         {Array.from(
                           new Set(deals.map((d) => d.Finsh?.[lang]))
-                        ).map((finsh) => (
-                          <MenuItem key={finsh} value={finsh}>
-                            {finsh}
+                        ).map((Finsh) => (
+                          <MenuItem key={Finsh} value={Finsh}>
+                            {Finsh}
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
                   </Grid>
 
-                  {/* Sale Filter */}
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth sx={{ minWidth: 200 }}>
                       <InputLabel>Sale</InputLabel>
@@ -406,7 +420,6 @@ function MaverickDeals() {
                     </FormControl>
                   </Grid>
 
-                  {/* Money Type Filter */}
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth sx={{ minWidth: 200 }}>
                       <InputLabel>Money Type</InputLabel>
@@ -432,7 +445,6 @@ function MaverickDeals() {
                     </FormControl>
                   </Grid>
 
-                  {/* Compound Name Filter */}
                   <Grid item xs={12} sm={6} md={3}>
                     <FormControl fullWidth sx={{ minWidth: 200 }}>
                       <InputLabel>Compound</InputLabel>
@@ -448,7 +460,7 @@ function MaverickDeals() {
                       >
                         <MenuItem value="">All</MenuItem>
                         {Array.from(
-                          new Set(deals.map((d) => d.CompoundName?.[lang]))
+                          new Set(deals.map((d) => d.compoundName?.[lang]))
                         ).map((compound, index) => (
                           <MenuItem key={index} value={compound}>
                             {compound}
@@ -458,7 +470,6 @@ function MaverickDeals() {
                     </FormControl>
                   </Grid>
 
-                  {/* Price Range Slider */}
                 </Grid>
                 <Grid container spacing={4} sx={{ p: "20px" }}>
                   <Grid item size={{ xs: 12, sm: 6 }} sx={{ flexGrow: 1 }}>
@@ -487,7 +498,7 @@ function MaverickDeals() {
                 </Grid>
               </Stack>
             </Container>
-          </SwipeableDrawer>
+          </SwipeableDrawer> */}
 
           {/* ✅ عرض الكروت */}
           <Row>

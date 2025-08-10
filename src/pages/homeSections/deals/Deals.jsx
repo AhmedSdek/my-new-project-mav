@@ -26,6 +26,7 @@ import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useGlobal } from "../../../context/GlobalContext";
 import ReactLoading from "react-loading";
+import Skeltoon from "../../../comp/skeltoon/Skeltoon";
 
 function Deals() {
   const [deals, setDeals] = useState([]);
@@ -83,15 +84,11 @@ function Deals() {
             }}
             spaceBetween={10}
             breakpoints={{
-              640: {
-                slidesPerView: 1,
-                spaceBetween: 10,
-              },
-              768: {
+              600: {
                 slidesPerView: 2,
                 spaceBetween: 10,
               },
-              1024: {
+              900: {
                 slidesPerView: 3,
                 spaceBetween: 10,
               },
@@ -103,14 +100,7 @@ function Deals() {
             className="mydealSwiper"
           >
             {loading ? (
-              <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
-                <ReactLoading
-                  color="black"
-                  type={"spin"}
-                  height={"50px"}
-                  width={"50px"}
-                />
-              </Stack>
+              <Skeltoon Xs={1} Sm={2} Md={3} lg={3} height={430} width="100%" />
             ) : deals && deals.length > 0 ? (
               deals.map((col, index) => {
                 return (
