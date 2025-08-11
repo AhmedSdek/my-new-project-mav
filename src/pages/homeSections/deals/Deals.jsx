@@ -100,7 +100,15 @@ function Deals() {
             className="mydealSwiper"
           >
             {loading ? (
-              <Skeltoon Xs={1} Sm={2} Md={3} lg={3} height={430} width="100%" />
+              <Skeltoon
+                Xs={1}
+                Sm={2}
+                Md={3}
+                lg={3}
+                height={430}
+                width="100%"
+                variant="rounded"
+              />
             ) : deals && deals.length > 0 ? (
               deals.map((col, index) => {
                 return (

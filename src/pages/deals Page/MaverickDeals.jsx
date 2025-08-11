@@ -55,8 +55,6 @@ function MaverickDeals() {
     compoundName: "",
     search: "", // 🔍 هنا السيرش
   });
-  const [openFilterDrawer, setOpenFilterDrawer] = useState(false);
-
   useEffect(() => {
     const fetchDeals = async () => {
       try {
@@ -199,9 +197,7 @@ function MaverickDeals() {
             data={deals}
             filters={filters}
             lang={lang}
-            openFilterDrawer={openFilterDrawer}
             setFilters={setFilters}
-            setOpenFilterDrawer={setOpenFilterDrawer}
             label={label}
           />
 

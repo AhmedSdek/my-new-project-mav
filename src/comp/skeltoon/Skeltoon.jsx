@@ -1,13 +1,14 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 
-function Skeltoon({ height, width, Xs, Sm, Md, lg }) {
+function Skeltoon({ height, width, Xs, Sm, Md, lg, variant }) {
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.only("xs"));
   const isSm = useMediaQuery(theme.breakpoints.only("sm"));
   const isMdUp = useMediaQuery(theme.breakpoints.only("md"));
   const islg = useMediaQuery(theme.breakpoints.only("lg"));
   let skeltonCount = 1;
+  if (isXs) skeltonCount = Xs;
   if (isSm) skeltonCount = Sm;
   if (isMdUp) skeltonCount = Md;
   if (islg) skeltonCount = lg;
@@ -27,7 +28,7 @@ function Skeltoon({ height, width, Xs, Sm, Md, lg }) {
         >
           <Skeleton
             height={height}
-            variant="rounded"
+            variant={variant}
             sx={{ width: { xs: width, sm: "100%" }, maxWidth: "100%" }}
           />
         </Grid>

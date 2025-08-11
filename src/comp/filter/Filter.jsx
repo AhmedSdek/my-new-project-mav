@@ -1,5 +1,6 @@
 import { Close, Tune } from "@mui/icons-material";
 import {
+  Box,
   Container,
   FormControl,
   Grid,
@@ -13,17 +14,36 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 
-function Filter({
-  data,
-  lang,
-  setOpenFilterDrawer,
-  openFilterDrawer,
-  setFilters,
-  filters,
-  label,
-}) {
+function Filter({ data, lang, setFilters, filters, label }) {
+  const [open, setOpen] = useState(false);
+  const [dragProgress, setDragProgress] = useState(0); // 0 = خط, 1 = مثلث
+  const [startY, setStartY] = useState(null);
+
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
+    setDragProgress(0);
+    setStartY(null);
+  };
+
+  const handleTouchStart = (e) => {
+    setStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e) => {
+    if (startY !== null) {
+      const distance = e.touches[0].clientY - startY;
+      const progress = Math.min(Math.max(distance / 100, 0), 1); // بين 0 و 1
+      setDragProgress(progress);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setStartY(null);
+    setDragProgress(0); // يرجع خط بعد ما يسيب
+  };
+
   const handleSliderChange = (type) => (event, newValue) => {
     setFilters((prev) => ({ ...prev, [type]: newValue }));
   };
@@ -47,7 +67,7 @@ function Filter({
           }
         />
         <IconButton
-          onClick={() => setOpenFilterDrawer(true)}
+          onClick={toggleDrawer(true)}
           sx={{
             borderRadius: 1,
             width: 40,
@@ -62,12 +82,39 @@ function Filter({
         </IconButton>
       </Stack>
       <SwipeableDrawer
+        PaperProps={{
+          sx: {
+            borderRadius: "20px 20px 0 0",
+          },
+        }}
         anchor="bottom"
-        open={openFilterDrawer}
-        onClose={() => setOpenFilterDrawer(false)}
-        onOpen={() => setOpenFilterDrawer(true)}
+        open={open}
+        onClose={toggleDrawer(false)}
+        onOpen={toggleDrawer(true)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <Container>
+          <Stack
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingTop: "13px",
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 6 + dragProgress * 8, // يكبر شوية أثناء السحب
+                background: "grey",
+                borderRadius: `${4 - dragProgress * 4}px ${
+                  4 - dragProgress * 4
+                }px ${dragProgress * 12}px ${dragProgress * 12}px`, // الحواف السفلية تنزل لتحت تدريجيًا
+                transition: startY ? "none" : "all 0.3s ease",
+              }}
+            />
+          </Stack>
           <Stack sx={{ padding: "10px" }}>
             <Stack
               sx={{
@@ -79,7 +126,7 @@ function Filter({
               }}
             >
               <IconButton
-                onClick={() => setOpenFilterDrawer(false)}
+                onClick={() => toggleDrawer(false)}
                 sx={{
                   borderRadius: 1,
                   width: 40,

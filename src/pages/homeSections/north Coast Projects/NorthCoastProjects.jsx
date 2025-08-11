@@ -64,7 +64,15 @@ function NorthCoastProjects() {
           </Link>
         </Stack>
         {loading ? (
-          <Skeltoon Xs={1} Sm={2} Md={3} lg={3} height={225} width={393} />
+          <Skeltoon
+            Xs={1}
+            Sm={2}
+            Md={3}
+            lg={3}
+            height={225}
+            width={393}
+            variant="rounded"
+          />
         ) : northCoast && northCoast.length > 0 ? (
           <Stack>
             <Swiper

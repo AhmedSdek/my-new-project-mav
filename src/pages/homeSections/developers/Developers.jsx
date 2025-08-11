@@ -15,6 +15,7 @@ import { Container, Stack, Typography } from "@mui/material";
 import { useGlobal } from "../../../context/GlobalContext";
 import ReactLoading from "react-loading";
 import { useTranslation } from "react-i18next";
+import Skeltoon from "../../../comp/skeltoon/Skeltoon";
 
 export default function Developers() {
   const [developers, setDevelopers] = useState([]);
@@ -66,23 +67,19 @@ export default function Developers() {
           </Link>
         </Stack>
         {loading ? (
-          <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
-            <ReactLoading
-              color="black"
-              type={"spin"}
-              height={"50px"}
-              width={"50px"}
-            />
-          </Stack>
+          <Skeltoon
+            Xs={2}
+            Sm={2}
+            Md={3}
+            lg={4}
+            height={126}
+            width={126}
+            variant="circular"
+          />
         ) : developers && developers.length > 0 ? (
           <Swiper
             slidesPerView={7}
-            // spaceBetween={30}
             freeMode={true}
-            // pagination={{
-            //   clickable: true,
-            //   dynamicBullets: true
-            // }}
             style={{ margin: "20px 0" }}
             autoplay={{
               delay: 2500,
