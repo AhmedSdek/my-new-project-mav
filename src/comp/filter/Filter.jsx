@@ -126,7 +126,7 @@ function Filter({ data, lang, setFilters, filters, label }) {
               }}
             >
               <IconButton
-                onClick={() => toggleDrawer(false)}
+                onClick={toggleDrawer(false)}
                 sx={{
                   borderRadius: 1,
                   width: 40,
