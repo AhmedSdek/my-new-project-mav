@@ -38,7 +38,7 @@ import im from "./2238332.png";
 import Filter from "../../comp/filter/Filter";
 function MaverickDeals() {
   const [deals, setDeals] = useState([]);
-  console.log(deals);
+  // console.log(deals);
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const [loading, setLoading] = useState(true);
@@ -55,6 +55,20 @@ function MaverickDeals() {
     compoundName: "",
     search: "", // 🔍 هنا السيرش
   });
+  const defaultFilters = useMemo(() => {
+    return {
+      price: [0, 10000000],
+      area: [0, 10000],
+      type: "",
+      bed: "",
+      bath: "",
+      Finsh: "",
+      sale: "",
+      monyType: "",
+      compoundName: "",
+      search: "", // 🔍 هنا السيرش
+    };
+  }, []);
   useEffect(() => {
     const fetchDeals = async () => {
       try {
@@ -199,6 +213,8 @@ function MaverickDeals() {
             lang={lang}
             setFilters={setFilters}
             label={label}
+            length={filteredDeals}
+            defaultFilters={defaultFilters}
           />
 
           {/* <Stack
