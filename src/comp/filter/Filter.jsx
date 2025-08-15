@@ -108,95 +108,84 @@ function Filter({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <Container>
-          <Stack
+        <Stack
+          sx={{
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: "13px",
+          }}
+        >
+          <Box
             sx={{
-              justifyContent: "center",
-              alignItems: "center",
-              paddingTop: "13px",
+              width: 40,
+              height: 6 + dragProgress * 8, // يكبر شوية أثناء السحب
+              background: "grey",
+              borderRadius: `${4 - dragProgress * 4}px ${
+                4 - dragProgress * 4
+              }px ${dragProgress * 12}px ${dragProgress * 12}px`, // الحواف السفلية تنزل لتحت تدريجيًا
+              transition: startY ? "none" : "all 0.3s ease",
+            }}
+          />
+        </Stack>
+        {/* ===== Header ثابت ===== */}
+        <Box
+          sx={{
+            flexShrink: 0,
+            padding: "15px",
+            borderBottom: "1px solid #ddd",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: "materialBold",
+              fontSize: "20px",
+              color: "rgb(30, 65, 100)",
+              textTransform: "uppercase",
+              letterSpacing: "4.14px",
             }}
           >
-            <Box
-              sx={{
-                width: 40,
-                height: 6 + dragProgress * 8, // يكبر شوية أثناء السحب
-                background: "grey",
-                borderRadius: `${4 - dragProgress * 4}px ${
-                  4 - dragProgress * 4
-                }px ${dragProgress * 12}px ${dragProgress * 12}px`, // الحواف السفلية تنزل لتحت تدريجيًا
-                transition: startY ? "none" : "all 0.3s ease",
-              }}
-            />
-          </Stack>
-          <Stack sx={{ padding: "10px" }}>
-            <Stack
-              sx={{
-                flexDirection: "row",
-                justifyContent: "start",
-                alignItems: "center",
-                gap: 2,
-                padding: "15px",
-              }}
-            >
-              <IconButton
-                onClick={() => toggleDrawer(false)}
-                sx={{
-                  borderRadius: 1,
-                  width: 40,
-                  height: 40,
-                  backgroundColor: "#f5f5f5",
-                  "&:hover": {
-                    backgroundColor: "#e0e0e0",
-                  },
-                }}
-              >
-                <Close color="error" />
-              </IconButton>
-              <Typography
-                sx={{
-                  fontFamily: "materialBold",
-                  fontSize: "20px",
-                  color: "rgb(30, 65, 100)",
-                  textTransform: "uppercase",
-                  letterSpacing: "4.14px",
-                }}
-              >
-                {lang === "ar" ? "خيارات البحث" : "Filter options"}
-              </Typography>
-            </Stack>
-            <Grid
-              container
-              spacing={4}
-              sx={{
-                px: 4,
-                justifyContent: { xs: "center", md: "initial" },
-              }}
-            >
-              {/* Type Filter */}
-              <Grid item xs={12} sm={6} md={3}>
-                <FormControl fullWidth sx={{ minWidth: 200 }}>
-                  <InputLabel>Type</InputLabel>
-                  <Select
-                    label="Type"
-                    value={filters.type}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        type: e.target.value,
-                      }))
-                    }
-                  >
-                    <MenuItem value="">All</MenuItem>
-                    {Array.from(new Set(data.map((d) => d.Type?.[lang]))).map(
-                      (type) => (
-                        <MenuItem key={type} value={type}>
-                          {type}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
-                </FormControl>
-              </Grid>
+            {lang === "ar" ? "خيارات البحث" : "Filter options"}
+          </Typography>
+        </Box>
+
+        <Stack sx={{ flexGrow: 1, overflowY: "auto", padding: "20px" }}>
+          <Grid
+            container
+            spacing={4}
+            sx={{
+              px: 4,
+              justifyContent: { xs: "center", md: "initial" },
+            }}
+          >
+            {/* Type Filter */}
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl fullWidth sx={{ minWidth: 200 }}>
+                <InputLabel>Type</InputLabel>
+                <Select
+                  label="Type"
+                  value={filters.type}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      type: e.target.value,
+                    }))
+                  }
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {Array.from(new Set(data.map((d) => d.Type?.[lang]))).map(
+                    (type) => (
+                      <MenuItem key={type} value={type}>
+                        {type}
+                      </MenuItem>
+                    )
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
 
             {/* Bedrooms Filter */}
             <Grid item xs={12} sm={6} md={3}>
